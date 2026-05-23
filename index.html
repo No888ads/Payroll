@@ -261,7 +261,7 @@
         <button class="tab-btn active" onclick="switchTab('otPage', this)">OT & PH Claim</button>
         <button class="tab-btn" onclick="switchTab('resignPage', this)">Resignation</button>
         <button class="tab-btn" onclick="switchTab('absentPage', this)">Absent Deduct</button>
-        <button class="tab-btn" onclick="switchTab('calendarPage', this)">HR Calendar in maintenance</button>
+        <button class="tab-btn" onclick="switchTab('calendarPage', this)">HR Calendar</button>
     </div>
 
     <div id="otPage" class="page active">
@@ -269,10 +269,13 @@
         
         <div class="radio-toggle">
             <label class="radio-label">
-                <input type="radio" name="claimMode" value="minutesOt" checked onchange="toggleClaimMode()"> Overtime (Minutes Tracker)
+                <input type="radio" name="claimMode" value="minutesOt" checked onchange="toggleClaimMode()"> Overtime (Minutes Tracker - 1.5x)
             </label>
             <label class="radio-label">
-                <input type="radio" name="claimMode" value="phDoublePay" onchange="toggleClaimMode()"> Public Holiday (Double Pay)
+                <input type="radio" name="claimMode" value="negativeOt" onchange="toggleClaimMode()"> Negative OT (Minutes Tracker - 1.0x)
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="claimMode" value="phDoublePay" onchange="toggleClaimMode()"> Public Holiday (Double Pay - 2.0x)
             </label>
         </div>
 
@@ -283,7 +286,7 @@
 
         <div id="otMinutesInputGroup">
             <div class="input-group">
-                <label>Overtime Duration (Minutes Per Day)</label>
+                <label id="minutesGroupLabel">Overtime Duration (Minutes Per Day)</label>
                 <div id="otRowsContainer">
                     <div class="ot-row">
                         <input type="number" class="ot-minutes" placeholder="Enter minutes & press Enter" min="0" onkeydown="checkEnter(event)">
@@ -301,12 +304,12 @@
             </div>
         </div>
 
-        <button class="btn-calc" onclick="calculateClaim()">Calculate Earnings</button>
+        <button class="btn-calc" onclick="calculateClaim()">Calculate Amount</button>
 
-        <div class="result-section" id="otResultSection" style="background-color: #f0fdf4; border: 1px solid #bbf7d0;">
+        <div class="result-section" id="otResultSection">
             <div class="total-hours-text" id="claimSummaryText" style="font-size: 13px; color: #4b5563; margin-bottom: 8px;">Total Breakdown</div>
-            <h3 style="color: #166534; font-size: 14px; margin-bottom: 6px; text-transform: uppercase;" id="claimResultTitle">Estimated Earnings</h3>
-            <p class="result-amount" style="color: #15803d;" id="totalOt">RM 0.00</p>
+            <h3 style="font-size: 14px; margin-bottom: 6px; text-transform: uppercase;" id="claimResultTitle">Estimated Amount</h3>
+            <p class="result-amount" id="totalOt">RM 0.00</p>
         </div>
     </div>
 
@@ -428,12 +431,17 @@
 
     function toggleClaimMode() {
         const mode = document.querySelector('input[name="claimMode"]:checked').value;
-        if (mode === 'minutesOt') {
-            document.getElementById('otMinutesInputGroup').style.display = 'block';
-            document.getElementById('phDaysInputGroup').style.display = 'none';
+        const minutesGroup = document.getElementById('otMinutesInputGroup');
+        const phGroup = document.getElementById('phDaysInputGroup');
+        const labelText = document.getElementById('minutesGroupLabel');
+
+        if (mode === 'minutesOt' || mode === 'negativeOt') {
+            minutesGroup.style.display = 'block';
+            phGroup.style.display = 'none';
+            labelText.innerText = mode === 'minutesOt' ? "Overtime Duration (Minutes Per Day)" : "Negative OT Duration (Minutes Per Day)";
         } else {
-            document.getElementById('otMinutesInputGroup').style.display = 'none';
-            document.getElementById('phDaysInputGroup').style.display = 'block';
+            minutesGroup.style.display = 'none';
+            phGroup.style.display = 'block';
         }
     }
 
@@ -455,7 +463,7 @@
         }
     }
 
-    // ================= OT & PH CLAIM CORE =================
+    // ================= OT, NEGATIVE OT & PH CLAIM CORE =================
     function addRow() {
         const container = document.getElementById('otRowsContainer');
         const newRow = document.createElement('div');
@@ -477,34 +485,55 @@
         if (isNaN(salary)) { alert("Please enter a valid basic salary."); return; }
         
         const mode = document.querySelector('input[name="claimMode"]:checked').value;
+        const resultSection = document.getElementById('otResultSection');
         let finalPay = 0;
 
-        if (mode === 'minutesOt') {
+        const ratePerDay = salary / 26;
+        const ratePerHour = ratePerDay / 7.5;
+        const ratePerMinute = ratePerHour / 60;
+
+        if (mode === 'minutesOt' || mode === 'negativeOt') {
             let totalMinutes = 0;
             document.querySelectorAll('.ot-minutes').forEach(input => { totalMinutes += parseFloat(input.value) || 0; });
             
-            // --- IMPLEMENTASI FORMULA UTAMA AWAK ---
-            // basic / 26 -> jawapan / 7.5 -> jawapan / 60 -> darab 1.5 -> darab total minit ot
-            const ratePerDay = salary / 26;
-            const ratePerHour = ratePerDay / 7.5;
-            const ratePerMinute = ratePerHour / 60;
-            
-            finalPay = ratePerMinute * 1.5 * totalMinutes;
-
-            document.getElementById('claimSummaryText').innerText = `Total OT Time: ${totalMinutes} mins (Calculated at 7.5 hrs/day baseline)`;
-            document.getElementById('claimResultTitle').innerText = "Estimated OT Earnings";
+            if (mode === 'minutesOt') {
+                // Normal OT: multiplier 1.5x
+                finalPay = ratePerMinute * 1.5 * totalMinutes;
+                document.getElementById('claimSummaryText').innerText = `Total OT Time: ${totalMinutes} mins (Multiplier 1.5x Active)`;
+                document.getElementById('claimResultTitle').innerText = "Estimated OT Earnings";
+                
+                // Visual Theme: Soft Green for positive claims
+                resultSection.style.backgroundColor = "#f0fdf4"; resultSection.style.borderColor = "#bbf7d0";
+                document.getElementById('claimResultTitle').style.color = "#166534";
+                document.getElementById('totalOt').style.color = "#15803d";
+            } else {
+                // Negative OT: multiplier 1.0x
+                finalPay = ratePerMinute * 1.0 * totalMinutes;
+                document.getElementById('claimSummaryText').innerText = `Total Negative OT Time: ${totalMinutes} mins (Rate 1.0x Active)`;
+                document.getElementById('claimResultTitle').innerText = "Total Negative OT Deduction";
+                
+                // Visual Theme: Light Amber/Orange for deductions
+                resultSection.style.backgroundColor = "#fffbeb"; resultSection.style.borderColor = "#fef3c7";
+                document.getElementById('claimResultTitle').style.color = "#92400e";
+                document.getElementById('totalOt').style.color = "#b45309";
+            }
         } else {
+            // PH Double Pay
             const phDays = parseInt(document.getElementById('phDaysWorked').value) || 0;
             if(phDays <= 0) { alert("Please enter the number of PH days worked."); return; }
             
-            finalPay = (salary / 26) * phDays * 2.0;
-
+            finalPay = ratePerDay * phDays * 2.0;
             document.getElementById('claimSummaryText').innerText = `Total PH Days Worked: ${phDays} Days (Double Pay Active)`;
             document.getElementById('claimResultTitle').innerText = "Public Holiday Earnings";
+            
+            // Visual Theme: Soft Green
+            resultSection.style.backgroundColor = "#f0fdf4"; resultSection.style.borderColor = "#bbf7d0";
+            document.getElementById('claimResultTitle').style.color = "#166534";
+            document.getElementById('totalOt').style.color = "#15803d";
         }
 
         document.getElementById('totalOt').innerText = "RM " + finalPay.toFixed(2);
-        document.getElementById('otResultSection').style.display = 'block';
+        resultSection.style.display = 'block';
     }
 
     // ================= RESIGNATION CORE =================
