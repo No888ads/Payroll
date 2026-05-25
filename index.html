@@ -411,6 +411,7 @@
 
 <script>
     let currentNavDate = new Date(); 
+    let remindersArray = JSON.parse(localStorage.getItem('hrReminders')) || [];
 
     window.onload = function() {
         const todayStr = new Date().toISOString().split('T')[0];
@@ -421,9 +422,7 @@
         renderVisualCalendar();
         
         // --- REALTIME ALERTS POLLING CLOCK ENGINE ---
-        // Jalankan semakan tarikh + masa serta-merta sebaik fail dibuka
         checkAndTriggerBotAlerts(); 
-        // Lakukan semakan automatik berterusan di latar belakang setiap 60 saat (1 minit) tanpa henti
         setInterval(checkAndTriggerBotAlerts, 60000); 
     };
 
@@ -593,8 +592,6 @@
     }
 
     // ================= HR VISUAL SCHEDULER CALENDAR & BOT WEBHOOK =================
-    let remindersArray = JSON.parse(localStorage.getItem('hrReminders')) || [];
-
     function changeMonth(direction) {
         currentNavDate.setMonth(currentNavDate.getMonth() + direction);
         renderVisualCalendar();
@@ -602,11 +599,10 @@
 
     function addReminder() {
         const dateVal = document.getElementById('reminderDate').value;
-        const timeVal = document.getElementById('reminderTime').value; // Ambil nilai masa HH:MM
+        const timeVal = document.getElementById('reminderTime').value; 
         const textVal = document.getElementById('reminderTitle').value;
         if (!dateVal || !timeVal || !textVal.trim()) return;
 
-        // Ditambah property 'time' ke dalam struktur objek database local
         const newEvent = { id: Date.now(), date: dateVal, time: timeVal, message: textVal, alerted: false };
         remindersArray.push(newEvent);
         localStorage.setItem('hrReminders', JSON.stringify(remindersArray));
@@ -623,46 +619,43 @@
         renderVisualCalendar();
     }
 
+    // --- DIKEMAS KINI: PENERIMAAN KAEDAH WEBHOOK FORMDATA ANTI-BLOCKING ---
     function hantarKeBotWhatsApp(message, date, time) {
         const cleanDate = new Date(date).toLocaleDateString('en-MY', { year: 'numeric', month: 'short', day: 'numeric' });
         
-        // Penukaran format paparan masa ke format 12-Jam AM/PM untuk pembacaan bot yang kemas
         const [hours, minutes] = time.split(':');
         const ampm = hours >= 12 ? 'PM' : 'AM';
         const formattedTime = `${hours % 12 || 12}:${minutes} ${ampm}`;
         
         const textMessage = `📢 *HR TASK ALERT SYSTEM*\n\n📅 *Date:* ${cleanDate}\n⏰ *Time:* ${formattedTime}\n📝 *Task To Do:* ${message}\n\n_Generated automatically via Noel Ethan Dashboard Scheduler_`;
 
-        // =========================================================================
-        // CONFIG UTAMA: Hubungkan konfigurasi token Fonnte / API milik awak di sini
-        // =========================================================================
-        const BOT_API_URL = "https://api.fonnte.com/send"; 
         const BOT_TOKEN = "71SME9mMhVBZgB7awkZQ";       
         const GROUP_ID = "HZIfA2IJrdjAzx23WXsZaP";        
 
-        fetch(BOT_API_URL, {
+        // Menggunakan FormData bagi menyelesaikan isu CORS Policy browser desktop
+        const formData = new FormData();
+        formData.append('target', GROUP_ID);
+        formData.append('message', textMessage);
+        formData.append('countryCode', '60'); 
+
+        fetch("https://api.fonnte.com/send", {
             method: 'POST',
             headers: {
-                'Authorization': BOT_TOKEN,
-                'Content-Type': 'application/json'
+                'Authorization': BOT_TOKEN
             },
-            body: JSON.stringify({
-                target: GROUP_ID,
-                message: textMessage
-            })
+            body: formData
         })
-        .then(response => console.log("Bot trigger push status:", response.status))
+        .then(response => response.json())
+        .then(result => {
+            console.log("Fonnte API Webhook Pipeline Out:", result);
+        })
         .catch(error => console.error("Webhook gateway configuration error:", error));
     }
 
-    // ENGINE UTAMA: Fungsi semak jam dan tarikh secara 'Live' setiap minit
     function checkAndTriggerBotAlerts() {
         const now = new Date();
-        
-        // Tukar zon waktu semasa PC kepada format string YYYY-MM-DD
         const todayStr = now.toISOString().split('T')[0];
         
-        // Ambil waktu semasa PC dalam format HH:MM (24-jam)
         const currentHours = String(now.getHours()).padStart(2, '0');
         const currentMinutes = String(now.getMinutes()).padStart(2, '0');
         const currentTimeStr = `${currentHours}:${currentMinutes}`;
@@ -670,12 +663,9 @@
         let stateUpdated = false;
 
         remindersArray.forEach(item => {
-            // Syarat penembusan bot: Mestilah tarikh HARI INI + masa SEKARANG + bot BELUM PERNAH hantar lagi
             if (item.date === todayStr && item.time === currentTimeStr && !item.alerted) {
-                item.alerted = true; // Kunci status serta-merta untuk elak duplikasi penghantaran
+                item.alerted = true; 
                 stateUpdated = true;
-                
-                // Tembak draf mesej ke gateway bot
                 hantarKeBotWhatsApp(item.message, item.date, item.time);
             }
         });
@@ -730,7 +720,6 @@
             if(loopDateStr === todayStr) cell.classList.add('today');
             cell.innerHTML = `<div class="cell-number">${day}</div>`;
 
-            // Filter task dan susun mengikut urutan masa terawal
             const dayEvents = remindersArray.filter(item => item.date === loopDateStr);
             dayEvents.sort((a, b) => a.time.localeCompare(b.time));
 
@@ -739,7 +728,6 @@
                 tag.className = 'calendar-event-tag';
                 if (evt.alerted) tag.classList.add('triggered'); 
                 
-                // Paparkan draf masa ringkas pada kotak kalendar visual (cth: "09:00 - Task Name")
                 tag.innerHTML = `
                     <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                         <strong>${evt.time}</strong> ${evt.message}
