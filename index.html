@@ -603,13 +603,16 @@
         const textVal = document.getElementById('reminderTitle').value;
         if (!dateVal || !timeVal || !textVal.trim()) return;
 
-        const newEvent = { id: Date.now(), date: dateVal, time: timeVal, message: textVal, alerted: false };
+        // Set 'alerted: true' masa mula simpan supaya enjin pengunduran minit latar belakang tak hantar dua kali
+        const newEvent = { id: Date.now(), date: dateVal, time: timeVal, message: textVal, alerted: true };
         remindersArray.push(newEvent);
         localStorage.setItem('hrReminders', JSON.stringify(remindersArray));
         
         document.getElementById('reminderTitle').value = '';
         renderVisualCalendar();
-        checkAndTriggerBotAlerts(); 
+        
+        // PENCETAN INSTANT: Serta-merta lepaskan Webhook terus ke group sekarang!
+        hantarKeBotWhatsApp(textVal, dateVal, timeVal);
     }
 
     function removeEvent(id, event) {
@@ -619,7 +622,6 @@
         renderVisualCalendar();
     }
 
-    // --- DIKEMAS KINI: PENERIMAAN KAEDAH WEBHOOK FORMDATA ANTI-BLOCKING ---
     function hantarKeBotWhatsApp(message, date, time) {
         const cleanDate = new Date(date).toLocaleDateString('en-MY', { year: 'numeric', month: 'short', day: 'numeric' });
         
@@ -629,10 +631,13 @@
         
         const textMessage = `📢 *HR TASK ALERT SYSTEM*\n\n📅 *Date:* ${cleanDate}\n⏰ *Time:* ${formattedTime}\n📝 *Task To Do:* ${message}\n\n_Generated automatically via Noel Ethan Dashboard Scheduler_`;
 
+        // =========================================================================
+        // DATA RASMI NOEL ETHAN YANG SUDAH BERJAYA DIHUBUNGKAN SEPENUHNYA
+        // =========================================================================
         const BOT_TOKEN = "71SME9mMhVBZgB7awkZQ";       
-        const GROUP_ID = "HZIfA2IJrdjAzx23WXsZaP";        
+        const GROUP_ID = "120363410088755340@g.us";        
 
-        // Menggunakan FormData bagi menyelesaikan isu CORS Policy browser desktop
+        // Menggunakan kaedah FormData Pipeline bagi menghancurkan sekatan CORS Policy desktop browser
         const formData = new FormData();
         formData.append('target', GROUP_ID);
         formData.append('message', textMessage);
@@ -647,9 +652,9 @@
         })
         .then(response => response.json())
         .then(result => {
-            console.log("Fonnte API Webhook Pipeline Out:", result);
+            console.log("Fonnte API Webhook Result Logged:", result);
         })
-        .catch(error => console.error("Webhook gateway configuration error:", error));
+        .catch(error => console.error("Webhook gateway pipeline configuration error:", error));
     }
 
     function checkAndTriggerBotAlerts() {
