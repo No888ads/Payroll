@@ -235,12 +235,13 @@
 
         .calendar-cell {
             background-color: #ffffff;
-            min-height: 85px;
+            min-height: 95px;
             padding: 4px;
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            overflow: hidden;
         }
 
         .calendar-cell.today { background-color: #eff6ff; border: 2px solid #3b82f6; }
@@ -250,20 +251,18 @@
         .calendar-event-tag {
             background-color: #3b82f6;
             color: white;
-            font-size: 10px;
+            font-size: 9px;
             padding: 2px 4px;
             border-radius: 3px;
             margin-bottom: 2px;
             font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            line-height: 1.2;
         }
 
-        .calendar-event-tag.triggered { background-color: #10b981; } /* Turns green when Bot successfully pushed data */
+        .calendar-event-tag.triggered { background-color: #10b981; } /* Turns green when Bot blast is sent */
 
         .event-delete-x {
             font-size: 9px; margin-left: 3px; background: rgba(0,0,0,0.2); 
@@ -379,12 +378,16 @@
         <h2>HR Task Scheduler View</h2>
         
         <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-            <div style="display: flex; gap: 10px;">
-                <div class="input-group" style="flex: 1; margin-bottom: 0;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div class="input-group" style="flex: 1; min-width: 140px; margin-bottom: 0;">
                     <label for="reminderDate">Event Date</label>
                     <input type="date" id="reminderDate">
                 </div>
-                <div class="input-group" style="flex: 2; margin-bottom: 0;">
+                <div class="input-group" style="flex: 1; min-width: 110px; margin-bottom: 0;">
+                    <label for="reminderTime">Event Time</label>
+                    <input type="time" id="reminderTime" value="09:00">
+                </div>
+                <div class="input-group" style="flex: 2; min-width: 200px; margin-bottom: 0;">
                     <label for="reminderTitle">Task / Event Description Note</label>
                     <input type="text" id="reminderTitle" placeholder="e.g., Final Run (Payroll Data)">
                 </div>
@@ -416,7 +419,12 @@
         if(document.getElementById('reminderDate')) document.getElementById('reminderDate').value = todayStr;
         
         renderVisualCalendar();
-        checkAndTriggerBotAlerts(); // Auto check latar belakang & blast ke Bot API
+        
+        // --- REALTIME ALERTS POLLING CLOCK ENGINE ---
+        // Jalankan semakan tarikh + masa serta-merta sebaik fail dibuka
+        checkAndTriggerBotAlerts(); 
+        // Lakukan semakan automatik berterusan di latar belakang setiap 60 saat (1 minit) tanpa henti
+        setInterval(checkAndTriggerBotAlerts, 60000); 
     };
 
     function switchTab(pageId, btn) {
@@ -455,7 +463,7 @@
             document.getElementById('noticeDurationGroup').style.display = 'block';
         } else if (mode === 'findDiff') {
             document.getElementById('standardNoticeDatesGroup').style.display = 'block';
-            document.getElementById('lastDayTargetDayTargetGroup').style.display = 'block';
+            document.getElementById('lastDayTargetGroup').style.display = 'block';
         } else if (mode === 'shortNotice') {
             document.getElementById('shortNoticeGroup').style.display = 'block';
         } else if (mode === 'ytdRefund') {
@@ -594,10 +602,12 @@
 
     function addReminder() {
         const dateVal = document.getElementById('reminderDate').value;
+        const timeVal = document.getElementById('reminderTime').value; // Ambil nilai masa HH:MM
         const textVal = document.getElementById('reminderTitle').value;
-        if (!dateVal || !textVal.trim()) return;
+        if (!dateVal || !timeVal || !textVal.trim()) return;
 
-        const newEvent = { id: Date.now(), date: dateVal, message: textVal, alerted: false };
+        // Ditambah property 'time' ke dalam struktur objek database local
+        const newEvent = { id: Date.now(), date: dateVal, time: timeVal, message: textVal, alerted: false };
         remindersArray.push(newEvent);
         localStorage.setItem('hrReminders', JSON.stringify(remindersArray));
         
@@ -613,21 +623,23 @@
         renderVisualCalendar();
     }
 
-    // --- LOGIK BACKEND WEBHOOK PUSH TO BOT INTERFACES ---
-    function hantarKeBotWhatsApp(message, date) {
+    function hantarKeBotWhatsApp(message, date, time) {
         const cleanDate = new Date(date).toLocaleDateString('en-MY', { year: 'numeric', month: 'short', day: 'numeric' });
         
-        // Format teks kemas untuk draf mesej dalam Group WhatsApp
-        const textMessage = `📢 *HR TASK ALERT SYSTEM*\n\n📅 *Date:* ${cleanDate}\n📝 *Task To Do:* ${message}\n\n_Generated automatically via Noel Ethan Dashboard Scheduler_`;
+        // Penukaran format paparan masa ke format 12-Jam AM/PM untuk pembacaan bot yang kemas
+        const [hours, minutes] = time.split(':');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedTime = `${hours % 12 || 12}:${minutes} ${ampm}`;
+        
+        const textMessage = `📢 *HR TASK ALERT SYSTEM*\n\n📅 *Date:* ${cleanDate}\n⏰ *Time:* ${formattedTime}\n📝 *Task To Do:* ${message}\n\n_Generated automatically via Noel Ethan Dashboard Scheduler_`;
 
         // =========================================================================
-        // PLACEHOLDER CONFIG: Gantikan parameter ini mengikut API Bot yang awak sewa
+        // CONFIG UTAMA: Hubungkan konfigurasi token Fonnte / API milik awak di sini
         // =========================================================================
-        const BOT_API_URL = "https://api.fonnte.com/send"; // Contoh URL API Fonnte / GreenAPI
-        const BOT_TOKEN = "71SME9mMhVBZgB7awkZQ";       // API Token/Key akses keselamatan
-        const GROUP_ID = "HZIfA2IJrdjAzx23WXsZaP";        // ID Group sasaran bot
+        const BOT_API_URL = "https://api.fonnte.com/send"; 
+        const BOT_TOKEN = "71SME9mMhVBZgB7awkZQ";       
+        const GROUP_ID = "HZIfA2IJrdjAzx23WXsZaP";        
 
-        // Menghantar data senyap di latar belakang menggunakan Fetch API (POST request)
         fetch(BOT_API_URL, {
             method: 'POST',
             headers: {
@@ -639,27 +651,32 @@
                 message: textMessage
             })
         })
-        .then(response => {
-            console.log("Bot push status logged:", response.status);
-        })
-        .catch(error => {
-            console.error("Webhook gateway pipeline broken:", error);
-        });
+        .then(response => console.log("Bot trigger push status:", response.status))
+        .catch(error => console.error("Webhook gateway configuration error:", error));
     }
 
-    // Fungsi semak tarikh hari ini sewaktu dashboard dibuka
+    // ENGINE UTAMA: Fungsi semak jam dan tarikh secara 'Live' setiap minit
     function checkAndTriggerBotAlerts() {
-        const todayStr = new Date().toISOString().split('T')[0];
+        const now = new Date();
+        
+        // Tukar zon waktu semasa PC kepada format string YYYY-MM-DD
+        const todayStr = now.toISOString().split('T')[0];
+        
+        // Ambil waktu semasa PC dalam format HH:MM (24-jam)
+        const currentHours = String(now.getHours()).padStart(2, '0');
+        const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+        const currentTimeStr = `${currentHours}:${currentMinutes}`;
+
         let stateUpdated = false;
 
         remindersArray.forEach(item => {
-            // Jika ada tugasan jatuh pada tarikh hari ini dan bot belum pernah blast lagi
-            if (item.date === todayStr && !item.alerted) {
-                item.alerted = true; // Kunci status kepada TRUE supaya bot tak blast berkali-kali
+            // Syarat penembusan bot: Mestilah tarikh HARI INI + masa SEKARANG + bot BELUM PERNAH hantar lagi
+            if (item.date === todayStr && item.time === currentTimeStr && !item.alerted) {
+                item.alerted = true; // Kunci status serta-merta untuk elak duplikasi penghantaran
                 stateUpdated = true;
                 
-                // Panggil fungsi hantar senyap ke bot WhatsApp
-                hantarKeBotWhatsApp(item.message, item.date);
+                // Tembak draf mesej ke gateway bot
+                hantarKeBotWhatsApp(item.message, item.date, item.time);
             }
         });
 
@@ -713,14 +730,20 @@
             if(loopDateStr === todayStr) cell.classList.add('today');
             cell.innerHTML = `<div class="cell-number">${day}</div>`;
 
+            // Filter task dan susun mengikut urutan masa terawal
             const dayEvents = remindersArray.filter(item => item.date === loopDateStr);
+            dayEvents.sort((a, b) => a.time.localeCompare(b.time));
+
             dayEvents.forEach(evt => {
                 const tag = document.createElement('div');
                 tag.className = 'calendar-event-tag';
-                if (evt.alerted) tag.classList.add('triggered'); // Bertukar jadi hijau jika bot dah blast
+                if (evt.alerted) tag.classList.add('triggered'); 
                 
+                // Paparkan draf masa ringkas pada kotak kalendar visual (cth: "09:00 - Task Name")
                 tag.innerHTML = `
-                    <span>${evt.message}</span>
+                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        <strong>${evt.time}</strong> ${evt.message}
+                    </span>
                     <button class="event-delete-x" onclick="removeEvent(${evt.id}, event)">x</button>
                 `;
                 cell.appendChild(tag);
