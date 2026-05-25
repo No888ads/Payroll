@@ -27,7 +27,7 @@
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 550px;
+            max-width: 700px;
             position: relative;
         }
 
@@ -145,10 +145,7 @@
             border: 1px dashed #cbd5e1;
         }
 
-        .ot-row input {
-            width: 100%;
-            padding: 10px;
-        }
+        .ot-row input { width: 100%; padding: 10px; }
 
         .btn-add {
             background-color: #28a745;
@@ -175,8 +172,6 @@
             font-weight: bold;
         }
 
-        .btn-remove:hover { background-color: #bd2130; }
-
         .btn-calc {
             width: 100%;
             padding: 14px;
@@ -190,8 +185,6 @@
             transition: background-color 0.3s;
         }
 
-        .btn-calc:hover { background-color: #0056b3; }
-
         /* Modern Result Section */
         .result-section {
             margin-top: 25px;
@@ -201,42 +194,81 @@
             display: none;
         }
 
-        .result-amount {
-            font-size: 26px;
-            font-weight: bold;
-        }
+        .result-amount { font-size: 26px; font-weight: bold; }
 
-        /* Reminder List Cards */
-        .reminder-list {
-            margin-top: 20px;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .reminder-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 12px;
+        /* ================= VISUAL CALENDAR STYLING ================= */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            background: #f1f5f9;
+            padding: 10px;
             border-radius: 8px;
-            margin-bottom: 10px;
+        }
+
+        .calendar-header h3 { font-size: 16px; color: #1e293b; }
+        .calendar-nav-btn {
+            background: #007bff; color: white; border: none; padding: 5px 12px;
+            border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            background-color: #cbd5e1;
+            padding: 4px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .calendar-day-name {
+            background-color: #e2e8f0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            padding: 6px 0;
+            color: #475569;
+            text-transform: uppercase;
+        }
+
+        .calendar-cell {
+            background-color: #ffffff;
+            min-height: 85px;
+            padding: 4px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .calendar-cell.today { background-color: #eff6ff; border: 2px solid #3b82f6; }
+        .calendar-cell.other-month { background-color: #f8fafc; color: #94a3b8; }
+        .cell-number { font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 4px; }
+
+        .calendar-event-tag {
+            background-color: #3b82f6;
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin-bottom: 2px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .reminder-details h4 { font-size: 14px; color: #334155; }
-        .reminder-details p { font-size: 12px; color: #64748b; }
+        .calendar-event-tag.triggered { background-color: #10b981; } /* Turns green when Bot successfully pushed data */
 
-        .reminder-actions { display: flex; gap: 5px; }
-
-        .btn-wa {
-            background-color: #25D366;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
+        .event-delete-x {
+            font-size: 9px; margin-left: 3px; background: rgba(0,0,0,0.2); 
+            border-radius: 50%; width: 11px; height: 11px; display: inline-flex;
+            align-items: center; justify-content: center; color: white; border: none;
             cursor: pointer;
         }
 
@@ -266,24 +298,15 @@
 
     <div id="otPage" class="page active">
         <h2>OT & Public Holiday Claims</h2>
-        
         <div class="radio-toggle">
-            <label class="radio-label">
-                <input type="radio" name="claimMode" value="minutesOt" checked onchange="toggleClaimMode()"> Overtime (Minutes Tracker - 1.5x)
-            </label>
-            <label class="radio-label">
-                <input type="radio" name="claimMode" value="negativeOt" onchange="toggleClaimMode()"> Negative OT (Minutes Tracker - 1.0x)
-            </label>
-            <label class="radio-label">
-                <input type="radio" name="claimMode" value="phDoublePay" onchange="toggleClaimMode()"> Public Holiday (Double Pay - 2.0x)
-            </label>
+            <label class="radio-label"><input type="radio" name="claimMode" value="minutesOt" checked onchange="toggleClaimMode()"> Overtime (Minutes Tracker - 1.5x)</label>
+            <label class="radio-label"><input type="radio" name="claimMode" value="negativeOt" onchange="toggleClaimMode()"> Negative OT (Minutes Tracker - 1.0x)</label>
+            <label class="radio-label"><input type="radio" name="claimMode" value="phDoublePay" onchange="toggleClaimMode()"> Public Holiday (Double Pay - 2.0x)</label>
         </div>
-
         <div class="input-group">
             <label for="basicSalary">Basic Monthly Salary (RM)</label>
             <input type="number" id="basicSalary" placeholder="e.g., 2500" min="0">
         </div>
-
         <div id="otMinutesInputGroup">
             <div class="input-group">
                 <label id="minutesGroupLabel">Overtime Duration (Minutes Per Day)</label>
@@ -296,16 +319,13 @@
             </div>
             <button class="btn-add" onclick="addRow()">+ Add Day</button>
         </div>
-
         <div id="phDaysInputGroup" style="display: none;">
             <div class="input-group">
-                <label for="phDaysWorked">Number of Public Holidays Worked (Hari Kerja PH)</label>
+                <label for="phDaysWorked">Number of Public Holidays Worked</label>
                 <input type="number" id="phDaysWorked" placeholder="e.g., 1" min="1">
             </div>
         </div>
-
         <button class="btn-calc" onclick="calculateClaim()">Calculate Amount</button>
-
         <div class="result-section" id="otResultSection">
             <div class="total-hours-text" id="claimSummaryText" style="font-size: 13px; color: #4b5563; margin-bottom: 8px;">Total Breakdown</div>
             <h3 style="font-size: 14px; margin-bottom: 6px; text-transform: uppercase;" id="claimResultTitle">Estimated Amount</h3>
@@ -318,61 +338,15 @@
         <div class="radio-toggle">
             <label class="radio-label"><input type="radio" name="resignMode" value="findEnd" checked onchange="toggleResignMode()"> Find Last Working Day</label>
             <label class="radio-label"><input type="radio" name="resignMode" value="findDiff" onchange="toggleResignMode()"> Calculate Notice Served</label>
-            <label class="radio-label"><input type="radio" name="resignMode" value="shortNotice" onchange="toggleResignMode()"> Short Notice Indemnity (Ganti Rugi)</label>
-            <label class="radio-label"><input type="radio" name="resignMode" value="ytdRefund" onchange="toggleResignMode()"> Refund YTD AL (Encashment)</label>
+            <label class="radio-label"><input type="radio" name="resignMode" value="shortNotice" onchange="toggleResignMode()"> Short Notice Indemnity</label>
+            <label class="radio-label"><input type="radio" name="resignMode" value="ytdRefund" onchange="toggleResignMode()"> Refund YTD AL</label>
         </div>
-
-        <div id="standardNoticeDatesGroup">
-            <div class="input-group">
-                <label for="submissionDate">Letter Submission Date</label>
-                <input type="date" id="submissionDate">
-            </div>
-        </div>
-        <div id="noticeDurationGroup">
-            <div class="input-group" style="display: flex; gap: 10px;">
-                <div style="flex: 2;">
-                    <label for="noticeValue">Notice Period Duration</label>
-                    <input type="number" id="noticeValue" placeholder="e.g., 30" min="1">
-                </div>
-                <div style="flex: 1.5;">
-                    <label for="noticeUnit">Unit</label>
-                    <select id="noticeUnit">
-                        <option value="days">Days</option>
-                        <option value="months">Months</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div id="lastDayTargetGroup" style="display: none;">
-            <div class="input-group">
-                <label for="targetLastDay">Proposed Last Working Day</label>
-                <input type="date" id="targetLastDay">
-            </div>
-        </div>
-        <div id="shortNoticeGroup" style="display: none;">
-            <div class="input-group">
-                <label for="shortNoticeSalary">Basic Monthly Salary (RM)</label>
-                <input type="number" id="shortNoticeSalary" placeholder="e.g., 3000" min="0">
-            </div>
-            <div class="input-group">
-                <label for="shortNoticeDays">Number of Short Notice Days</label>
-                <input type="number" id="shortNoticeDays" placeholder="e.g., 5" min="1">
-            </div>
-        </div>
-
-        <div id="ytdRefundGroup" style="display: none;">
-            <div class="input-group">
-                <label for="ytdSalary">Basic Monthly Salary (RM)</label>
-                <input type="number" id="ytdSalary" placeholder="e.g., 2500" min="0">
-            </div>
-            <div class="input-group">
-                <label for="ytdDays">Balance YTD Annual Leave (Baki Hari Cuti AL)</label>
-                <input type="number" id="ytdDays" placeholder="e.g., 4.5" min="0.5" step="0.5">
-            </div>
-        </div>
-
+        <div id="standardNoticeDatesGroup"><div class="input-group"><label for="submissionDate">Letter Submission Date</label><input type="date" id="submissionDate"></div></div>
+        <div id="noticeDurationGroup"><div class="input-group" style="display: flex; gap: 10px;"><div style="flex: 2;"><label for="noticeValue">Notice Period Duration</label><input type="number" id="noticeValue" placeholder="e.g., 30" min="1"></div><div style="flex: 1.5;"><label for="noticeUnit">Unit</label><select id="noticeUnit"><option value="days">Days</option><option value="months">Months</option></select></div></div></div>
+        <div id="lastDayTargetGroup" style="display: none;"><div class="input-group"><label for="targetLastDay">Proposed Last Working Day</label><input type="date" id="targetLastDay"></div></div>
+        <div id="shortNoticeGroup" style="display: none;"><div class="input-group"><label for="shortNoticeSalary">Basic Monthly Salary (RM)</label><input type="number" id="shortNoticeSalary" placeholder="e.g., 3000" min="0"></div><div class="input-group"><label for="shortNoticeDays">Number of Short Notice Days</label><input type="number" id="shortNoticeDays" placeholder="e.g., 5" min="1"></div></div>
+        <div id="ytdRefundGroup" style="display: none;"><div class="input-group"><label for="ytdSalary">Basic Monthly Salary (RM)</label><input type="number" id="ytdSalary" placeholder="e.g., 2500" min="0"></div><div class="input-group"><label for="ytdDays">Balance YTD Annual Leave</label><input type="number" id="ytdDays" placeholder="e.g., 4.5" min="0.5" step="0.5"></div></div>
         <button class="btn-calc" onclick="calculateNotice()">Calculate Amount</button>
-
         <div class="result-section" id="resignResultSection">
             <h3 style="font-size: 14px; margin-bottom: 6px; text-transform: uppercase;" id="resignResultTitle">Calculated Result</h3>
             <p class="result-amount" style="font-size: 22px;" id="resignResultValue">-</p>
@@ -385,7 +359,6 @@
             <label class="radio-label"><input type="radio" name="absentMode" value="normalAbsent" checked> Normal Absent</label>
             <label class="radio-label"><input type="radio" name="absentMode" value="phAbsent"> Absent Adjacent to Public Holiday</label>
         </div>
-
         <div class="input-group">
             <label for="absentSalary">Basic Monthly Salary (RM)</label>
             <input type="number" id="absentSalary" placeholder="e.g., 2500" min="0">
@@ -394,9 +367,7 @@
             <label for="absentDays">Number of Absent Days</label>
             <input type="number" id="absentDays" placeholder="e.g., 1" min="1">
         </div>
-
         <button class="btn-calc" onclick="calculateAbsent()" style="background-color: #dc3545;">Calculate Deduction</button>
-
         <div class="result-section" id="absentResultSection" style="background-color: #fff5f5; border: 1px solid #feb2b2;">
             <div class="total-hours-text" id="absentDaysDisplay" style="color: #9b2c2c; font-weight: 600; font-size: 13px; margin-bottom: 8px;">Total Days Deducted: 0 Days</div>
             <h3 style="color: #9b2c2c; font-size: 14px; margin-bottom: 6px; text-transform: uppercase;">Total Salary to Deduct</h3>
@@ -405,19 +376,29 @@
     </div>
 
     <div id="calendarPage" class="page">
-        <h2>HR Scheduler & Reminders</h2>
-        <div class="input-group">
-            <label for="reminderDate">Select Event Target Date</label>
-            <input type="date" id="reminderDate">
+        <h2>HR Task Scheduler View</h2>
+        
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px;">
+                <div class="input-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="reminderDate">Event Date</label>
+                    <input type="date" id="reminderDate">
+                </div>
+                <div class="input-group" style="flex: 2; margin-bottom: 0;">
+                    <label for="reminderTitle">Task / Event Description Note</label>
+                    <input type="text" id="reminderTitle" placeholder="e.g., Final Run (Payroll Data)">
+                </div>
+            </div>
+            <button onclick="addReminder()" style="width: 100%; padding: 10px; background-color: #4f46e5; color: white; border: none; border-radius: 6px; font-weight: bold; margin-top: 12px; cursor: pointer;">Insert Event to Calendar</button>
         </div>
-        <div class="input-group">
-            <label for="reminderTitle">Event / Task Note</label>
-            <input type="text" id="reminderTitle" placeholder="e.g., Submit H&L Retail Payroll Data">
-        </div>
-        <button class="btn-calc" onclick="addReminder()" style="background-color: #4f46e5;">Save Event Note</button>
 
-        <h3 style="margin-top: 25px; font-size: 14px; color: #475569; text-transform: uppercase;">Saved Events Schedule</h3>
-        <div class="reminder-list" id="reminderListContainer"></div>
+        <div class="calendar-header">
+            <button class="calendar-nav-btn" onclick="changeMonth(-1)">&lt; Prev</button>
+            <h3 id="calendarMonthYearTitle">Month Year</h3>
+            <button class="calendar-nav-btn" onclick="changeMonth(1)">Next &gt;</button>
+        </div>
+
+        <div class="calendar-grid" id="calendarGridContainer"></div>
     </div>
 
     <div class="app-footer">
@@ -426,12 +407,16 @@
 </div>
 
 <script>
+    let currentNavDate = new Date(); 
+
     window.onload = function() {
-        const today = new Date().toISOString().split('T')[0];
-        if(document.getElementById('submissionDate')) document.getElementById('submissionDate').value = today;
-        if(document.getElementById('targetLastDay')) document.getElementById('targetLastDay').value = today;
-        if(document.getElementById('reminderDate')) document.getElementById('reminderDate').value = today;
-        loadReminders();
+        const todayStr = new Date().toISOString().split('T')[0];
+        if(document.getElementById('submissionDate')) document.getElementById('submissionDate').value = todayStr;
+        if(document.getElementById('targetLastDay')) document.getElementById('targetLastDay').value = todayStr;
+        if(document.getElementById('reminderDate')) document.getElementById('reminderDate').value = todayStr;
+        
+        renderVisualCalendar();
+        checkAndTriggerBotAlerts(); // Auto check latar belakang & blast ke Bot API
     };
 
     function switchTab(pageId, btn) {
@@ -470,7 +455,7 @@
             document.getElementById('noticeDurationGroup').style.display = 'block';
         } else if (mode === 'findDiff') {
             document.getElementById('standardNoticeDatesGroup').style.display = 'block';
-            document.getElementById('lastDayTargetGroup').style.display = 'block';
+            document.getElementById('lastDayTargetDayTargetGroup').style.display = 'block';
         } else if (mode === 'shortNotice') {
             document.getElementById('shortNoticeGroup').style.display = 'block';
         } else if (mode === 'ytdRefund') {
@@ -478,7 +463,7 @@
         }
     }
 
-    // ================= OT, NEGATIVE OT & PH CLAIM CORE =================
+    // ================= OT, NEGATIVE OT & PH CLAIM =================
     function addRow() {
         const container = document.getElementById('otRowsContainer');
         const newRow = document.createElement('div');
@@ -498,7 +483,6 @@
     function calculateClaim() {
         const salary = parseFloat(document.getElementById('basicSalary').value);
         if (isNaN(salary)) { alert("Please enter a valid basic salary."); return; }
-        
         const mode = document.querySelector('input[name="claimMode"]:checked').value;
         const resultSection = document.getElementById('otResultSection');
         let finalPay = 0;
@@ -536,12 +520,11 @@
             document.getElementById('claimResultTitle').style.color = "#166534";
             document.getElementById('totalOt').style.color = "#15803d";
         }
-
         document.getElementById('totalOt').innerText = "RM " + finalPay.toFixed(2);
         resultSection.style.display = 'block';
     }
 
-    // ================= RESIGNATION, SHORT NOTICE & YTD AL CORE =================
+    // ================= RESIGNATION, INDEMNITY & LEAVE ENCHASHMENT =================
     function calculateNotice() {
         const mode = document.querySelector('input[name="resignMode"]:checked').value;
         const resultSection = document.getElementById('resignResultSection');
@@ -551,35 +534,25 @@
         if (mode === 'shortNotice') {
             const basic = parseFloat(document.getElementById('shortNoticeSalary').value);
             const days = parseInt(document.getElementById('shortNoticeDays').value);
-            if (isNaN(basic) || isNaN(days)) { alert("Please enter valid fields."); return; }
-            
+            if (isNaN(basic) || isNaN(days)) return;
             const indemnityAmount = (basic / 26) * days;
             resultTitle.innerText = "Indemnity Amount Payable (Ganti Rugi):";
             resultValue.innerText = "RM " + indemnityAmount.toFixed(2);
             resultSection.style.backgroundColor = "#fef2f2"; resultSection.style.borderColor = "#fca5a5";
             resultTitle.style.color = "#991b1b"; resultValue.style.color = "#991b1b";
-
         } else if (mode === 'ytdRefund') {
-            // New Implementation: Refund YTD AL (basic / 26 * amount YTD)
             const basic = parseFloat(document.getElementById('ytdSalary').value);
             const ytdDays = parseFloat(document.getElementById('ytdDays').value);
-            if (isNaN(basic) || isNaN(ytdDays) || ytdDays < 0) { alert("Please enter valid Basic Salary and YTD Leave Days."); return; }
-            
+            if (isNaN(basic) || isNaN(ytdDays)) return;
             const refundAmount = (basic / 26) * ytdDays;
             resultTitle.innerText = "YTD AL Refund Amount (Leave Encashment):";
             resultValue.innerText = "RM " + refundAmount.toFixed(2);
-            
-            // Visual Theme: Soft Green/Mint for reimbursement payout
             resultSection.style.backgroundColor = "#f0fdf4"; resultSection.style.borderColor = "#bbf7d0";
             resultTitle.style.color = "#166534"; resultValue.style.color = "#15803d";
-
         } else {
             resultSection.style.backgroundColor = "#f0f7ff"; resultSection.style.borderColor = "#bae6fd";
             resultTitle.style.color = "#0369a1"; resultValue.style.color = "#0369a1";
-            const subDateVal = document.getElementById('submissionDate').value;
-            if (!subDateVal) { alert("Please select the letter submission date."); return; }
-            const submissionDate = new Date(subDateVal);
-
+            const submissionDate = new Date(document.getElementById('submissionDate').value);
             if (mode === 'findEnd') {
                 const duration = parseInt(document.getElementById('noticeValue').value);
                 const unit = document.getElementById('noticeUnit').value;
@@ -598,7 +571,7 @@
         resultSection.style.display = 'block';
     }
 
-    // ================= ABSENT CORE =================
+    // ================= ABSENT DEDUCTION =================
     function calculateAbsent() {
         const basic = parseFloat(document.getElementById('absentSalary').value);
         const inputDays = parseInt(document.getElementById('absentDays').value);
@@ -611,58 +584,161 @@
         document.getElementById('absentResultSection').style.display = 'block';
     }
 
-    // ================= HR REMINDER CALENDAR LOGIC =================
+    // ================= HR VISUAL SCHEDULER CALENDAR & BOT WEBHOOK =================
     let remindersArray = JSON.parse(localStorage.getItem('hrReminders')) || [];
+
+    function changeMonth(direction) {
+        currentNavDate.setMonth(currentNavDate.getMonth() + direction);
+        renderVisualCalendar();
+    }
 
     function addReminder() {
         const dateVal = document.getElementById('reminderDate').value;
         const textVal = document.getElementById('reminderTitle').value;
         if (!dateVal || !textVal.trim()) return;
 
-        const newEvent = { id: Date.now(), date: dateVal, message: textVal };
+        const newEvent = { id: Date.now(), date: dateVal, message: textVal, alerted: false };
         remindersArray.push(newEvent);
         localStorage.setItem('hrReminders', JSON.stringify(remindersArray));
+        
         document.getElementById('reminderTitle').value = '';
-        renderReminders();
+        renderVisualCalendar();
+        checkAndTriggerBotAlerts(); 
     }
 
-    function deleteReminder(id) {
+    function removeEvent(id, event) {
+        if(event) event.stopPropagation();
         remindersArray = remindersArray.filter(item => item.id !== id);
         localStorage.setItem('hrReminders', JSON.stringify(remindersArray));
-        renderReminders();
+        renderVisualCalendar();
     }
 
-    function sendWhatsApp(message, date) {
+    // --- LOGIK BACKEND WEBHOOK PUSH TO BOT INTERFACES ---
+    function hantarKeBotWhatsApp(message, date) {
         const cleanDate = new Date(date).toLocaleDateString('en-MY', { year: 'numeric', month: 'short', day: 'numeric' });
-        const text = encodeURIComponent(`📢 *HR REMINDER SCHEDULE*\n\n📅 *Date:* ${cleanDate}\n📝 *Task:* ${message}\n\n_Generated via Noel Ethan HR System_`);
-        window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-    }
+        
+        // Format teks kemas untuk draf mesej dalam Group WhatsApp
+        const textMessage = `📢 *HR TASK ALERT SYSTEM*\n\n📅 *Date:* ${cleanDate}\n📝 *Task To Do:* ${message}\n\n_Generated automatically via Noel Ethan Dashboard Scheduler_`;
 
-    function renderReminders() {
-        const container = document.getElementById('reminderListContainer');
-        container.innerHTML = '';
-        if (remindersArray.length === 0) {
-            container.innerHTML = `<p style="font-size:13px; color:#94a3b8; text-align:center; padding:10px;">No events scheduled.</p>`;
-            return;
-        }
-        remindersArray.sort((a,b) => new Date(a.date) - new Date(b.date));
-        remindersArray.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'reminder-card';
-            card.innerHTML = `
-                <div class="reminder-details">
-                    <h4>${item.message}</h4>
-                    <p>📅 ${item.date}</p>
-                </div>
-                <div class="reminder-actions">
-                    <button class="btn-wa" onclick="sendWhatsApp('${item.message.replace(/'/g, "\\'")}', '${item.date}')">Share WA</button>
-                    <button class="btn-remove" style="padding: 5px 10px; font-size:11px;" onclick="deleteReminder(${item.id})">Del</button>
-                </div>
-            `;
-            container.appendChild(card);
+        // =========================================================================
+        // PLACEHOLDER CONFIG: Gantikan parameter ini mengikut API Bot yang awak sewa
+        // =========================================================================
+        const BOT_API_URL = "https://api.fonnte.com/send"; // Contoh URL API Fonnte / GreenAPI
+        const BOT_TOKEN = "71SME9mMhVBZgB7awkZQ";       // API Token/Key akses keselamatan
+        const GROUP_ID = "HZIfA2IJrdjAzx23WXsZaP";        // ID Group sasaran bot
+
+        // Menghantar data senyap di latar belakang menggunakan Fetch API (POST request)
+        fetch(BOT_API_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': BOT_TOKEN,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                target: GROUP_ID,
+                message: textMessage
+            })
+        })
+        .then(response => {
+            console.log("Bot push status logged:", response.status);
+        })
+        .catch(error => {
+            console.error("Webhook gateway pipeline broken:", error);
         });
     }
-    function loadReminders() { renderReminders(); }
+
+    // Fungsi semak tarikh hari ini sewaktu dashboard dibuka
+    function checkAndTriggerBotAlerts() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        let stateUpdated = false;
+
+        remindersArray.forEach(item => {
+            // Jika ada tugasan jatuh pada tarikh hari ini dan bot belum pernah blast lagi
+            if (item.date === todayStr && !item.alerted) {
+                item.alerted = true; // Kunci status kepada TRUE supaya bot tak blast berkali-kali
+                stateUpdated = true;
+                
+                // Panggil fungsi hantar senyap ke bot WhatsApp
+                hantarKeBotWhatsApp(item.message, item.date);
+            }
+        });
+
+        if (stateUpdated) {
+            localStorage.setItem('hrReminders', JSON.stringify(remindersArray));
+            renderVisualCalendar();
+        }
+    }
+
+    function renderVisualCalendar() {
+        const container = document.getElementById('calendarGridContainer');
+        const titleContainer = document.getElementById('calendarMonthYearTitle');
+        container.innerHTML = '';
+
+        const year = currentNavDate.getFullYear();
+        const month = currentNavDate.getMonth();
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        titleContainer.innerText = `${monthNames[month]} ${year}`;
+
+        const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        daysOfWeek.forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'calendar-day-name';
+            el.innerText = d;
+            container.appendChild(el);
+        });
+
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        const totalDaysMonth = new Date(year, month + 1, 0).getDate();
+        const totalDaysPrevMonth = new Date(year, month, 0).getDate();
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // Fill Prev Month
+        for(let i = firstDayIndex; i > 0; i--) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell other-month';
+            cell.innerHTML = `<div class="cell-number">${totalDaysPrevMonth - i + 1}</div>`;
+            container.appendChild(cell);
+        }
+
+        // Current Active Month
+        for(let day = 1; day <= totalDaysMonth; day++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell';
+            
+            const mStr = String(month + 1).padStart(2, '0');
+            const dStr = String(day).padStart(2, '0');
+            const loopDateStr = `${year}-${mStr}-${dStr}`;
+
+            if(loopDateStr === todayStr) cell.classList.add('today');
+            cell.innerHTML = `<div class="cell-number">${day}</div>`;
+
+            const dayEvents = remindersArray.filter(item => item.date === loopDateStr);
+            dayEvents.forEach(evt => {
+                const tag = document.createElement('div');
+                tag.className = 'calendar-event-tag';
+                if (evt.alerted) tag.classList.add('triggered'); // Bertukar jadi hijau jika bot dah blast
+                
+                tag.innerHTML = `
+                    <span>${evt.message}</span>
+                    <button class="event-delete-x" onclick="removeEvent(${evt.id}, event)">x</button>
+                `;
+                cell.appendChild(tag);
+            });
+
+            container.appendChild(cell);
+        }
+
+        // Next Month Padding
+        const totalCells = firstDayIndex + totalDaysMonth;
+        const remaining = 42 - totalCells;
+        for(let nextDay = 1; nextDay <= remaining; nextDay++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell other-month';
+            cell.innerHTML = `<div class="cell-number">${nextDay}</div>`;
+            container.appendChild(cell);
+        }
+    }
 </script>
 
 </body>
