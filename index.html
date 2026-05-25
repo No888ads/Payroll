@@ -314,11 +314,12 @@
     </div>
 
     <div id="resignPage" class="page">
-        <h2>Notice & Indemnity</h2>
+        <h2>Notice, Indemnity & Leave Encashment</h2>
         <div class="radio-toggle">
             <label class="radio-label"><input type="radio" name="resignMode" value="findEnd" checked onchange="toggleResignMode()"> Find Last Working Day</label>
             <label class="radio-label"><input type="radio" name="resignMode" value="findDiff" onchange="toggleResignMode()"> Calculate Notice Served</label>
-            <label class="radio-label"><input type="radio" name="resignMode" value="shortNotice" onchange="toggleResignMode()"> Short Notice Indemnity</label>
+            <label class="radio-label"><input type="radio" name="resignMode" value="shortNotice" onchange="toggleResignMode()"> Short Notice Indemnity (Ganti Rugi)</label>
+            <label class="radio-label"><input type="radio" name="resignMode" value="ytdRefund" onchange="toggleResignMode()"> Refund YTD AL (Encashment)</label>
         </div>
 
         <div id="standardNoticeDatesGroup">
@@ -359,11 +360,22 @@
             </div>
         </div>
 
-        <button class="btn-calc" onclick="calculateNotice()">Calculate Notice</button>
+        <div id="ytdRefundGroup" style="display: none;">
+            <div class="input-group">
+                <label for="ytdSalary">Basic Monthly Salary (RM)</label>
+                <input type="number" id="ytdSalary" placeholder="e.g., 2500" min="0">
+            </div>
+            <div class="input-group">
+                <label for="ytdDays">Balance YTD Annual Leave (Baki Hari Cuti AL)</label>
+                <input type="number" id="ytdDays" placeholder="e.g., 4.5" min="0.5" step="0.5">
+            </div>
+        </div>
 
-        <div class="result-section" id="resignResultSection" style="background-color: #f0f7ff; border: 1px solid #bae6fd;">
-            <h3 style="color: #0369a1; font-size: 14px; margin-bottom: 6px; text-transform: uppercase;" id="resignResultTitle">Calculated Result</h3>
-            <p class="result-amount" style="color: #0369a1; font-size: 22px;" id="resignResultValue">-</p>
+        <button class="btn-calc" onclick="calculateNotice()">Calculate Amount</button>
+
+        <div class="result-section" id="resignResultSection">
+            <h3 style="font-size: 14px; margin-bottom: 6px; text-transform: uppercase;" id="resignResultTitle">Calculated Result</h3>
+            <p class="result-amount" style="font-size: 22px;" id="resignResultValue">-</p>
         </div>
     </div>
 
@@ -451,6 +463,7 @@
         document.getElementById('noticeDurationGroup').style.display = 'none';
         document.getElementById('lastDayTargetGroup').style.display = 'none';
         document.getElementById('shortNoticeGroup').style.display = 'none';
+        document.getElementById('ytdRefundGroup').style.display = 'none';
 
         if (mode === 'findEnd') {
             document.getElementById('standardNoticeDatesGroup').style.display = 'block';
@@ -460,6 +473,8 @@
             document.getElementById('lastDayTargetGroup').style.display = 'block';
         } else if (mode === 'shortNotice') {
             document.getElementById('shortNoticeGroup').style.display = 'block';
+        } else if (mode === 'ytdRefund') {
+            document.getElementById('ytdRefundGroup').style.display = 'block';
         }
     }
 
@@ -497,36 +512,26 @@
             document.querySelectorAll('.ot-minutes').forEach(input => { totalMinutes += parseFloat(input.value) || 0; });
             
             if (mode === 'minutesOt') {
-                // Normal OT: multiplier 1.5x
                 finalPay = ratePerMinute * 1.5 * totalMinutes;
                 document.getElementById('claimSummaryText').innerText = `Total OT Time: ${totalMinutes} mins (Multiplier 1.5x Active)`;
                 document.getElementById('claimResultTitle').innerText = "Estimated OT Earnings";
-                
-                // Visual Theme: Soft Green for positive claims
                 resultSection.style.backgroundColor = "#f0fdf4"; resultSection.style.borderColor = "#bbf7d0";
                 document.getElementById('claimResultTitle').style.color = "#166534";
                 document.getElementById('totalOt').style.color = "#15803d";
             } else {
-                // Negative OT: multiplier 1.0x
                 finalPay = ratePerMinute * 1.0 * totalMinutes;
                 document.getElementById('claimSummaryText').innerText = `Total Negative OT Time: ${totalMinutes} mins (Rate 1.0x Active)`;
                 document.getElementById('claimResultTitle').innerText = "Total Negative OT Deduction";
-                
-                // Visual Theme: Light Amber/Orange for deductions
                 resultSection.style.backgroundColor = "#fffbeb"; resultSection.style.borderColor = "#fef3c7";
                 document.getElementById('claimResultTitle').style.color = "#92400e";
                 document.getElementById('totalOt').style.color = "#b45309";
             }
         } else {
-            // PH Double Pay
             const phDays = parseInt(document.getElementById('phDaysWorked').value) || 0;
             if(phDays <= 0) { alert("Please enter the number of PH days worked."); return; }
-            
             finalPay = ratePerDay * phDays * 2.0;
             document.getElementById('claimSummaryText').innerText = `Total PH Days Worked: ${phDays} Days (Double Pay Active)`;
             document.getElementById('claimResultTitle').innerText = "Public Holiday Earnings";
-            
-            // Visual Theme: Soft Green
             resultSection.style.backgroundColor = "#f0fdf4"; resultSection.style.borderColor = "#bbf7d0";
             document.getElementById('claimResultTitle').style.color = "#166534";
             document.getElementById('totalOt').style.color = "#15803d";
@@ -536,7 +541,7 @@
         resultSection.style.display = 'block';
     }
 
-    // ================= RESIGNATION CORE =================
+    // ================= RESIGNATION, SHORT NOTICE & YTD AL CORE =================
     function calculateNotice() {
         const mode = document.querySelector('input[name="resignMode"]:checked').value;
         const resultSection = document.getElementById('resignResultSection');
@@ -546,12 +551,35 @@
         if (mode === 'shortNotice') {
             const basic = parseFloat(document.getElementById('shortNoticeSalary').value);
             const days = parseInt(document.getElementById('shortNoticeDays').value);
-            if (isNaN(basic) || isNaN(days)) return;
+            if (isNaN(basic) || isNaN(days)) { alert("Please enter valid fields."); return; }
+            
             const indemnityAmount = (basic / 26) * days;
-            resultTitle.innerText = "Indemnity Amount Payable:";
+            resultTitle.innerText = "Indemnity Amount Payable (Ganti Rugi):";
             resultValue.innerText = "RM " + indemnityAmount.toFixed(2);
+            resultSection.style.backgroundColor = "#fef2f2"; resultSection.style.borderColor = "#fca5a5";
+            resultTitle.style.color = "#991b1b"; resultValue.style.color = "#991b1b";
+
+        } else if (mode === 'ytdRefund') {
+            // New Implementation: Refund YTD AL (basic / 26 * amount YTD)
+            const basic = parseFloat(document.getElementById('ytdSalary').value);
+            const ytdDays = parseFloat(document.getElementById('ytdDays').value);
+            if (isNaN(basic) || isNaN(ytdDays) || ytdDays < 0) { alert("Please enter valid Basic Salary and YTD Leave Days."); return; }
+            
+            const refundAmount = (basic / 26) * ytdDays;
+            resultTitle.innerText = "YTD AL Refund Amount (Leave Encashment):";
+            resultValue.innerText = "RM " + refundAmount.toFixed(2);
+            
+            // Visual Theme: Soft Green/Mint for reimbursement payout
+            resultSection.style.backgroundColor = "#f0fdf4"; resultSection.style.borderColor = "#bbf7d0";
+            resultTitle.style.color = "#166534"; resultValue.style.color = "#15803d";
+
         } else {
-            const submissionDate = new Date(document.getElementById('submissionDate').value);
+            resultSection.style.backgroundColor = "#f0f7ff"; resultSection.style.borderColor = "#bae6fd";
+            resultTitle.style.color = "#0369a1"; resultValue.style.color = "#0369a1";
+            const subDateVal = document.getElementById('submissionDate').value;
+            if (!subDateVal) { alert("Please select the letter submission date."); return; }
+            const submissionDate = new Date(subDateVal);
+
             if (mode === 'findEnd') {
                 const duration = parseInt(document.getElementById('noticeValue').value);
                 const unit = document.getElementById('noticeUnit').value;
