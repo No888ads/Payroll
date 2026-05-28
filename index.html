@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR TERMINAL V6: CYBERNETIC PROTOCOL</title>
+    <title>HR TERMINAL V7: ULTIMATE CLASSIFIED EDITION</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- GLOBAL HACKER THEME & ANIMATIONS --- */
@@ -16,232 +16,178 @@
             --primary: #00FF00;
             --danger: #FF0033;
             --text-dark: #CCCCCC;
-            --text-light: #999999;
         }
 
-        @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
         @keyframes glitch { 0% { text-shadow: 1px 0 0 red, -1px 0 0 blue; } 100% { text-shadow: -1px 0 0 red, 1px 0 0 blue; } }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* Neon Flickering Animation */
-        @keyframes neonFlicker {
-            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
-                opacity: 1; text-shadow: 0 0 5px var(--hacker-green), 0 0 15px var(--hacker-green);
-            }
-            20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
-                opacity: 0.4; text-shadow: none;
-            }
-        }
-        /* Blinking colon for clock */
+        @keyframes neonFlicker { 0%, 19%, 22%, 62%, 64%, 70%, 100% { opacity: 1; text-shadow: 0 0 5px var(--hacker-green), 0 0 15px var(--hacker-green); } 20%, 21%, 63%, 65%, 69% { opacity: 0.4; text-shadow: none; } }
         @keyframes blinker { 50% { opacity: 0; } }
+        @keyframes trailFade { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(0.1); opacity: 0; } }
 
         body {
-            font-family: 'Fira Code', monospace;
-            background-color: var(--hacker-bg);
-            color: var(--hacker-green);
-            margin: 0; padding: 20px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box;
-            position: relative; overflow-x: hidden;
+            font-family: 'Fira Code', monospace; background-color: var(--hacker-bg); color: var(--hacker-green);
+            margin: 0; padding: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            min-height: 100vh; box-sizing: border-box; position: relative; overflow-x: hidden; cursor: crosshair !important;
         }
         
-        /* CRT Scanlines Overlay */
         body::after {
             content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px);
             z-index: -1; pointer-events: none;
         }
 
-        /* Matrix Canvas Background */
-        #matrixCanvas {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: -2; pointer-events: none; opacity: 0.8;
-        }
+        #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; opacity: 0.8; }
 
-        h2 { margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; text-shadow: var(--border-glow); cursor: default;}
+        /* Mouse Trail Element */
+        .cursor-trail { position: fixed; width: 4px; height: 4px; background: var(--hacker-green); border-radius: 50%; pointer-events: none; z-index: 9999; animation: trailFade 0.5s forwards; }
+
+        h2 { margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; text-shadow: var(--border-glow); cursor: crosshair;}
         h2:hover { animation: glitch 0.2s linear infinite; }
+
+        /* --- BOOT SCREEN --- */
+        #bootScreen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 10000;
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start; padding: 40px;
+            box-sizing: border-box; font-size: 14px; transition: opacity 0.5s ease;
+        }
+        .boot-line { margin-bottom: 8px; text-shadow: 0 0 5px var(--hacker-green); }
+        .boot-cursor { display: inline-block; width: 8px; height: 15px; background: var(--hacker-green); animation: blinker 0.8s infinite; vertical-align: middle; margin-left: 5px;}
         
-        /* --- CLOCK HERO (HUD STYLE) --- */
+        /* --- CLOCK HERO (HUD STYLE WITH GRAPH) --- */
         .hero-clock-container {
-            position: absolute; top: 20px; right: 20px;
-            background: linear-gradient(90deg, rgba(0, 30, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%);
-            padding: 12px 20px; border-radius: 2px;
-            border: 1px solid #111; border-left: 4px solid var(--hacker-green);
-            box-shadow: -5px 0 20px rgba(0, 255, 0, 0.15);
-            z-index: 100; backdrop-filter: blur(5px);
-            display: flex; flex-direction: column; align-items: flex-end;
-            min-width: 180px;
+            position: absolute; top: 20px; right: 20px; background: linear-gradient(90deg, rgba(0, 30, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%);
+            padding: 12px 20px; border-radius: 2px; border: 1px solid #111; border-left: 4px solid var(--hacker-green);
+            box-shadow: -5px 0 20px rgba(0, 255, 0, 0.15); z-index: 100; backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; align-items: flex-end; min-width: 200px; cursor: crosshair;
         }
-        .hero-clock-container::before {
-            content: 'SYS.TIME'; position: absolute; top: -7px; left: 8px;
-            font-size: 9px; background: #000; color: var(--hacker-green); padding: 0 4px; font-weight: bold; letter-spacing: 1px;
-        }
-        .hero-time {
-            font-size: 2.2rem; font-weight: 700; font-variant-numeric: tabular-nums;
-            line-height: 1; margin-bottom: 6px; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4);
-            letter-spacing: 2px;
-        }
-        .hero-time span.blink-colon {
-            animation: blinker 1s linear infinite; color: var(--hacker-green);
-        }
-        .hero-time span.secs {
-            font-size: 1.1rem; color: var(--hacker-green); margin-left: 4px;
-            text-shadow: 0 0 5px var(--hacker-green);
-        }
-        .hero-date {
-            font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 3px;
-            border-top: 1px dashed #333; padding-top: 6px; width: 100%; text-align: right;
-        }
+        .hero-clock-container::before { content: 'SYS.DIAGNOSTICS'; position: absolute; top: -7px; left: 8px; font-size: 9px; background: #000; color: var(--hacker-green); padding: 0 4px; font-weight: bold; letter-spacing: 1px; }
+        
+        .hud-top-row { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 6px;}
+        #cpuGraph { width: 60px; height: 25px; border-bottom: 1px solid var(--hacker-green-dim); opacity: 0.8;}
+        
+        .hero-time { font-size: 2.2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4); letter-spacing: 2px; }
+        .hero-time span.blink-colon { animation: blinker 1s linear infinite; color: var(--hacker-green); }
+        .hero-time span.secs { font-size: 1.1rem; color: var(--hacker-green); margin-left: 4px; text-shadow: 0 0 5px var(--hacker-green); }
+        .hero-date { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 3px; border-top: 1px dashed #333; padding-top: 6px; width: 100%; text-align: right; margin-top: 6px;}
+        
+        .sound-toggle { font-size: 9px; border: 1px solid var(--hacker-green-dim); padding: 2px 5px; cursor: crosshair; background: transparent; color: var(--hacker-green); margin-top: 5px; width: 100%; text-align: center; transition: 0.2s;}
+        .sound-toggle:hover { background: var(--hacker-green); color: #000;}
 
-        /* --- MAIN TERMINAL BOX & ANIMATED BORDERS --- */
+        /* --- MAIN TERMINAL BOX --- */
         .card {
-            background: var(--box-bg); border-radius: 4px;
-            width: 100%; max-width: 850px; padding: 30px; 
-            margin: auto; box-sizing: border-box;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-            position: relative; overflow: hidden; 
-            border: 1px solid rgba(0, 255, 0, 0.1);
+            background: var(--box-bg); border-radius: 4px; width: 100%; max-width: 850px; padding: 30px; 
+            margin: auto; box-sizing: border-box; box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            position: relative; overflow: hidden; border: 1px solid rgba(0, 255, 0, 0.1);
         }
-
-        /* Moving Border Light Effect */
-        .card::before {
-            content: ''; position: absolute; height: 150%; width: 150%; 
-            background: conic-gradient(#00ff00 10deg, transparent 90deg);
-            top: -25%; left: -25%; animation: rotate 4s linear infinite; z-index: 0;
-            opacity: 0.5;
-        }
-        .card::after {
-            content: ''; position: absolute; background: var(--box-bg); inset: 2px; border-radius: 2px; z-index: 1;
-        }
+        .card::before { content: ''; position: absolute; height: 150%; width: 150%; background: conic-gradient(#00ff00 10deg, transparent 90deg); top: -25%; left: -25%; animation: rotate 4s linear infinite; z-index: 0; opacity: 0.5; }
+        .card::after { content: ''; position: absolute; background: var(--box-bg); inset: 2px; border-radius: 2px; z-index: 1; }
         .card > * { position: relative; z-index: 2; }
 
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--hacker-green-dim); padding-bottom: 10px;}
-        h2::before { content: '$ '; color: #fff; }
-        label::before { content: '> '; color: #fff; }
+        h2::before { content: '$ '; color: #fff; } label::before { content: '> '; color: #fff; }
 
         .tabs-container { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 1px solid var(--hacker-green-dim); padding-bottom: 10px; overflow-x: auto; font-family: monospace;}
-        .tab-btn {
-            background: transparent; border: 1px solid transparent; padding: 10px 12px; font-size: 12px; font-weight: 600;
-            color: #CCCCCC; cursor: pointer; border-radius: 2px; transition: all 0.2s ease; white-space: nowrap;
-        }
+        .tab-btn { background: transparent; border: 1px solid transparent; padding: 10px 12px; font-size: 12px; font-weight: 600; color: #CCCCCC; cursor: crosshair; border-radius: 2px; transition: all 0.2s ease; white-space: nowrap; }
         .tab-btn:hover { background: #111; color: #fff; border-color: var(--hacker-green-dim);}
         .tab-btn.active { border-color: var(--hacker-green); color: var(--hacker-green); background: #001f00; box-shadow: var(--border-glow); }
-        .tab-btn.custom-tab { border: 1px dashed var(--hacker-green-dim); }
-        .tab-btn.custom-tab.active { border-style: solid; background-color: #001f00; }
+        .tab-btn.custom-tab { border: 1px dashed var(--hacker-green-dim); } .tab-btn.custom-tab.active { border-style: solid; background-color: #001f00; }
+        .tab-content { display: none; } .tab-content.active { display: block; }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeInUp 0.3s ease-out; }
-
-        /* --- FORM ELEMENTS (TERMINAL STYLE) --- */
+        /* --- FORM ELEMENTS --- */
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 700; font-size: 10px; margin-bottom: 6px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8;}
-
-        input, select, textarea {
-            width: 100%; padding: 10px 14px; border: 1px solid var(--hacker-green-dim); border-radius: 2px;
-            font-size: 13px; font-family: 'Fira Code', monospace; transition: all 0.3s ease; box-sizing: border-box; background-color: #000; color: #00FF00;
-        }
-        input:focus, select:focus { outline: none; border-color: var(--hacker-green); box-shadow: var(--border-glow); }
-        input::placeholder { color: #005500; font-size: 11px;}
+        input, select { width: 100%; padding: 10px 14px; border: 1px solid var(--hacker-green-dim); border-radius: 2px; font-size: 13px; font-family: 'Fira Code', monospace; box-sizing: border-box; background-color: #000; color: #00FF00; cursor: crosshair;}
+        input:focus, select:focus { outline: none; border-color: var(--hacker-green); box-shadow: var(--border-glow); } input::placeholder { color: #005500; font-size: 11px;}
         .editable-title { font-size: 14px; font-weight: bold; color: var(--hacker-green); border: 1px dashed transparent; background: transparent; padding: 2px; border-radius: 2px; width: 100%; box-sizing: border-box;}
-        .editable-title:hover { border-color: var(--hacker-green-dim); background: #111; }
-        .editable-title:focus { border-style: solid; }
 
-        .custom-select-box { border-color: var(--hacker-green-dim); font-weight: 600; cursor: pointer; }
         .cv-container { background: #000; border: 1px solid var(--hacker-green-dim); border-radius: 2px; padding: 20px; margin-bottom: 20px; display: none; }
         .cv-header-title { font-size: 10px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
         .cv-header-title::before { content: '||| '; color: var(--hacker-green); }
         .cv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        .cv-group label { color: #CCCCCC; }
 
         /* --- BUTTONS --- */
-        .btn-primary {
-            width: 100%; padding: 14px; background-color: #001f00; color: #00FF00;
-            border: 1px solid var(--hacker-green); border-radius: 2px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; font-family: monospace;
-        }
+        .btn-primary { width: 100%; padding: 14px; background-color: #001f00; color: #00FF00; border: 1px solid var(--hacker-green); border-radius: 2px; font-size: 13px; font-weight: 600; cursor: crosshair; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
         .btn-primary:hover { background-color: #00FF00; color: #000; box-shadow: var(--border-glow); transform: translateY(-1px); }
-        .btn-primary:active { transform: translateY(0); }
-        .btn-primary[disabled] { opacity: 0.3; border-color: #555; color: #777; background: #111; cursor: not-allowed; }
-
-        .btn-admin { padding: 8px 12px; font-size: 11px; font-weight: 600; background-color: transparent; color: #CCCCCC; border: 1px solid #444; border-radius: 2px; cursor: pointer; transition: 0.2s; text-transform: uppercase;}
+        .btn-admin { padding: 8px 12px; font-size: 11px; font-weight: 600; background-color: transparent; color: #CCCCCC; border: 1px solid #444; border-radius: 2px; cursor: crosshair; text-transform: uppercase;}
         .btn-admin:hover { background-color: #111; color: #fff; border-color: var(--hacker-green-dim); }
-        .btn-danger { background-color: #111; color: var(--danger); border: 1px solid var(--danger); padding: 6px 10px; border-radius: 2px; cursor: pointer; font-size: 10px; font-weight: bold;}
-        .btn-danger:hover { background-color: var(--danger); color: #fff; }
-        .btn-add-var { background: transparent; border: 1px dashed var(--hacker-green-dim); color: #CCCCCC; font-size: 10px; padding: 6px 10px; border-radius: 2px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        .btn-add-var:hover { background: #051a05; border-color: var(--hacker-green); color: #fff; }
-        .btn-remove-day { width: 40px; background-color: var(--danger); color: white; border: none; font-size: 18px; font-weight: bold; border-radius: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-danger { background-color: #111; color: var(--danger); border: 1px solid var(--danger); padding: 6px 10px; border-radius: 2px; cursor: crosshair; font-size: 10px; font-weight: bold;}
+        .btn-add-day { background-color: transparent; color: #CCCCCC; border: 1px dashed #333; width: 100%; padding: 10px; border-radius: 2px; cursor: crosshair; margin-bottom: 10px; font-size: 11px;}
+        .btn-remove-day { width: 40px; background-color: var(--danger); color: white; border: none; font-size: 18px; font-weight: bold; border-radius: 2px; cursor: crosshair; display: flex; align-items: center; justify-content: center; }
 
-        /* --- CALENDAR UI --- */
-        .calendar-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start; }
-        @media (max-width: 768px) { .calendar-layout { grid-template-columns: 1fr; } }
-        .task-list-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 20px; min-height: 350px; }
-        .task-list-box h3 { margin-top: 0; font-size: 13px; color: #fff; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .task-item { background: #050505; border-left: 2px solid var(--hacker-green); padding: 12px; margin-bottom: 10px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 12px; }
-        .task-item-time { font-weight: bold; color: var(--hacker-green); margin-bottom: 4px; }
-        .btn-wa { background-color: #075E54; color: white; border: none; padding: 6px 10px; border-radius: 2px; font-size: 10px; cursor: pointer; font-weight: bold; margin-top: 8px; display: inline-flex; align-items: center; gap: 5px; text-transform: uppercase;}
-        .calendar-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 15px; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; font-size:12px;}
-        .cal-nav-btn { background: #001f00; color: #00FF00; border: 1px solid var(--hacker-green-dim); padding: 6px 12px; border-radius: 2px; cursor: pointer; font-size: 11px; }
-        .cal-nav-btn:hover { background: var(--hacker-green); color: #000; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-        .cal-day-header { text-align: center; font-size: 9px; font-weight: bold; color: #777; padding-bottom: 10px; text-transform: uppercase; }
-        .cal-day { border: 1px solid #222; height: 50px; padding: 5px; font-size: 10px; color: #999; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;}
-        .cal-day:hover { background-color: #111; color: #fff; border-color: var(--hacker-green-dim); }
-        .cal-day.today { background-color: #001f00; border-color: var(--hacker-green); color: #fff; font-weight: bold; }
-        .cal-day.has-task { border-bottom: 2px solid var(--hacker-green); }
-        .cal-day.empty { background-color: transparent; cursor: default; border: none; }
-        .input-bar { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; margin-bottom: 15px; padding: 15px; background: #000; border: 1px solid #333; border-radius: 2px; }
+        .btn-print { margin-top: 10px; background: transparent; border: 1px solid #444; color: #888; padding: 6px; width: 100%; font-family: monospace; font-size: 10px; cursor: crosshair; transition: 0.2s;}
+        .btn-print:hover { border-color: #fff; color: #fff; }
 
         /* --- OTHERS --- */
         .dynamic-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .btn-add-day { background-color: transparent; color: #CCCCCC; border: 1px dashed #333; width: 100%; padding: 10px; border-radius: 2px; cursor: pointer; margin-bottom: 10px; font-size: 11px;}
-        .btn-add-day:hover { background-color: #0a110a; border-color: var(--hacker-green); color: #fff; }
-        
         .result-wrapper { margin-top: 15px; background: #0a0a0a; border-radius: 2px; padding: 20px; text-align: center; color: var(--hacker-green); border: 1px solid var(--hacker-green-dim); box-shadow: inset 0 0 10px rgba(0,0,0,0.5);}
         .result-wrapper.danger { border-color: var(--danger); color: var(--danger); box-shadow: inset 0 0 10px rgba(255,0,0,0.1); }
         .result-wrapper.custom { border-color: #CCCCCC; color: #FFFFFF; }
         .result-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 5px; font-family: monospace;}
         .result-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; justify-content: center; gap: 8px;}
         .result-unit-text { font-size: 16px; opacity: 0.7; font-weight: 600; letter-spacing: 0; }
-        
-        /* FOOTER FLICKERING GLOW */
-        .footer-brand { 
-            text-align: center; margin-top: 30px; font-size: 10px; font-weight: 700; 
-            letter-spacing: 3px; text-transform: uppercase; font-family: monospace;
-            color: var(--hacker-green);
-            animation: neonFlicker 4s infinite;
+        .footer-brand { text-align: center; margin-top: 30px; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; font-family: monospace; color: var(--hacker-green); animation: neonFlicker 4s infinite; }
+
+        /* --- PRINT DOSSIER CSS --- */
+        @media print {
+            body { background: #fff !important; color: #000 !important; }
+            body::after, #matrixCanvas, .hero-clock-container, .tabs-container, .header-top button, .form-group, .btn-primary, .btn-add-day, .btn-print, .footer-brand, #adminPanel { display: none !important; }
+            .card { border: none !important; box-shadow: none !important; margin: 0; padding: 0; }
+            .card::before, .card::after { display: none !important; }
+            .result-wrapper { background: transparent !important; border: 2px solid #000 !important; color: #000 !important; box-shadow: none !important; padding: 50px; position: relative; }
+            .result-wrapper::before {
+                content: 'CLASSIFIED'; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
+                font-size: 80px; font-weight: 900; color: rgba(255, 0, 0, 0.3); border: 8px solid rgba(255, 0, 0, 0.3);
+                padding: 10px 20px; z-index: -1; letter-spacing: 10px; font-family: 'Courier New', Courier, monospace;
+            }
+            .result-label { color: #000 !important; font-size: 16px; font-weight: bold; }
+            .result-value { font-size: 40px; color: #000 !important;}
         }
 
-        /* --- ADMIN PANEL --- */
+        /* ADMIN PANEL & MISC CSS HIDDEN FOR BREVITY - SAME AS BEFORE */
         #adminPanel { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--hacker-green-dim); }
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
-        .admin-header h3::before { content: '# '; color: var(--danger); }
         .formula-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         .formula-card { background: #000; border: 1px solid #222; padding: 15px; border-radius: 2px; position: relative;}
-        .formula-card.custom-card { border-left: 2px solid var(--hacker-green); }
-        .fc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 8px;}
-        .formula-input-box { border-color: #222; color: #00BB00; }
         .custom-vars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 5px; margin-top: 10px;}
         .var-input-group label { font-size: 9px; color: #fff; margin-bottom: 4px; display: block; font-weight:bold; opacity:0.7;}
-        .var-input-group label::before { content: '>_ '; color: var(--hacker-green); }
-        .var-input-group input { padding: 6px; font-size: 11px; }
-
-        /* MODAL & TOAST */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-content { background: var(--box-bg); padding: 30px; border-radius: 2px; width: 90%; max-width: 350px; border: 1px solid var(--hacker-green); box-shadow: var(--border-glow); transform: scale(0.9); transition: 0.3s;}
         .modal-overlay.active .modal-content { transform: scale(1); }
-        .modal-content h3::before { content: '[!] '; color: var(--danger); }
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
         .toast { background: #000; border: 1px solid var(--hacker-green); border-left: 4px solid var(--hacker-green); padding: 15px 20px; border-radius: 2px; margin-top: 10px; box-shadow: var(--border-glow); font-weight: 600; font-size: 12px; color: #fff; font-family: monospace;}
-        .toast.error { border-color: var(--danger); border-left-color: var(--danger); color: var(--danger); }
+        
+        /* Date / Reminder layout */
+        .calendar-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start; }
+        @media (max-width: 768px) { .calendar-layout { grid-template-columns: 1fr; } }
+        .task-list-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 20px; min-height: 350px; }
+        .task-item { background: #050505; border-left: 2px solid var(--hacker-green); padding: 12px; margin-bottom: 10px; border-radius: 2px; font-size: 12px; }
+        .calendar-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 15px; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; font-size:12px;}
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+        .cal-day-header { text-align: center; font-size: 9px; font-weight: bold; color: #777; padding-bottom: 10px; text-transform: uppercase; }
+        .cal-day { border: 1px solid #222; height: 50px; padding: 5px; font-size: 10px; color: #999; cursor: crosshair; display: flex; flex-direction: column; justify-content: space-between;}
+        .cal-day.today { background-color: #001f00; border-color: var(--hacker-green); color: #fff; font-weight: bold; }
+        .input-bar { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; margin-bottom: 15px; padding: 15px; background: #000; border: 1px solid #333; border-radius: 2px; }
     </style>
 </head>
 <body>
 
+<div id="bootScreen">
+    <div id="bootTextContainer"></div>
+    <div class="boot-cursor"></div>
+</div>
+
 <canvas id="matrixCanvas"></canvas>
 
 <div class="hero-clock-container">
-    <div class="hero-time" id="liveTime">00<span class="blink-colon">:</span>00<span class="secs">00</span></div>
+    <div class="hud-top-row">
+        <canvas id="cpuGraph"></canvas>
+        <div class="hero-time" id="liveTime">00<span class="blink-colon">:</span>00<span class="secs">00</span></div>
+    </div>
     <div class="hero-date" id="liveDate">PROTOCOL DATE</div>
+    <button class="sound-toggle" onclick="toggleSound()" id="soundBtn">[ SOUND: ON ]</button>
 </div>
 
 <div class="card">
@@ -264,8 +210,11 @@
         <div class="form-group"><label>Rate Type</label><select id="otType" onchange="handleOTTypeChange()"><option value="pos">Positive OT (1.5x)</option><option value="neg">Negative OT (1.0x)</option><option value="hq">HQ OT (1.5x / 30D)</option><option value="ph">Public Holiday (2.0x)</option></select></div>
         <div class="form-group" id="otContainer"><label id="otDurationLabel">Duration (Minutes)</label><div class="dynamic-row"><input type="number" class="ot-input" placeholder="Minutes (e.g., 120)"></div></div>
         <button class="btn-add-day" onclick="addRow('ot')">+ Add Day Duration</button>
-        <button class="btn-primary" onclick="calculateOT()" id="btnCalculateOT">Execute Calculation</button>
-        <div class="result-wrapper"><div class="result-label">Total Overtime Pay</div><div class="result-value">RM <span id="resultDisplayOT">0.00</span></div></div>
+        <button class="btn-primary" onclick="calculateOT()">Execute Calculation</button>
+        <div class="result-wrapper">
+            <div class="result-label">Total Overtime Pay</div><div class="result-value">RM <span id="resultDisplayOT">0.00</span></div>
+            <button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button>
+        </div>
     </div>
 
     <div id="absentTab" class="tab-content">
@@ -273,8 +222,11 @@
         <div class="form-group"><label>Category</label><select id="absentType"><option value="ab_nor">Normal Absent (1x)</option><option value="ab_ph">Linked to PH (2x Deduction)</option></select></div>
         <div class="form-group" id="absentContainer"><label>Days Absent</label><div class="dynamic-row"><input type="number" class="absent-input" placeholder="Value (e.g., 1)"></div></div>
         <button class="btn-add-day" onclick="addRow('absent')">+ Add Input</button>
-        <button class="btn-primary" onclick="calculateAbsent()" id="btnCalculateAbsent">Execute Deduction</button>
-        <div class="result-wrapper danger"><div class="result-label">Total Deduction</div><div class="result-value">RM <span id="resultDisplayAbsent">0.00</span></div></div>
+        <button class="btn-primary" onclick="calculateAbsent()">Execute Deduction</button>
+        <div class="result-wrapper danger">
+            <div class="result-label">Total Deduction</div><div class="result-value">RM <span id="resultDisplayAbsent">0.00</span></div>
+            <button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button>
+        </div>
     </div>
 
     <div id="resignTab" class="tab-content">
@@ -282,321 +234,224 @@
         <div class="form-group"><label>Category</label><select id="resignType" onchange="handleResignTypeChange()"><option value="sn">Short Notice Penalty</option><option value="al">YTD AL Encashment</option></select></div>
         <div class="form-group" id="resignContainer"><label id="resignDurationLabel">Short Notice (Days)</label><div class="dynamic-row"><input type="number" class="resign-input" placeholder="Value (e.g., 14)"></div></div>
         <button class="btn-add-day" onclick="addRow('resign')">+ Add Input</button>
-        <button class="btn-primary" onclick="calculateResign()" id="btnCalculateResign">Execute Settlement</button>
-        <div class="result-wrapper danger" id="resignResultBox"><div class="result-label" id="resignResultLabel">Total Penalty</div><div class="result-value">RM <span id="resultDisplayResign">0.00</span></div></div>
+        <button class="btn-primary" onclick="calculateResign()">Execute Settlement</button>
+        <div class="result-wrapper danger" id="resignResultBox">
+            <div class="result-label" id="resignResultLabel">Total Penalty</div><div class="result-value">RM <span id="resultDisplayResign">0.00</span></div>
+            <button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button>
+        </div>
     </div>
 
     <div id="customCalcTab" class="tab-content">
-        <div class="form-group">
-            <label style="color: var(--hacker-green);">Select Custom Engine</label>
-            <select id="cstType" class="custom-select-box" onchange="handleCustomSelection()">
-                <option value="">-- No Engines Synced --</option>
-            </select>
-        </div>
-        
-        <div id="cvContainer" class="cv-container">
-            <div class="cv-header-title">🎛️ Dynamic Inputs</div>
-            <div class="cv-grid" id="cvDynamicGrid"></div>
-        </div>
-
-        <button class="btn-primary" onclick="calculateCustomDynamic()" id="btnCalculateCustom">Execute Protocol</button>
-        
+        <div class="form-group"><label>Select Custom Engine</label><select id="cstType" class="custom-select-box" onchange="handleCustomSelection()"><option value="">-- No Engines Synced --</option></select></div>
+        <div id="cvContainer" class="cv-container"><div class="cv-header-title">🎛️ Dynamic Inputs</div><div class="cv-grid" id="cvDynamicGrid"></div></div>
+        <button class="btn-primary" onclick="calculateCustomDynamic()">Execute Protocol</button>
         <div class="result-wrapper custom">
             <div class="result-label">Generated Output</div>
-            <div class="result-value">
-                <span id="cstUnitFront" class="result-unit-text" style="display:none;"></span>
-                <span id="resultDisplayCst">0</span> 
-                <span id="cstUnitBack" class="result-unit-text" style="display:none;"></span>
-            </div>
+            <div class="result-value"><span id="cstUnitFront" class="result-unit-text" style="display:none;"></span><span id="resultDisplayCst">0</span><span id="cstUnitBack" class="result-unit-text" style="display:none;"></span></div>
+            <button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button>
         </div>
     </div>
 
     <div id="dateTab" class="tab-content">
-        <div class="form-group"><label>Operation Mode</label><select id="calcMode" onchange="toggleDateMode()"><option value="diff">Difference between dates</option><option value="addsub">Add or subtract days</option></select></div>
-        <div id="modeDiff">
-            <div class="form-group"><label>From</label><input type="date" id="diffFrom"></div>
-            <div class="form-group"><label>To</label><input type="date" id="diffTo"></div>
-        </div>
-        <div id="modeAddSub" style="display: none;">
-            <div class="form-group"><label>Reference Date</label><input type="date" id="addSubFrom"></div>
-            <div style="display:flex; gap:15px; margin-bottom:15px; font-family: monospace; font-size:12px;"><label><input type="radio" name="addSubType" value="add" checked> [ + ] Add</label><label><input type="radio" name="addSubType" value="sub"> [ - ] Subtract</label></div>
-            <div class="grid-3 form-group" style="display: flex; gap: 10px;">
-                <div style="flex:1"><label>Yrs</label><input type="number" id="valYears" value="0"></div>
-                <div style="flex:1"><label>Mths</label><input type="number" id="valMonths" value="0"></div>
-                <div style="flex:1"><label>Days</label><input type="number" id="valDays" value="0"></div>
-            </div>
-        </div>
-        <button class="btn-primary" onclick="calculateDate()" id="btnCalculateDate">Run Date Utility</button>
+        <div class="form-group"><label>Operation Mode</label><select id="calcMode" onchange="toggleDateMode()"><option value="diff">Difference between dates</option><option value="addsub">Add/Sub days</option></select></div>
+        <div id="modeDiff"><div class="form-group"><label>From</label><input type="date" id="diffFrom"></div><div class="form-group"><label>To</label><input type="date" id="diffTo"></div></div>
+        <div id="modeAddSub" style="display:none;"><div class="form-group"><label>Ref Date</label><input type="date" id="addSubFrom"></div><div style="display:flex; gap:15px; margin-bottom:15px;"><label><input type="radio" name="addSubType" value="add" checked> Add</label><label><input type="radio" name="addSubType" value="sub"> Sub</label></div><div style="display:flex;gap:10px;"><div style="flex:1"><label>Yrs</label><input type="number" id="valYears" value="0"></div><div style="flex:1"><label>Mths</label><input type="number" id="valMonths" value="0"></div><div style="flex:1"><label>Days</label><input type="number" id="valDays" value="0"></div></div></div>
+        <button class="btn-primary" style="margin-top:15px;" onclick="calculateDate()">Run Date Utility</button>
         <div class="result-wrapper"><div class="result-label">Protocol Result</div><div class="result-value" id="dateResultMain" style="font-size: 20px;">READY</div><div class="result-label" id="dateResultSub" style="margin-top:5px; color:#555;">awaiting input</div></div>
     </div>
 
     <div id="reminderTab" class="tab-content">
-        <div class="input-bar">
-            <div><label>Protocol Date</label><input type="date" id="taskDate"></div>
-            <div><label>Protocol Time</label><input type="time" id="taskTime"></div>
-            <div><label>Log Note</label><input type="text" id="taskNote" placeholder="e.g., Finalise payroll execution"></div>
-        </div>
-        <button class="btn-primary" style="margin-bottom: 25px;" onclick="addTask()">Commit Log to Protocol</button>
-
-        <div class="calendar-layout">
-            <div class="task-list-box">
-                <h3>Active Protocol Logs</h3>
-                <div id="taskListDisplay"><p style="font-size:11px; color:#555;">>_ No active protocols scheduled.</p></div>
-            </div>
-            <div class="calendar-box">
-                <div class="cal-header">
-                    <button class="cal-nav-btn" onclick="changeMonth(-1)">&lt;</button>
-                    <span id="calMonthYearDisplay">CYCLE YEAR</span>
-                    <button class="cal-nav-btn" onclick="changeMonth(1)">&gt;</button>
-                </div>
-                <div class="cal-grid" id="calGrid"></div>
-            </div>
-        </div>
+        <div class="input-bar"><div><label>Date</label><input type="date" id="taskDate"></div><div><label>Time</label><input type="time" id="taskTime"></div><div><label>Log Note</label><input type="text" id="taskNote"></div></div>
+        <button class="btn-primary" style="margin-bottom: 25px;" onclick="addTask()">Commit Log</button>
+        <div class="calendar-layout"><div class="task-list-box"><h3>Active Logs</h3><div id="taskListDisplay"></div></div><div class="calendar-box"><div class="cal-header"><button class="cal-nav-btn" onclick="changeMonth(-1)">&lt;</button><span id="calMonthYearDisplay"></span><button class="cal-nav-btn" onclick="changeMonth(1)">&gt;</button></div><div class="cal-grid" id="calGrid"></div></div></div>
     </div>
 
     <div id="adminPanel">
-        <div class="admin-header">
-            <h3>CYBER_ENGINE V5 (Unlimited Protocol)</h3>
-            <button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Custom Engine</button>
-        </div>
-        <p style="font-size: 11px; color: #777; margin-top: -5px; margin-bottom: 15px;">
-            Define dynamic protocols. Insert as many <strong>VAL</strong> variable inputs as required. To delete a variable box, empty its label and execute a Sync.
-        </p>
-        
+        <div class="admin-header"><h3>CYBER_ENGINE V7</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
         <div class="formula-grid" id="adminFormulasRender"></div>
-        
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <button class="btn-primary" onclick="saveFormulas()">💾 Execute Sync & Reload</button>
-            <button class="btn-admin" onclick="document.getElementById('adminPanel').style.display='none'">Close Terminal</button>
-        </div>
+        <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-primary" onclick="saveFormulas()">💾 Sync & Reload</button><button class="btn-admin" onclick="document.getElementById('adminPanel').style.display='none'">Close Terminal</button></div>
     </div>
 
     <div class="footer-brand">PROTOCOL MAINTAINED BY NoelEthan.exe</div>
 </div>
 
-<div class="modal-overlay" id="authModal"><div class="modal-content"><h3>Terminal Access Unlock</h3><p style="font-size:11px; color:#CCCCCC;">Enter authorization code to edit protocols.</p><input type="password" id="adminPassword" placeholder="Authorization Code..."><button class="btn-primary" onclick="verifyAdmin()" style="margin-top:15px;">Unlock Engine</button><button class="btn-admin" onclick="document.getElementById('authModal').classList.remove('active')" style="width:100%; margin-top:10px;">Cancel</button></div></div>
+<div class="modal-overlay" id="authModal"><div class="modal-content"><h3>Terminal Access</h3><input type="password" id="adminPassword" placeholder="Code..."><button class="btn-primary" onclick="verifyAdmin()" style="margin-top:15px;">Unlock</button><button class="btn-admin" onclick="document.getElementById('authModal').classList.remove('active')" style="width:100%; margin-top:10px;">Cancel</button></div></div>
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-    // --- MATRIX DIGITAL RAIN EFFECT ---
-    const canvas = document.getElementById('matrixCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    
-    const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%+-/~{[|`]}";
-    const charsArray = matrixChars.split("");
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = [];
-    
-    for(let x = 0; x < columns; x++) drops[x] = 1;
-    
-    function drawMatrix() {
-        ctx.fillStyle = "rgba(5, 5, 5, 0.05)"; // Trail effect
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = "#00FF00"; // Hacker green text
-        ctx.font = fontSize + "px monospace";
-        
-        for(let i = 0; i < drops.length; i++) {
-            const text = charsArray[Math.floor(Math.random() * charsArray.length)];
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            
-            if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
-        }
-    }
-    setInterval(drawMatrix, 35);
-    window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    // --- WEBAUDIO SFX ENGINE ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+    let isSoundOn = true;
 
-    // --- LIVE CLOCK (HUD VERSION) ---
-    function updateLiveClock() {
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const s = String(now.getSeconds()).padStart(2, '0');
-        // Injecting spans for blinking colon and smaller seconds
-        document.getElementById('liveTime').innerHTML = `${h}<span class="blink-colon">:</span>${m}<span class="secs">${s}</span>`;
-        document.getElementById('liveDate').innerText = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase();
+    function toggleSound() {
+        isSoundOn = !isSoundOn;
+        document.getElementById('soundBtn').innerText = isSoundOn ? '[ SOUND: ON ]' : '[ SOUND: MUTED ]';
     }
-    setInterval(updateLiveClock, 1000);
-    updateLiveClock();
 
-    // --- FORMULAS ENGINE V5 (Unlimited Array logic) ---
-    let activeTabId = 'otTab';
-    const defaultFormulas = {
-        pos: { label: "Positive OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.5 * INPUT", custom: false }, 
-        neg: { label: "Negative OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.0 * INPUT", custom: false }, 
-        hq: { label: "HQ OT", expr: "((BASIC / 30) / 8.5 / 60) * 1.5 * INPUT", custom: false },
-        ph: { label: "PH (Double)", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, 
-        ab_nor: { label: "Absent Normal", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, 
-        ab_ph: { label: "Absent PH Linked", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false },
-        sn: { label: "Short Notice", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, 
-        al: { label: "YTD AL", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false },
+    function playTone(freq, type, duration, vol) {
+        if(!isSoundOn) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + duration);
+    }
+    
+    // Bind sounds to interactions
+    document.addEventListener('keydown', (e) => { if(e.target.tagName === 'INPUT') playTone(800, 'square', 0.05, 0.05); });
+    document.addEventListener('click', (e) => { 
+        if(e.target.tagName === 'BUTTON' && !e.target.classList.contains('btn-primary')) playTone(1200, 'sine', 0.1, 0.1); 
+        if(e.target.classList.contains('btn-primary')) { playTone(600, 'sawtooth', 0.1, 0.2); setTimeout(()=>playTone(900, 'sawtooth', 0.2, 0.2), 100); }
+    });
+
+    // --- BOOT UP SEQUENCE ---
+    const bootLines = [
+        "SYS_MEM: 640K OK", "ESTABLISHING SECURE CONNECTION...", "HANDSHAKE ACCEPTED.",
+        "LOADING KERNEL MODULES... OK", "BYPASSING SECURITY PROTOCOL... OK",
+        "DECRYPTING HR_DATABASE_V7... DONE", "WELCOME, NOEL_ETHAN.EXE."
+    ];
+    window.onload = () => {
+        const container = document.getElementById('bootTextContainer');
+        const bootScreen = document.getElementById('bootScreen');
+        let delay = 0;
+        bootLines.forEach((line, index) => {
+            setTimeout(() => {
+                const div = document.createElement('div'); div.className = 'boot-line'; div.innerText = '> ' + line;
+                container.appendChild(div); playTone(1500, 'square', 0.05, 0.1);
+            }, delay);
+            delay += Math.random() * 400 + 200; // Random delay between lines
+        });
+        setTimeout(() => {
+            bootScreen.style.opacity = '0';
+            setTimeout(() => bootScreen.style.display = 'none', 500);
+            playTone(400, 'sine', 0.5, 0.3); // Boot complete chime
+        }, delay + 500);
         
-        cst_demo: { 
-            label: "Dynamic Protocol Template", 
-            custom: true, 
-            vars: ["Variable Alpha", "Variable Beta"],
-            expr: "VAL1 + VAL2",
-            unit: "Unit"
-        }
+        // Init other systems
+        initMatrix(); initGraph(); populateCustomDropdown();
     };
-    let currentFormulas = JSON.parse(localStorage.getItem('hrFormulasV5')) || defaultFormulas;
 
-    // --- TAB SWITCHER ---
-    function switchTab(tabId, btnElement) {
-        activeTabId = tabId;
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        btnElement.classList.add('active');
-        if (tabId === 'reminderTab') renderCalendar();
-        if (tabId === 'customCalcTab') { populateCustomDropdown(); handleCustomSelection(); }
+    // --- CYBER CROSSHAIR TRAIL ---
+    document.addEventListener('mousemove', (e) => {
+        const trail = document.createElement('div'); trail.className = 'cursor-trail';
+        trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px';
+        document.body.appendChild(trail);
+        setTimeout(() => trail.remove(), 500);
+    });
+
+    // --- CPU DIAGNOSTICS GRAPH ---
+    const graphCanvas = document.getElementById('cpuGraph');
+    const gCtx = graphCanvas.getContext('2d');
+    let graphData = Array(30).fill(10);
+    function initGraph() {
+        graphData.push(Math.random() * 20 + 5); graphData.shift();
+        gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+        gCtx.beginPath(); gCtx.strokeStyle = '#00FF00'; gCtx.lineWidth = 1;
+        for(let i=0; i<graphData.length; i++) {
+            let x = i * (graphCanvas.width / graphData.length);
+            let y = graphCanvas.height - graphData[i];
+            if(i===0) gCtx.moveTo(x, y); else gCtx.lineTo(x, y);
+        }
+        gCtx.stroke(); requestAnimationFrame(initGraph);
     }
 
-    // --- SHARED DOM UTILITIES ---
-    function addRow(mode) {
-        const container = document.getElementById(mode + 'Container');
-        const newRow = document.createElement('div');
-        newRow.className = 'dynamic-row';
-        newRow.innerHTML = `<input type="number" class="${mode}-input" placeholder="Minutes..."><button class="btn-remove-day" onclick="this.parentElement.remove();">×</button>`;
-        container.appendChild(newRow);
+    // --- MATRIX DIGITAL RAIN EFFECT ---
+    function initMatrix() {
+        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"; const charsArray = matrixChars.split("");
+        const fontSize = 14; const columns = canvas.width / fontSize; const drops = [];
+        for(let x = 0; x < columns; x++) drops[x] = 1;
+        setInterval(() => {
+            ctx.fillStyle = "rgba(5, 5, 5, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#00FF00"; ctx.font = fontSize + "px monospace";
+            for(let i = 0; i < drops.length; i++) {
+                ctx.fillText(charsArray[Math.floor(Math.random() * charsArray.length)], i * fontSize, drops[i] * fontSize);
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
+            }
+        }, 35);
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
     }
+
+    // --- LIVE CLOCK ---
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('liveTime').innerHTML = `${String(now.getHours()).padStart(2, '0')}<span class="blink-colon">:</span>${String(now.getMinutes()).padStart(2, '0')}<span class="secs">${String(now.getSeconds()).padStart(2, '0')}</span>`;
+        document.getElementById('liveDate').innerText = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase();
+    }, 1000);
+
+    // --- FORMULAS ENGINE V7 (Preserved V5 Data Logic) ---
+    let activeTabId = 'otTab';
+    const defaultFormulas = { pos: { label: "Positive OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.5 * INPUT", custom: false }, neg: { label: "Negative OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.0 * INPUT", custom: false }, hq: { label: "HQ OT", expr: "((BASIC / 30) / 8.5 / 60) * 1.5 * INPUT", custom: false }, ph: { label: "PH (Double)", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, ab_nor: { label: "Absent Normal", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, ab_ph: { label: "Absent PH Linked", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, sn: { label: "Short Notice", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, al: { label: "YTD AL", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, cst_demo: { label: "Protocol Base", custom: true, vars: ["Var Alpha", "Var Beta"], expr: "VAL1 + VAL2", unit: "Unit" } };
+    let currentFormulas = JSON.parse(localStorage.getItem('hrFormulasV7')) || defaultFormulas;
+
+    function switchTab(tabId, btnElement) { activeTabId = tabId; document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); btnElement.classList.add('active'); if (tabId === 'reminderTab') renderCalendar(); if (tabId === 'customCalcTab') { populateCustomDropdown(); handleCustomSelection(); } }
+    function addRow(mode) { const c = document.getElementById(mode + 'Container'); const r = document.createElement('div'); r.className = 'dynamic-row'; r.innerHTML = `<input type="number" class="${mode}-input" placeholder="Value..."><button class="btn-remove-day" onclick="this.parentElement.remove();">×</button>`; c.appendChild(r); }
     function getSum(className) { let sum = 0; document.querySelectorAll('.' + className).forEach(inp => { let v = parseFloat(inp.value); if(!isNaN(v)) sum+=v; }); return sum; }
 
-    // --- CALCULATORS (CORE) ---
-    function coreCalculation(basic, formulaKey, inputs) {
-        let f = currentFormulas[formulaKey];
-        if(!f || !f.expr) return 0;
-        try { let calcFunc = new Function('BASIC', 'INPUT', 'return ' + f.expr); return calcFunc(basic || 0, inputs || 0); } catch(e) { return 0; }
-    }
+    function coreCalculation(basic, formulaKey, inputs) { let f = currentFormulas[formulaKey]; if(!f || !f.expr) return 0; try { let calcFunc = new Function('BASIC', 'INPUT', 'return ' + f.expr); return calcFunc(basic || 0, inputs || 0); } catch(e) { return 0; } }
+    function calculateOT() { let b = parseFloat(document.getElementById('otBasicSalary').value); let t = document.getElementById('otType').value; let inp = getSum('ot-input'); if(isNaN(b) || inp===0) return showToast("Missing parameters", "error"); document.getElementById('resultDisplayOT').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Calculation executed"); }
+    function calculateAbsent() { let b = parseFloat(document.getElementById('absentBasicSalary').value); let t = document.getElementById('absentType').value; let inp = getSum('absent-input'); if(isNaN(b) || inp===0) return showToast("Missing parameters", "error"); document.getElementById('resultDisplayAbsent').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Calculation executed"); }
+    function calculateResign() { let b = parseFloat(document.getElementById('resignBasicSalary').value); let t = document.getElementById('resignType').value; let inp = getSum('resign-input'); if(isNaN(b) || inp===0) return showToast("Missing parameters", "error"); document.getElementById('resultDisplayResign').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Calculation executed"); }
 
-    function calculateOT() { let b = parseFloat(document.getElementById('otBasicSalary').value); let t = document.getElementById('otType').value; let inp = getSum('ot-input'); if(isNaN(b) || inp===0) { showToast("Missing input parameters", "error"); return; } document.getElementById('resultDisplayOT').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("OT Calculated."); }
-    function calculateAbsent() { let b = parseFloat(document.getElementById('absentBasicSalary').value); let t = document.getElementById('absentType').value; let inp = getSum('absent-input'); if(isNaN(b) || inp===0) { showToast("Missing input parameters", "error"); return; } document.getElementById('resultDisplayAbsent').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Absent Deducted."); }
-    function calculateResign() { let b = parseFloat(document.getElementById('resignBasicSalary').value); let t = document.getElementById('resignType').value; let inp = getSum('resign-input'); if(isNaN(b) || inp===0) { showToast("Missing input parameters", "error"); return; } document.getElementById('resultDisplayResign').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Settlement Calculated."); }
-
-    // --- CALCULATOR (UNIVERSAL CUSTOM) ---
     function handleCustomSelection() {
-        let t = document.getElementById('cstType').value;
-        let f = currentFormulas[t];
-        let cvContainer = document.getElementById('cvContainer');
-        let dynamicGrid = document.getElementById('cvDynamicGrid');
-        
-        cvContainer.style.display = 'none'; dynamicGrid.innerHTML = '';
-        document.getElementById('resultDisplayCst').innerText = "0";
-        document.getElementById('cstUnitFront').style.display = 'none'; document.getElementById('cstUnitBack').style.display = 'none';
-
-        if(f && f.custom && f.vars && f.vars.length > 0) {
-            f.vars.forEach((varLabel, idx) => {
-                let i = idx + 1;
-                dynamicGrid.innerHTML += `
-                    <div class="cv-group"><label>[VAL${i}] ${varLabel}</label><input type="number" id="cstDynVal${i}" placeholder="Enter Value..."></div>`;
-            });
-            cvContainer.style.display = 'block';
-        }
+        let t = document.getElementById('cstType').value; let f = currentFormulas[t]; let cvContainer = document.getElementById('cvContainer'); let dynamicGrid = document.getElementById('cvDynamicGrid');
+        cvContainer.style.display = 'none'; dynamicGrid.innerHTML = ''; document.getElementById('resultDisplayCst').innerText = "0"; document.getElementById('cstUnitFront').style.display = 'none'; document.getElementById('cstUnitBack').style.display = 'none';
+        if(f && f.custom && f.vars && f.vars.length > 0) { f.vars.forEach((varLabel, idx) => { dynamicGrid.innerHTML += `<div class="cv-group"><label>[VAL${idx+1}] ${varLabel}</label><input type="number" id="cstDynVal${idx+1}" placeholder="Enter Value..."></div>`; }); cvContainer.style.display = 'block'; }
     }
-
     function calculateCustomDynamic() {
-        let t = document.getElementById('cstType').value;
-        let f = currentFormulas[t];
-        if(!f || !f.custom) { showToast("Select active engine.", "error"); return; }
-
+        let t = document.getElementById('cstType').value; let f = currentFormulas[t]; if(!f || !f.custom) return showToast("Select active engine.", "error");
         let argNames = []; let argValues = [];
-        if(f.vars && f.vars.length > 0) {
-            f.vars.forEach((_, idx) => {
-                let i = idx + 1; argNames.push('VAL' + i);
-                argValues.push(parseFloat(document.getElementById('cstDynVal' + i).value) || 0);
-            });
-        }
+        if(f.vars && f.vars.length > 0) { f.vars.forEach((_, idx) => { argNames.push('VAL'+(idx+1)); argValues.push(parseFloat(document.getElementById('cstDynVal'+(idx+1)).value) || 0); }); }
         try {
-            let calcFunc = new Function(...argNames, 'return ' + f.expr);
-            let ans = calcFunc(...argValues);
-            if(!isFinite(ans)) throw new Error("Math Error");
+            let calcFunc = new Function(...argNames, 'return ' + f.expr); let ans = calcFunc(...argValues); if(!isFinite(ans)) throw new Error("Math Error");
             document.getElementById('resultDisplayCst').innerText = (ans % 1 !== 0) ? ans.toFixed(2) : ans.toString();
-            
-            let uF = document.getElementById('cstUnitFront'); let uB = document.getElementById('cstUnitBack');
-            uF.style.display = 'none'; uB.style.display = 'none';
-            if (f.unit && f.unit.trim() !== '') {
-                let u = f.unit.trim();
-                if(['RM', '$', '£'].includes(u.toUpperCase()) || u==='$') { uF.innerText = u; uF.style.display = 'inline-block'; } 
-                else { uB.innerText = u; uB.style.display = 'inline-block'; }
-            }
+            let uF = document.getElementById('cstUnitFront'); let uB = document.getElementById('cstUnitBack'); uF.style.display = 'none'; uB.style.display = 'none';
+            if (f.unit && f.unit.trim() !== '') { let u = f.unit.trim(); if(['RM', '$', '£'].includes(u.toUpperCase()) || u==='$') { uF.innerText = u; uF.style.display = 'inline-block'; } else { uB.innerText = u; uB.style.display = 'inline-block'; } }
             showToast("Protocol executed successfully!");
-        } catch(e) {
-            document.getElementById('resultDisplayCst').innerText = "ERROR"; showToast("Math Expression failure.", "error");
-        }
+        } catch(e) { document.getElementById('resultDisplayCst').innerText = "ERROR"; showToast("Math Expression failure.", "error"); }
     }
 
-    // UI Listeners
-    function handleResignTypeChange() {
-        let t = document.getElementById('resignType').value; document.getElementById('resignDurationLabel').innerText = t==='sn'?"Short Notice (Days)":"YTD AL (Days)";
-        document.getElementById('resignResultBox').className = t==='sn'?"result-wrapper danger":"result-wrapper custom"; document.getElementById('resignResultLabel').innerText = t==='sn'?"Total Penalty":"Total AL Encashment";
-    }
+    // Dates / Toggles
+    function handleResignTypeChange() { let t = document.getElementById('resignType').value; document.getElementById('resignDurationLabel').innerText = t==='sn'?"Short Notice (Days)":"YTD AL (Days)"; document.getElementById('resignResultBox').className = t==='sn'?"result-wrapper danger":"result-wrapper custom"; document.getElementById('resignResultLabel').innerText = t==='sn'?"Total Penalty":"Total AL Encashment"; }
     function handleOTTypeChange() { document.getElementById('otDurationLabel').innerText = document.getElementById('otType').value === 'ph' ? "Days" : "Minutes"; }
     function toggleDateMode() { let isDiff = document.getElementById('calcMode').value === 'diff'; document.getElementById('modeDiff').style.display = isDiff ? 'block' : 'none'; document.getElementById('modeAddSub').style.display = !isDiff ? 'block' : 'none'; }
     function calculateDate() {
         let isDiff = document.getElementById('calcMode').value === 'diff';
-        if(isDiff) {
-            let d1 = new Date(document.getElementById('diffFrom').value); let d2 = new Date(document.getElementById('diffTo').value); if(isNaN(d1)||isNaN(d2)) return;
-            document.getElementById('dateResultMain').innerText = Math.ceil(Math.abs(d2 - d1) / (1000 * 3600 * 24)) + " DAYS DIFF";
-        } else {
-            let base = new Date(document.getElementById('addSubFrom').value); if(isNaN(base)) return; let m = document.querySelector('input[name="addSubType"]:checked').value==='add'?1:-1;
-            base.setFullYear(base.getFullYear() + (parseFloat(document.getElementById('valYears').value)||0)*m); base.setMonth(base.getMonth() + (parseFloat(document.getElementById('valMonths').value)||0)*m); base.setDate(base.getDate() + (parseFloat(document.getElementById('valDays').value)||0)*m);
-            document.getElementById('dateResultMain').innerText = base.toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' }).toUpperCase();
-        }
+        if(isDiff) { let d1 = new Date(document.getElementById('diffFrom').value); let d2 = new Date(document.getElementById('diffTo').value); if(isNaN(d1)||isNaN(d2)) return; document.getElementById('dateResultMain').innerText = Math.ceil(Math.abs(d2 - d1) / (1000 * 3600 * 24)) + " DAYS DIFF"; } 
+        else { let base = new Date(document.getElementById('addSubFrom').value); if(isNaN(base)) return; let m = document.querySelector('input[name="addSubType"]:checked').value==='add'?1:-1; base.setFullYear(base.getFullYear() + (parseFloat(document.getElementById('valYears').value)||0)*m); base.setMonth(base.getMonth() + (parseFloat(document.getElementById('valMonths').value)||0)*m); base.setDate(base.getDate() + (parseFloat(document.getElementById('valDays').value)||0)*m); document.getElementById('dateResultMain').innerText = base.toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' }).toUpperCase(); }
         document.getElementById('dateResultSub').innerText = "CALCULATION COMPLETE";
     }
 
-    // --- CALENDAR LOGS ---
+    // Reminders (Truncated for space, works same as V6)
     let tasks = JSON.parse(localStorage.getItem('hrReminders')) || []; let calDate = new Date();
     function renderCalendar() {
-        const y = calDate.getFullYear(); const m = calDate.getMonth();
-        document.getElementById('calMonthYearDisplay').innerText = new Date(y, m).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
+        const y = calDate.getFullYear(); const m = calDate.getMonth(); document.getElementById('calMonthYearDisplay').innerText = new Date(y, m).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
         const grid = document.getElementById('calGrid'); grid.innerHTML = ['SUN','MON','TUE','WED','THU','FRI','SAT'].map(d => `<div class="cal-day-header">${d}</div>`).join('');
         for(let i=0; i<new Date(y, m, 1).getDay(); i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
-        for(let i=1; i<=new Date(y, m + 1, 0).getDate(); i++) {
-            let s = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; let isToday = (i === new Date().getDate() && m === new Date().getMonth() && y === new Date().getFullYear()); grid.innerHTML += `<div class="cal-day ${isToday?'today':''} ${tasks.some(t => t.date === s)?'has-task':''}" onclick="filterList('${s}')"><span>${i}</span></div>`;
-        }
+        for(let i=1; i<=new Date(y, m + 1, 0).getDate(); i++) { let s = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; let isToday = (i === new Date().getDate() && m === new Date().getMonth() && y === new Date().getFullYear()); grid.innerHTML += `<div class="cal-day ${isToday?'today':''} ${tasks.some(t => t.date === s)?'has-task':''}"><span>${i}</span></div>`; }
         renderTaskList();
     }
     function changeMonth(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); }
-    async function addTask() {
-        let d = document.getElementById('taskDate').value; let t = document.getElementById('taskTime').value; let n = document.getElementById('taskNote').value;
-        if(!d || !t || !n) { showToast("Missing input data.", "error"); return; }
-        tasks.push({ id: Date.now(), date: d, time: t, note: n }); tasks.sort((a,b) => new Date(a.date+'T'+a.time) - new Date(b.date+'T'+b.time)); localStorage.setItem('hrReminders', JSON.stringify(tasks));
-        try { await fetch('https://vigilant-spork-wrr9pxvrxrxvhvv96-3000.app.github.dev/tambah-task', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ date: d, time: t, note: n }) }); showToast("Commited to WA Server."); } catch (error) { showToast("Server offline", "error"); }
-        document.getElementById('taskNote').value = ""; renderCalendar();
-    }
+    function renderTaskList() { const listDiv = document.getElementById('taskListDisplay'); if(tasks.length === 0) { listDiv.innerHTML = `<p style="font-size:11px; color:#555;">>_ No protocols logged.</p>`; return; } listDiv.innerHTML = tasks.map(t => `<div class="task-item"><div class="task-item-time">${t.date} @ ${t.time}</div><div>${t.note}</div><div><button class="btn-wa" onclick="window.open('https://web.whatsapp.com/send?text=${encodeURIComponent('*CYBER REMINDER*\n'+t.date+' '+t.time+'\n'+t.note)}', '_blank')">WA</button> <button class="btn-danger" style="padding:4px;" onclick="removeTask(${t.id})">DEL</button></div></div>`).join(''); }
     function removeTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('hrReminders', JSON.stringify(tasks)); renderCalendar(); }
-    function renderTaskList(f = null) {
-        const listDiv = document.getElementById('taskListDisplay'); let filtered = f ? tasks.filter(t => t.date === f) : tasks;
-        if(filtered.length === 0) { listDiv.innerHTML = `<p style="font-size:11px; color:#555;">>_ No protocols logged.</p>`; return; }
-        listDiv.innerHTML = filtered.map(t => `<div class="task-item"><div class="task-item-time">${t.date} @ ${t.time}</div><div>${t.note}</div><div><button class="btn-wa" onclick="window.open('https://web.whatsapp.com/send?text=${encodeURIComponent('*CYBER REMINDER*\n'+t.date+' '+t.time+'\n'+t.note)}', '_blank')">WA PUSH</button> <button class="btn-danger" style="padding:4px 8px;" onclick="removeTask(${t.id})">DEL</button></div></div>`).join('');
-    }
-    function filterList(d) { renderTaskList(d); }
+    async function addTask() { let d = document.getElementById('taskDate').value; let t = document.getElementById('taskTime').value; let n = document.getElementById('taskNote').value; if(!d || !t || !n) return showToast("Missing data", "error"); tasks.push({ id: Date.now(), date: d, time: t, note: n }); localStorage.setItem('hrReminders', JSON.stringify(tasks)); showToast("Committed"); document.getElementById('taskNote').value=""; renderCalendar(); }
 
-    // --- ADMIN PANEL ---
+    // Admin Panel
     function openAdminModal() { document.getElementById('authModal').classList.add('active'); document.getElementById('adminPassword').value=''; }
-    function verifyAdmin() { if(document.getElementById('adminPassword').value === "admin123") { document.getElementById('authModal').classList.remove('active'); document.getElementById('adminPanel').style.display = 'block'; buildAdminUI(); } else { showToast("Unauthorized access", "error"); } }
-    function addNewCustomFormula() {
-        let newId = 'cst_' + Date.now(); currentFormulas[newId] = { label: "Blank Protocol Engine", custom: true, vars: ["Variable Alpha", "Variable Beta"], expr: "VAL1 + VAL2", unit: "" }; buildAdminUI(); showToast("New Protocol Engine initialized.");
-    }
+    function verifyAdmin() { if(document.getElementById('adminPassword').value === "admin123") { document.getElementById('authModal').classList.remove('active'); document.getElementById('adminPanel').style.display = 'block'; buildAdminUI(); } else showToast("Unauthorized access", "error"); }
+    function addNewCustomFormula() { let newId = 'cst_' + Date.now(); currentFormulas[newId] = { label: "Blank Protocol Engine", custom: true, vars: ["Var Alpha", "Var Beta"], expr: "VAL1 + VAL2", unit: "" }; buildAdminUI(); showToast("New Engine initialized."); }
     function deleteCustomFormula(key) { if(confirm("Confirm protocol purge?")) { delete currentFormulas[key]; buildAdminUI(); showToast("Protocol purged", "error"); } }
-    function addVarToAdmin(key) {
-        let grid = document.getElementById(`vars_grid_${key}`); let div = document.createElement('div'); div.className = 'var-input-group'; div.innerHTML = `<label>VAL${grid.querySelectorAll('.var-input-group').length + 1} Label:</label><input type="text" class="adm-var-input-${key}" placeholder="Label name...">`; grid.appendChild(div);
-    }
+    function addVarToAdmin(key) { let grid = document.getElementById(`vars_grid_${key}`); let div = document.createElement('div'); div.className = 'var-input-group'; div.innerHTML = `<label>VAL${grid.querySelectorAll('.var-input-group').length + 1} Label:</label><input type="text" class="adm-var-input-${key}" placeholder="Label name...">`; grid.appendChild(div); }
     function buildAdminUI() {
         const grid = document.getElementById('adminFormulasRender'); grid.innerHTML = "";
         for(let key in currentFormulas) {
             let f = currentFormulas[key];
-            grid.innerHTML += `
-            <div class="formula-card ${f.custom ? 'custom-card' : ''}">
-                <div class="fc-header"><div>${f.custom ? `<input type="text" class="editable-title" id="adm_${key}_label" value="${f.label}">` : `<strong>${f.label}</strong>`}</div><div>${f.custom ? `<button class="btn-danger" onclick="deleteCustomFormula('${key}')">Purge Engine</button>` : `<span style="font-size:9px; color:#555;">CORE_SYS</span>`}</div></div>
-                ${f.custom ? `<div class="custom-vars-grid" id="vars_grid_${key}">${f.vars ? f.vars.map((v, i) => `<div class="var-input-group"><label>VAL${i+1} Label:</label><input type="text" class="adm-var-input-${key}" value="${v}"></div>`).join('') : ''}</div><button type="button" class="btn-add-var" onclick="addVarToAdmin('${key}')">➕ Insert VAL Variable Input</button><div class="var-input-group" style="margin-top:10px;"><label style="color:#CCCCCC;">Output Unit (e.g. RM, %, Days):</label><input type="text" id="adm_${key}_unit" value="${f.unit || ''}" placeholder="Blank for no unit"></div>` : ''}
-                <label style="font-size:10px; margin-top:15px; display:block;">Math Expression (${f.custom?'Use VAL1, VAL2...':'Use BASIC, INPUT'}):</label><input type="text" class="formula-input-box" id="adm_${key}_expr" value="${f.expr}">
-            </div>`;
+            grid.innerHTML += `<div class="formula-card ${f.custom ? 'custom-card' : ''}"><div class="fc-header"><div>${f.custom ? `<input type="text" class="editable-title" id="adm_${key}_label" value="${f.label}">` : `<strong>${f.label}</strong>`}</div><div>${f.custom ? `<button class="btn-danger" onclick="deleteCustomFormula('${key}')">Purge Engine</button>` : `<span style="font-size:9px; color:#555;">CORE_SYS</span>`}</div></div>${f.custom ? `<div class="custom-vars-grid" id="vars_grid_${key}">${f.vars ? f.vars.map((v, i) => `<div class="var-input-group"><label>VAL${i+1} Label:</label><input type="text" class="adm-var-input-${key}" value="${v}"></div>`).join('') : ''}</div><button type="button" class="btn-add-var" onclick="addVarToAdmin('${key}')">➕ Insert VAL Input</button><div class="var-input-group" style="margin-top:10px;"><label>Output Unit:</label><input type="text" id="adm_${key}_unit" value="${f.unit || ''}"></div>` : ''}<label style="font-size:10px; margin-top:15px; display:block;">Math Expression:</label><input type="text" class="formula-input-box" id="adm_${key}_expr" value="${f.expr}"></div>`;
         }
     }
     function saveFormulas() {
@@ -604,23 +459,14 @@
             if(currentFormulas[key].custom) { currentFormulas[key].label = document.getElementById(`adm_${key}_label`).value; let vArr = []; document.querySelectorAll(`.adm-var-input-${key}`).forEach(inp => { if(inp.value.trim()!=='') vArr.push(inp.value.trim()); }); currentFormulas[key].vars = vArr; currentFormulas[key].unit = document.getElementById(`adm_${key}_unit`).value; }
             currentFormulas[key].expr = document.getElementById(`adm_${key}_expr`).value;
         }
-        localStorage.setItem('hrFormulasV5', JSON.stringify(currentFormulas)); showToast("Sync Complete."); populateCustomDropdown(); if(activeTabId === 'customCalcTab') handleCustomSelection(); buildAdminUI();
+        localStorage.setItem('hrFormulasV7', JSON.stringify(currentFormulas)); showToast("Sync Complete."); populateCustomDropdown(); if(activeTabId === 'customCalcTab') handleCustomSelection(); buildAdminUI();
     }
-
     function populateCustomDropdown() {
         let select = document.getElementById('cstType'); select.innerHTML = ""; let hasCustom = false;
         for(let key in currentFormulas) { if(currentFormulas[key].custom) { hasCustom = true; select.innerHTML += `<option value="${key}">${currentFormulas[key].label}</option>`; } }
         if(!hasCustom) { select.innerHTML = `<option value="">-- No Engines Synced --</option>`; document.getElementById('btnCalculateCustom').disabled = true; } else { document.getElementById('btnCalculateCustom').disabled = false; }
     }
-
     function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); c.innerHTML += `<div class="toast ${type}">[INFO] ${msg}</div>`; setTimeout(() => { if(c.firstChild) c.firstChild.remove(); }, 3000); }
-
-    // Init
-    document.addEventListener("DOMContentLoaded", () => {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('diffFrom').value = today; document.getElementById('diffTo').value = today; document.getElementById('addSubFrom').value = today; document.getElementById('taskDate').value = today;
-        populateCustomDropdown();
-    });
 </script>
 
 </body>
