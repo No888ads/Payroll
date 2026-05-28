@@ -3,574 +3,446 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Payroll Suite & Form Editor</title>
+    <title>Enterprise HR Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ================= PREMIUM GLOBAL STYLING ================= */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        /* --- GLOBAL & ANIMATIONS --- */
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #EF4444;
+            --danger-hover: #DC2626;
+            --success: #10B981;
+            --bg-gradient-1: #e0e7ff;
+            --bg-gradient-2: #ede9fe;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
         }
+
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
 
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 30px 20px;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, var(--bg-gradient-1), var(--bg-gradient-2), #f3e8ff, #dbeafe);
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: var(--text-dark); margin: 0; padding: 40px 20px;
+            display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; box-sizing: border-box;
         }
 
-        .calculator-container {
-            background-color: #ffffff;
-            padding: 35px;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.02);
-            width: 100%;
-            max-width: 1100px;
-            position: relative;
-            border: 1px solid rgba(226, 232, 240, 0.8);
+        /* --- MAIN CONTAINER & TABS --- */
+        .card {
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+            width: 100%; max-width: 850px; padding: 30px; animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative; border: 1px solid #e5e7eb;
         }
 
-        /* Top Header Navigation Panel */
-        .top-nav-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            gap: 20px;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 15px;
-        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h2 { margin: 0; font-weight: 700; color: #1e3a8a; letter-spacing: -0.5px; }
 
-        .tabs {
-            display: flex;
-            background-color: #f1f5f9;
-            padding: 6px;
-            border-radius: 14px;
-            gap: 4px;
-            flex: 1;
-        }
-
+        .tabs-container { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; overflow-x: auto;}
         .tab-btn {
-            flex: 1;
-            padding: 10px 4px;
-            background: none;
-            border: none;
-            font-size: 13px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
+            background: transparent; border: none; padding: 10px 12px; font-size: 13px; font-weight: 600;
+            color: var(--text-light); cursor: pointer; border-radius: 6px; transition: all 0.3s ease; white-space: nowrap;
         }
+        .tab-btn:hover { background: #f3f4f6; color: var(--text-dark); }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
 
-        .tab-btn:hover {
-            color: #1e293b;
-            background-color: rgba(255, 255, 255, 0.5);
+        .tab-content { display: none; animation: fadeInUp 0.4s ease; }
+        .tab-content.active { display: block; }
+
+        /* --- FORM ELEMENTS --- */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 5px; color: var(--text-dark); text-transform: uppercase; letter-spacing: 0.5px;}
+
+        input[type="number"], input[type="date"], input[type="time"], input[type="text"], select, input[type="password"] {
+            width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 6px;
+            font-size: 14px; font-family: 'Inter', sans-serif; transition: all 0.3s ease; box-sizing: border-box; background-color: #fff;
         }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
 
-        .tab-btn.active {
-            background-color: #ffffff;
-            color: #2563eb;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        /* --- BUTTONS --- */
+        .btn-primary {
+            width: 100%; padding: 14px; background-color: var(--primary); color: white;
+            border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
         }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-admin { padding: 8px 12px; font-size: 12px; background-color: transparent; color: var(--text-light); border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; }
+        .btn-admin:hover { background-color: #f1f5f9; color: var(--text-dark); }
 
-        /* Authorised Personnel Button */
-        .btn-secure-gate {
-            padding: 10px 20px;
-            background: #0f172a;
-            color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
-        }
-        .btn-secure-gate:hover { background: #1e293b; transform: translateY(-1px); }
-
-        /* Admin Controls Dashboard Context Bar */
-        .admin-control-bar {
-            display: none;
-            background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%);
-            border: 1px solid #bfdbfe;
-            padding: 14px 24px;
-            border-radius: 14px;
-            margin-bottom: 25px;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: inset 0 1px 2px rgba(255,255,255,0.6);
-            animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-
-        .btn-studio { padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; }
-        .btn-purple { background: #4f46e5; color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
-        .btn-purple:hover { background: #4338ca; }
-        .btn-green { background: #10b981; color: white; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
-        .btn-green:hover { background: #059669; }
-        .btn-dark { background: #0f172a; color: white; }
-        .btn-dark:hover { background: #1e293b; }
-
-        /* ================= WORKSPACE MODULAR VIEW INTERFACES ================= */
-        .workspace-grid { display: flex; gap: 25px; }
-        .page { display: none; flex: 1; position: relative; }
-        .page.active { display: block; }
+        /* --- CALENDAR UI --- */
+        .calendar-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start; }
+        @media (max-width: 768px) { .calendar-layout { grid-template-columns: 1fr; } }
         
-        h2 { color: #0f172a; margin-bottom: 24px; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
-
-        /* CANVAS BORANG DYNAMIC DESIGN */
-        .dynamic-form-canvas {
-            width: 100%;
-            min-height: 580px;
-            background: #ffffff;
-            position: relative;
-            border-radius: 16px;
-            transition: all 0.3s;
-        }
-
-        .dynamic-form-canvas.staff-mode-locked { border: none !important; }
-        .dynamic-form-canvas.admin-mode-active {
-            border: 2px dashed #cbd5e1;
-            background-color: #fafbfc;
-            background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
-            background-size: 15px 15px;
-            border-radius: 16px;
-        }
-
-        /* PREMIUM FORM WIDGET LAYOUTS */
-        .form-editable-widget {
-            position: absolute;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            transition: box-shadow 0.2s;
-        }
-
-        /* Mod Canva Border Hilite */
-        .admin-mode-active .form-editable-widget { border: 1px dashed #94a3b8; border-radius: 12px; cursor: move; }
-        .admin-mode-active .form-editable-widget:hover { background: rgba(241, 245, 249, 0.6); }
-        .admin-mode-active .form-editable-widget.selected { border: 2px solid #2563eb; background-color: #f0f6ff; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.05); }
-        .staff-mode-locked .form-editable-widget { border: none !important; cursor: default !important; }
-
-        /* Widget inner formatting elements */
-        .widget-label-text { font-size: 13px; font-weight: 700; color: #475569; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
-        .widget-input-field { width: 100%; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 15px; font-weight: 600; color: #1e293b; background: #ffffff; transition: all 0.2s; }
-        .widget-input-field:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); outline: none; }
+        .task-list-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; min-height: 350px; }
+        .task-list-box h3 { margin-top: 0; font-size: 15px; color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .task-item { background: white; border-left: 4px solid var(--primary); padding: 12px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 13px; }
+        .task-item-time { font-weight: bold; color: var(--primary); margin-bottom: 4px; }
+        .btn-wa { background-color: #25D366; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; margin-top: 8px; display: inline-flex; align-items: center; gap: 5px;}
+        .btn-wa:hover { background-color: #128C7E; }
+        .btn-del-task { background-color: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 5px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 5px;}
         
-        /* Premium Radio Box Toggle Group */
-        .radio-toggle {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: #f8fafc;
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            width: 100%;
-        }
-
-        .radio-label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #334155; cursor: pointer; user-select: none; }
-        .radio-label input[type="radio"] { width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb; }
-
-        /* Dynamic Day Loop Rows Design */
-        .ot-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; background: #f8fafc; padding: 10px; border-radius: 10px; border: 1px dashed #cbd5e1; }
-        .loop-minute-input { flex: 1; }
-        .btn-add { background-color: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); transition: all 0.2s; }
-        .btn-add:hover { background-color: #059669; }
-        .btn-remove { background-color: #ef4444; color: white; border: none; padding: 12px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
-        /* Premium Result Card Presentation Section */
-        .canva-element.type-result {
-            background: linear-gradient(to bottom right, #ffffff, #fafdfb);
-        }
-        .widget-result-display { font-size: 32px; font-weight: 800; color: #0f172a; margin-top: 2px; letter-spacing: -1px; }
-
-        .widget-resize-handle { width: 10px; height: 10px; background: #cbd5e1; position: absolute; right: 0; bottom: 0; cursor: se-resize; display: none; border-radius: 5px 0 0 0; }
-        .admin-mode-active .form-editable-widget.selected .widget-resize-handle { display: block; background: #2563eb; }
-
-        /* PROPERTIES SIDE PANEL INSPECTOR DESIGN */
-        .inspector-panel {
-            width: 280px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-            height: fit-content;
-        }
-
-        .inspector-panel h3 { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
-        .property-group { display: flex; flex-direction: column; gap: 6px; }
-        .property-group label { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; }
-        .property-group input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-weight: 600; color: #1e293b; background: #fff; }
-
-        /* SCHEDULER LAYOUT SUITE CONFIGS */
-        .scheduler-grid { display: flex; gap: 20px; height: 500px; width: 100%; }
-        .sched-left { flex: 1.1; background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 16px; overflow-y: auto; }
-        .sched-right { flex: 1.8; }
+        .calendar-box { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; }
+        .cal-nav-btn { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
         
-        .task-card { background: white; border: 1px solid #e2e8f0; border-left: 4px solid #2563eb; border-radius: 10px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.01); }
-        .task-card.sent { border-left-color: #10b981; }
-        .task-card h4 { font-size: 14px; color: #1e293b; font-weight: 700; }
-        .task-card p { font-size: 11px; color: #64748b; font-weight: 600; margin-top: 2px; }
-        .task-del-btn { background: #fee2e2; color: #ef4444; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
-        .task-del-btn:hover { background: #fca5a5; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .cal-day-header { text-align: center; font-size: 11px; font-weight: bold; color: #64748b; padding-bottom: 10px; text-transform: uppercase; }
+        .cal-day { border: 1px solid #e2e8f0; height: 60px; padding: 5px; font-size: 12px; color: #334155; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between;}
+        .cal-day:hover { background-color: #f1f5f9; }
+        .cal-day.today { background-color: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; font-weight: bold; }
+        .cal-day.has-task { border-bottom: 3px solid var(--primary); }
+        .cal-day.empty { background-color: #f8fafc; cursor: default; border: none; }
+        
+        .input-bar { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 15px; margin-bottom: 15px; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; }
+        @media (max-width: 600px) { .input-bar { grid-template-columns: 1fr; } }
 
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 12px; margin-bottom: 12px; }
-        .calendar-header h3 { font-size: 15px; color: #0f172a; font-weight: 700; }
-        .calendar-nav-btn { background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 12px; }
+        /* --- OTHERS (Dynamic Row, Result Box, Admin) --- */
+        .dynamic-row { display: flex; gap: 10px; margin-bottom: 10px; animation: fadeInUp 0.3s ease; }
+        .btn-add-day { background-color: transparent; color: var(--primary); border: 2px dashed #cbd5e1; width: 100%; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-bottom: 10px; font-size: 13px;}
+        .btn-add-day:hover { background-color: #f8fafc; border-color: var(--primary); }
+        .btn-remove-day { width: 40px; background-color: var(--danger); color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        
+        .result-wrapper { margin-top: 15px; background: #1e293b; border-radius: 8px; padding: 20px; text-align: center; color: white; }
+        .result-wrapper.danger { background: #7f1d1d; }
+        .result-wrapper.success { background: #064e3b; }
+        .result-label { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 5px; }
+        .result-value { font-size: 32px; font-weight: 700; }
+        
+        .footer-brand { text-align: center; margin-top: 30px; font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #94a3b8; text-transform: uppercase; }
 
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background-color: #e2e8f0; padding: 5px; border-radius: 14px; }
-        .calendar-day-name { background-color: #f1f5f9; text-align: center; font-weight: 700; font-size: 11px; padding: 8px 0; color: #475569; text-transform: uppercase; border-radius: 6px; }
-        .calendar-cell { background-color: #ffffff; min-height: 68px; padding: 6px; position: relative; display: flex; flex-direction: column; justify-content: flex-start; overflow: hidden; border-radius: 8px; }
-        .calendar-cell.today { background-color: #eff6ff; border: 2px solid #2563eb; }
-        .calendar-cell.other-month { background-color: #f8fafc; color: #cbd5e1; }
-        .cell-number { font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 4px; }
-        .calendar-event-mini-tag { background-color: #2563eb; color: white; font-size: 8px; padding: 2px 4px; border-radius: 4px; margin-bottom: 2px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .calendar-event-mini-tag.triggered { background-color: #10b981; }
+        /* --- ADMIN PANEL (Hidden by default) --- */
+        #adminPanel { display: none; margin-top: 30px; padding-top: 20px; border-top: 2px dashed #cbd5e1; }
+        .admin-section-title { font-size: 13px; font-weight:bold; color: var(--primary); margin: 20px 0 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        .formula-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .formula-card h4 { margin: 0 0 5px 0; color: #334155; font-size: 14px;}
+        .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
 
-        .app-footer { margin-top: 30px; text-align: center; font-size: 11px; color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; border-top: 1px solid #f1f5f9; padding-top: 20px; }
+        /* MODAL & TOAST */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 350px; transform: scale(0.9); transition: 0.3s; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .toast { background: white; border-left: 5px solid var(--primary); padding: 15px 20px; border-radius: 6px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: 600; font-size: 13px; animation: slideInRight 0.4s; }
     </style>
 </head>
 <body>
 
-<div class="calculator-container">
+<div class="card">
+    <div class="header-top">
+        <h2>HR System</h2>
+        <button class="btn-admin" onclick="openAdminModal()">⚙️ Formula</button>
+    </div>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab('otTab', this)">⏱️ Overtime</button>
+        <button class="tab-btn" onclick="switchTab('absentTab', this)">❌ Absence</button>
+        <button class="tab-btn" onclick="switchTab('resignTab', this)">🚪 Resign</button>
+        <button class="tab-btn" onclick="switchTab('dateTab', this)">📅 Dates</button>
+        <button class="tab-btn" onclick="switchTab('reminderTab', this)">🔔 Reminders</button>
+    </div>
     
-    <div class="top-nav-wrapper">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchActiveFormTab('otPage', this)">OT & PH Claim</button>
-            <button class="tab-btn" onclick="switchActiveFormTab('resignPage', this)">Resignation</button>
-            <button class="tab-btn" onclick="switchActiveFormTab('absentPage', this)">Absent Deduct</button>
-            <button class="tab-btn" onclick="switchActiveFormTab('auditorPage', this)">Payroll Auditor</button>
-            <button class="tab-btn" onclick="switchActiveFormTab('calendarPage', this)">HR Scheduler</button>
-        </div>
-        <button class="btn-secure-gate" id="adminSecurityGateBtn" onclick="toggleFormEditorSecureSystem()">🔑 Authorised Login</button>
+    <div id="otTab" class="tab-content active">
+        <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="otBasicSalary"></div>
+        <div class="form-group"><label>Type</label><select id="otType" onchange="handleOTTypeChange()"><option value="positive">Positive OT</option><option value="negative">Negative OT</option><option value="hq">HQ OT</option><option value="ph">Public Holiday (Double Pay)</option></select></div>
+        <div class="form-group" id="otContainer"><label id="otDurationLabel">Duration (Minutes)</label><div class="dynamic-row"><input type="number" class="ot-input" placeholder="Day 1 (e.g., 120)"></div></div>
+        <button class="btn-add-day" onclick="addRow('ot')">+ Add Another Day</button>
+        <button class="btn-primary" onclick="calculateOT()" id="btnCalculateOT">Calculate Overtime</button>
+        <div class="result-wrapper"><div class="result-label">Total Overtime Pay</div><div class="result-value">RM <span id="resultDisplayOT">0.00</span></div></div>
     </div>
 
-    <div class="admin-control-bar" id="adminStudioControlsPanel">
-        <span style="font-size:12px; font-weight:700; color:#4f46e5;">🎨 FORM LAYOUT STUDIO & WORD PROPERTIES EDITOR ACTIVE</span>
-        <div style="display:flex; gap:8px;">
-            <button class="btn-studio btn-purple" onclick="insertNewFieldToActiveForm('input')">+ Add Input Box</button>
-            <button class="btn-studio btn-green" onclick="insertNewFieldToActiveForm('result')">+ Add Formula Display</button>
-            <button class="btn-studio btn-dark" onclick="saveFormLayoutDataToMemoryDatabase()">💾 Save Visual Changes</button>
-        </div>
+    <div id="absentTab" class="tab-content">
+        <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="absentBasicSalary"></div>
+        <div class="form-group"><label>Category</label><select id="absentType"><option value="absent_normal">Normal Absent (1x)</option><option value="absent_ph">Linked to PH (2x Deduction)</option></select></div>
+        <div class="form-group" id="absentContainer"><label>Days Absent</label><div class="dynamic-row"><input type="number" class="absent-input" placeholder="Input 1 (e.g., 1)"></div></div>
+        <button class="btn-add-day" onclick="addRow('absent')">+ Add Input</button>
+        <button class="btn-primary" onclick="calculateAbsent()" id="btnCalculateAbsent">Calculate Deduction</button>
+        <div class="result-wrapper danger"><div class="result-label" style="color:#fca5a5;">Total Deduction</div><div class="result-value">RM <span id="resultDisplayAbsent">0.00</span></div></div>
     </div>
 
-    <div class="workspace-grid">
-        
-        <div style="flex: 1; overflow: hidden;">
-            
-            <div id="otPage" class="page active"><div class="dynamic-form-canvas staff-mode-locked" id="canvas-otPage" onclick="deselectAllActiveFormWidgets()"></div></div>
+    <div id="resignTab" class="tab-content">
+        <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="resignBasicSalary"></div>
+        <div class="form-group"><label>Category</label><select id="resignType" onchange="handleResignTypeChange()"><option value="short_notice">Short Notice Penalty</option><option value="al_refund">YTD AL Encashment</option></select></div>
+        <div class="form-group" id="resignContainer"><label id="resignDurationLabel">Short Notice (Days)</label><div class="dynamic-row"><input type="number" class="resign-input" placeholder="Input 1 (e.g., 14)"></div></div>
+        <button class="btn-add-day" onclick="addRow('resign')">+ Add Input</button>
+        <button class="btn-primary" onclick="calculateResign()" id="btnCalculateResign">Calculate Settlement</button>
+        <div class="result-wrapper danger" id="resignResultBox"><div class="result-label" id="resignResultLabel" style="color:#fca5a5;">Total Penalty</div><div class="result-value">RM <span id="resultDisplayResign">0.00</span></div></div>
+    </div>
 
-            <div id="resignPage" class="page"><div class="dynamic-form-canvas staff-mode-locked" id="canvas-resignPage" onclick="deselectAllActiveFormWidgets()"></div></div>
+    <div id="dateTab" class="tab-content">
+        <div class="form-group"><label>Mode</label><select id="calcMode" onchange="toggleDateMode()"><option value="diff">Difference between dates</option><option value="addsub">Add or subtract days</option></select></div>
+        <div id="modeDiff">
+            <div class="form-group"><label>From</label><input type="date" id="diffFrom"></div>
+            <div class="form-group"><label>To</label><input type="date" id="diffTo"></div>
+        </div>
+        <div id="modeAddSub" style="display: none;">
+            <div class="form-group"><label>From</label><input type="date" id="addSubFrom"></div>
+            <div style="display:flex; gap:15px; margin-bottom:15px;"><label><input type="radio" name="addSubType" value="add" checked> Add</label><label><input type="radio" name="addSubType" value="sub"> Subtract</label></div>
+            <div class="grid-3 form-group">
+                <div><label>Years</label><input type="number" id="valYears" value="0"></div><div><label>Months</label><input type="number" id="valMonths" value="0"></div><div><label>Days</label><input type="number" id="valDays" value="0"></div>
+            </div>
+        </div>
+        <button class="btn-primary" onclick="calculateDate()" id="btnCalculateDate">Calculate Date</button>
+        <div class="result-wrapper"><div class="result-label" id="dateResultLabel">Result</div><div class="result-value" id="dateResultMain" style="font-size: 24px;">Same dates</div><div class="result-sub-value" id="dateResultSub">0 days</div></div>
+    </div>
 
-            <div id="absentPage" class="page"><div class="dynamic-form-canvas staff-mode-locked" id="canvas-absentPage" onclick="deselectAllActiveFormWidgets()"></div></div>
+    <div id="reminderTab" class="tab-content">
+        <div class="input-bar">
+            <div><label>Event Date</label><input type="date" id="taskDate"></div>
+            <div><label>Event Time</label><input type="time" id="taskTime"></div>
+            <div><label>Task / Notification Note</label><input type="text" id="taskNote" placeholder="e.g., Finalise payroll cutoff lists"></div>
+        </div>
+        <button class="btn-primary" style="margin-bottom: 25px;" onclick="addTask()">Insert Task Event to Calendar Router</button>
 
-            <div id="auditorPage" class="page"><div class="dynamic-form-canvas staff-mode-locked" id="canvas-auditorPage" onclick="deselectAllActiveFormWidgets()"></div></div>
-
-            <div id="calendarPage" class="page">
-                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.01);">
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                        <div class="input-group" style="flex: 1; min-width: 140px; margin-bottom: 0;"><label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:6px; display:block;">Event Date</label><input type="date" id="rem-date" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; width:100%;"></div>
-                        <div class="input-group" style="flex: 1; min-width: 110px; margin-bottom: 0;"><label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:6px; display:block;">Event Time</label><input type="time" id="rem-time" value="09:00" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; width:100%;"></div>
-                        <div class="input-group" style="flex: 2; min-width: 200px; margin-bottom: 0;"><label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:6px; display:block;">Task / Notification Note</label><input type="text" id="rem-title" placeholder="e.g., Finalise run payroll cutoff data lists" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; width:100%;"></div>
-                    </div>
-                    <button onclick="addNewReminderTask()" style="width:100%; padding:12px; background:#2563eb; color:white; border:none; border-radius:10px; font-weight:700; margin-top:14px; cursor:pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);">Insert Task Event to Calendar Router</button>
-                </div>
-                <div class="scheduler-grid">
-                    <div class="sched-left">
-                        <div class="task-list-title">Task Reminder List</div>
-                        <div id="schedListZone"></div>
-                    </div>
-                    <div class="sched-right">
-                        <div class="calendar-header">
-                            <button class="calendar-nav-btn" onclick="navMonthChange(-1)">&lt; Prev</button>
-                            <h3 id="calMonthYearTitle">Month Year</h3>
-                            <button class="calendar-nav-btn" onclick="navMonthChange(1)">Next &gt;</button>
-                        </div>
-                        <div class="calendar-grid" id="calGridZone"></div>
-                    </div>
-                </div>
+        <div class="calendar-layout">
+            <div class="task-list-box">
+                <h3>Task Reminder List</h3>
+                <div id="taskListDisplay"><p style="font-size:13px; color:#94a3b8;">No tasks scheduled.</p></div>
             </div>
 
+            <div class="calendar-box">
+                <div class="cal-header">
+                    <button class="cal-nav-btn" onclick="changeMonth(-1)">&lt; Prev</button>
+                    <span id="calMonthYearDisplay">May 2026</span>
+                    <button class="cal-nav-btn" onclick="changeMonth(1)">Next &gt;</button>
+                </div>
+                <div class="cal-grid" id="calGrid">
+                    </div>
+            </div>
         </div>
-
-        <div class="inspector-panel" id="formWidgetInspectorPanel">
-            <h3>Widget Content Inspector</h3>
-            <div class="property-group"><label>Label Display Word</label><input type="text" id="ins-label" oninput="syncWidgetPropertiesRealtime()"></div>
-            <div class="property-group"><label>System Core Key ID</label><input type="text" id="ins-varid" oninput="syncWidgetPropertiesRealtime()"></div>
-            <div class="property-group" id="ins-formula-wrap" style="display:none;"><label style="color:#059669;">Mathematical Code Logic</label><input type="text" id="ins-formula" oninput="syncWidgetPropertiesRealtime()"></div>
-            <button onclick="deleteSelectedFormWidget()" style="width:100%; padding:10px; background:#fee2e2; color:#ef4444; border:none; border-radius:10px; font-weight:700; cursor:pointer; margin-top:15px; font-size:12px;">Remove Field Box</button>
-        </div>
-
     </div>
 
-    <div class="app-footer">Made in NOEL ETHAN</div>
+    <div id="adminPanel">
+        <h3 style="color: var(--primary);">Master Formulas</h3>
+        <div class="formula-grid" id="adminFormulasRender"></div>
+        <button class="btn-primary" onclick="saveFormulas()" style="margin-top:10px; background:var(--success);">Save Formulas</button>
+        <button class="btn-admin" onclick="document.getElementById('adminPanel').style.display='none'" style="margin-top:10px; width:100%;">Close Panel</button>
+    </div>
+
+    <div class="footer-brand">MADE IN NOEL ETHAN</div>
 </div>
 
+<div class="modal-overlay" id="authModal"><div class="modal-content"><h3>Admin Login</h3><input type="password" id="adminPassword" placeholder="Password..."><button class="btn-primary" onclick="verifyAdmin()" style="margin-top:10px;">Unlock</button><button class="btn-admin" onclick="document.getElementById('authModal').classList.remove('active')" style="width:100%; margin-top:10px;">Cancel</button></div></div>
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
-    // --- DATABASE CORE MEMORY ARRAYS ---
-    let globalActiveTab = "otPage";
-    let isFormAdminUnlocked = false;
-    let widgetCounter = 0;
-    let selectedActiveWidget = null;
-    let currentNavDate = new Date();
-    let remindersArray = JSON.parse(localStorage.getItem('hrReminders')) || [];
-
-    // Induk susunan koordinat layout borang kemas (Professional baseline alignment)
-    let masterFormLayoutDatabase = {
-        otPage: [
-            { type: 'radio_ot', label: 'OT & Public Holiday Claims Tracker Mode Options', varid: 'claim_mode', left: '0px', top: '10px', width: '890px', height: '115px' },
-            { type: 'input', label: 'Basic Monthly Salary (RM)', varid: 'salary', val: '2500', left: '0px', top: '145px', width: '890px', height: '80px' },
-            { type: 'minutes_loop', label: 'Overtime Duration Entry Tracker (Minutes Per Day Log)', varid: 'ot_loop', left: '0px', top: '245px', width: '890px', height: '170px' },
-            { type: 'result', label: 'Estimated Calculation Result Payout Gross', varid: 'res_ot', formula: '0', left: '0px', top: '435px', width: '890px', height: '100px' }
-        ],
-        resignPage: [
-            { type: 'radio_resign', label: 'Notice Duration / Indemnity Pay Mode Option Logic Selector', varid: 'resign_mode', left: '0px', top: '10px', width: '890px', height: '140px' },
-            { type: 'input', label: 'Basic Monthly Salary reference validation (RM)', varid: 'salary', val: '3000', left: '0px', top: '170px', width: '890px', height: '80px' },
-            { type: 'input', label: 'Notice Period Value Count / Balance Accumulation YTD AL (Days)', varid: 'duration', val: '30', left: '0px', top: '270px', width: '890px', height: '80px' },
-            { type: 'result', label: 'Calculated Final Value Settlement Amount Result', varid: 'res_resign', formula: '0', left: '0px', top: '370px', width: '890px', height: '100px' }
-        ],
-        absentPage: [
-            { type: 'radio_absent', label: 'Absent Tracker Penalty Deduction Configurator', varid: 'absent_mode', left: '0px', top: '10px', width: '890px', height: '85px' },
-            { type: 'input', label: 'Basic Monthly Salary (RM)', varid: 'salary', val: '2500', left: '0px', top: '115px', width: '890px', height: '80px' },
-            { type: 'input', label: 'Number of Days Absent Counter Metric', varid: 'abs_days', val: '1', left: '0px', top: '215px', width: '890px', height: '80px' },
-            { type: 'result', label: 'Total Salary Value To Deduct From Base Payroll', varid: 'res_absent', formula: '0', left: '0px', top: '315px', width: '890px', height: '100px' }
-        ],
-        auditorPage: [
-            { type: 'input', label: 'Basic Monthly Salary Base (RM)', varid: 'salary', val: '2500', left: '0px', top: '10px', width: '430px', height: '80px' },
-            { type: 'input', label: 'Working Days Month Baseline Divisor', varid: 'base_days', val: '26', left: '460px', top: '10px', width: '430px', height: '80px' },
-            { type: 'input', label: 'Positive Overtime (Total Minutes Logged)', varid: 'ot_min', val: '60', left: '0px', top: '110px', width: '430px', height: '80px' },
-            { type: 'input', label: 'Negative OT Less Hours (Total Minutes Logged)', varid: 'neg_min', val: '0', left: '460px', top: '110px', width: '430px', height: '80px' },
-            { type: 'input', label: 'Absent Tracker (Unapproved Days Counter)', varid: 'abs_days', val: '0', left: '0px', top: '210px', width: '430px', height: '80px' },
-            { type: 'input', label: 'Adjacent to Public Holiday Penalty Factor (1 = True / 0 = False)', varid: 'ph_penalty', val: '0', left: '460px', top: '210px', width: '430px', height: '80px' },
-            { type: 'input', label: 'Refund Accumulation YTD AL (Leave Encashment Days)', varid: 'ytd_days', val: '0', left: '0px', top: '310px', width: '430px', height: '80px' },
-            { type: 'input', label: 'Public Holiday Worked Log (Total Days Counter)', varid: 'ph_worked', val: '0', left: '460px', top: '310px', width: '430px', height: '80px' },
-            { type: 'result', label: 'Realtime Payroll Audit Board Integrity Gross Final Settlement Payout', varid: 'res_auditor', formula: '0', left: '0px', top: '415px', width: '890px', height: '100px' }
-        ]
-    };
-
-    // --- PIPELINE ONLOAD CONTEXT ---
-    window.onload = function() {
-        const todayStr = new Date().toISOString().split('T')[0];
-        if(document.getElementById('rem-date')) document.getElementById('rem-date').value = todayStr;
-        if (localStorage.getItem('master_form_canvas_db')) { masterFormLayoutDatabase = JSON.parse(localStorage.getItem('master_form_canvas_db')); }
-        renderDynamicFormPageStructure('otPage');
-        renderVisualCalendarInterface();
-        setInterval(checkAndTriggerBotAlerts, 60000); 
-    };
-
-    // --- UI/UX RENDER DYNAMIC PIPELINES ---
-    function renderDynamicFormPageStructure(pageId) {
-        const canvas = document.getElementById(`canvas-${pageId}`); if (!canvas) return; canvas.innerHTML = ''; 
-        let fields = masterFormLayoutDatabase[pageId] || [];
-
-        fields.forEach((fItem) => {
-            widgetCounter++; const wDiv = document.createElement('div');
-            wDiv.id = `w-node-${widgetCounter}`; wDiv.style.left = fItem.left; wDiv.style.top = fItem.top; wDiv.style.width = fItem.width; wDiv.style.height = fItem.height;
-            wDiv.setAttribute('data-type', fItem.type); wDiv.setAttribute('data-label', fItem.label); wDiv.setAttribute('data-varid', fItem.varid);
-
-            if (fItem.type === 'radio_ot') {
-                wDiv.className = 'form-editable-widget type-input';
-                wDiv.innerHTML = `<label class="widget-label-text" id="lbl-${wDiv.id}">${fItem.label}</label><div class="radio-toggle" onmousedown="event.stopPropagation()"><label class="radio-label"><input type="radio" name="claimMode" value="minutesOt" checked onchange="executeLiveFormMathEngine('${pageId}')"> Overtime (Minutes Tracker - 1.5x)</label><label class="radio-label"><input type="radio" name="claimMode" value="negativeOt" onchange="executeLiveFormMathEngine('${pageId}')"> Negative OT (Minutes Tracker - 1.0x)</label><label class="radio-label"><input type="radio" name="claimMode" value="phDoublePay" onchange="executeLiveFormMathEngine('${pageId}')"> Public Holiday (Double Pay - 2.0x)</label></div><div class="widget-resize-handle"></div>`;
-            } else if (fItem.type === 'radio_resign') {
-                wDiv.className = 'form-editable-widget type-input';
-                wDiv.innerHTML = `<label class="widget-label-text" id="lbl-${wDiv.id}">${fItem.label}</label><div class="radio-toggle" onmousedown="event.stopPropagation()"><label class="radio-label"><input type="radio" name="resignMode" value="findEnd" checked onchange="executeLiveFormMathEngine('${pageId}')"> Find Last Working Day</label><label class="radio-label"><input type="radio" name="resignMode" value="findDiff" onchange="executeLiveFormMathEngine('${pageId}')"> Calculate Notice Served</label><label class="radio-label"><input type="radio" name="resignMode" value="shortNotice" onchange="executeLiveFormMathEngine('${pageId}')"> Short Notice Indemnity</label><label class="radio-label"><input type="radio" name="resignMode" value="ytdRefund" onchange="executeLiveFormMathEngine('${pageId}')"> Refund YTD AL</label></div><div class="widget-resize-handle"></div>`;
-            } else if (fItem.type === 'radio_absent') {
-                wDiv.className = 'form-editable-widget type-input';
-                wDiv.innerHTML = `<label class="widget-label-text" id="lbl-${wDiv.id}">${fItem.label}</label><div class="radio-toggle" onmousedown="event.stopPropagation()"><label class="radio-label"><input type="radio" name="absentMode" value="normalAbsent" checked onchange="executeLiveFormMathEngine('${pageId}')"> Normal Absent</label><label class="radio-label"><input type="radio" name="absentMode" value="phAbsent" onchange="executeLiveFormMathEngine('${pageId}')"> Absent Adjacent to Public Holiday</label></div><div class="widget-resize-handle"></div>`;
-            } else if (fItem.type === 'minutes_loop') {
-                wDiv.className = 'form-editable-widget type-input';
-                wDiv.innerHTML = `<label class="widget-label-text" id="lbl-${wDiv.id}">${fItem.label}</label><div style="display:flex; flex-direction:column; gap:8px; width:100%;" onmousedown="event.stopPropagation()"><div id="otLoopRowsHolder"><div class="ot-row" style="margin-bottom:6px;"><input type="number" class="loop-minute-input widget-input-field" value="60" style="padding:10px;" oninput="executeLiveFormMathEngine('${pageId}')"><button class="btn-remove" style="padding:10px 14px;" onclick="removeLoopRowNode(this, '${pageId}')">X</button></div></div><button class="btn-add" style="padding:8px 16px; width:fit-content; margin:0;" onclick="addLoopRowNode('${pageId}')">+ Add Day</button></div><div class="widget-resize-handle"></div>`;
-            } else if (fItem.type === 'input') {
-                wDiv.className = 'form-editable-widget type-input';
-                wDiv.innerHTML = `<label class="widget-label-text" id="lbl-${wDiv.id}">${fItem.label}</label><input type="number" class="widget-input-field" id="w-val-${wDiv.id}" value="${fItem.val}" oninput="executeLiveFormMathEngine('${pageId}')" onmousedown="event.stopPropagation()"><div class="widget-resize-handle"></div>`;
-            } else {
-                wDiv.className = 'form-editable-widget type-result'; wDiv.setAttribute('data-formula', fItem.formula);
-                wDiv.innerHTML = `<label class="widget-label-text" id="lbl-${wDiv.id}" style="color:#2563eb; font-weight:800; font-size:12px;">${fItem.label}</label><div class="widget-result-display" id="w-disp-${wDiv.id}">RM 0.00</div><div class="widget-resize-handle"></div>`;
-            }
-
-            wDiv.addEventListener('click', function(e) { if (!isFormAdminUnlocked) return; e.stopPropagation(); selectFormWidgetForEditing(wDiv); });
-            makeWidgetDraggableAndResizableInAdmin(wDiv, pageId); canvas.appendChild(wDiv);
-        });
-        executeLiveFormMathEngine(pageId);
-    }
-
-    // --- CORES DYNAMIC LOGIC RUNNERS ---
-    function addLoopRowNode(pId) { const holder = document.getElementById('otLoopRowsHolder'); const d = document.createElement('div'); d.className = 'ot-row'; d.style.marginBottom = '6px'; d.innerHTML = `<input type="number" class="loop-minute-input widget-input-field" value="0" style="padding:10px;" oninput="executeLiveFormMathEngine('${pId}')"><button class="btn-remove" style="padding:10px 14px;" onclick="removeLoopRowNode(this, '${pId}')">X</button>`; holder.appendChild(d); executeLiveFormMathEngine(pId); }
-    function removeLoopRowNode(btn, pId) { const holder = document.getElementById('otLoopRowsHolder'); if (holder.children.length > 1) { btn.parentElement.remove(); } else { alert("Keep at least one row active."); } executeLiveFormMathEngine(pId); }
-
-    function executeLiveFormMathEngine(pageId) {
-        const canvas = document.getElementById(`canvas-${pageId}`); if (!canvas) return;
-        let mathMap = {};
-        canvas.querySelectorAll('.form-editable-widget.type-input').forEach(w => {
-            const vKey = w.getAttribute('data-varid'); const fInput = document.getElementById(`w-val-${w.id}`);
-            if (vKey && fInput) { mathMap[vKey] = parseFloat(fInput.value) || 0; }
-        });
-
-        let summedMinutes = 0; const loops = canvas.querySelectorAll('.loop-minute-input');
-        if (loops.length > 0) { loops.forEach(l => { summedMinutes += parseFloat(l.value) || 0; }); mathMap['ot_min'] = summedMinutes; }
-
-        canvas.querySelectorAll('.form-editable-widget.type-result').forEach(w => {
-            const display = document.getElementById(`w-disp-${w.id}`); if (!display) return;
-            let finalValue = 0; const salary = mathMap['salary'] || 2500; const baseline = mathMap['base_days'] || 26;
-            const ratePerDay = salary / baseline; const ratePerHour = ratePerDay / 7.5; const ratePerMinute = ratePerHour / 60;
-
-            if (pageId === 'otPage') {
-                const mode = document.querySelector('input[name="claimMode"]:checked').value; const totalMins = mathMap['ot_min'] || 0;
-                if (mode === 'minutesOt') { finalValue = ratePerMinute * 1.5 * totalMins; }
-                else if (mode === 'negativeOt') { finalValue = ratePerMinute * 1.0 * totalMins; }
-                else { finalValue = ratePerDay * 1.0 * 2.0; }
-            } else if (pageId === 'resignPage') {
-                const mode = document.querySelector('input[name="resignMode"]:checked').value; const duration = mathMap['duration'] || 30;
-                if (mode === 'shortNotice' || mode === 'ytdRefund') { finalValue = (salary / 26) * duration; }
-                else { finalValue = duration; }
-            } else if (pageId === 'absentPage') {
-                const mode = document.querySelector('input[name="absentMode"]:checked').value; const absDays = mathMap['abs_days'] || 0;
-                let totalAbs = absDays + (mode === 'phAbsent' ? 1 : 0); finalValue = (salary / 26) * totalAbs;
-            } else if (pageId === 'auditorPage') {
-                const otMin = mathMap['ot_min'] || 0; const negMin = mathMap['neg_min'] || 0; const absDays = mathMap['abs_days'] || 0;
-                const penalty = mathMap['ph_penalty'] || 0; const ytdDays = mathMap['ytd_days'] || 0; const phWorked = mathMap['ph_worked'] || 0;
-                const auditOtPay = ratePerMinute * 1.5 * otMin; const auditPhPay = ratePerDay * 2.0 * phWorked; const auditYtdPay = ratePerDay * ytdDays;
-                const auditNegDeduct = ratePerMinute * 1.0 * negMin; const auditAbsDeduct = ratePerDay * (absDays + (penalty > 0 ? 1 : 0));
-                finalValue = (salary + auditOtPay + auditPhPay + auditYtdPay) - (auditNegDeduct + auditAbsDeduct);
-                triggerAuditorDashboardRealtimeAlerts(otMin, negMin, absDays, penalty, finalValue);
-            }
-            display.innerText = "RM " + finalValue.toFixed(2);
-        });
-    }
-
-    function triggerAuditorDashboardRealtimeAlerts(ot, neg, abs, penalty, net) {
-        const zone = document.getElementById('auditAlertsLogZone'); if (!zone) return; zone.innerHTML = ''; let e = 0; let w = 0;
-        if (ot > 0 && neg > 0) { e++; zone.innerHTML += `<div class="aud-alert-box danger"><strong>❌ ERROR: OT & Negative OT Conflict</strong><span>Sila semak, data tuntutan OT dan pulang awal bertembung.</span></div>`; }
-        if (ot > 4320) { w++; zone.innerHTML += `<div class="aud-alert-box warning"><strong>⚠️ WARNING: Extreme OT Hours Logged</strong><span>Minit OT dikesan melanggar had maksimum akta buruh.</span></div>`; }
-        if (abs > 0 && penalty > 0) { w++; zone.innerHTML += `<div class="aud-alert-box warning"><strong>📢 PENALTY: Public Holiday Absent Triggered</strong><span>Tolakan berganda aktif secara automatik bersebelahan PH.</span></div>`; }
-        if (net < 0) { e++; zone.innerHTML += `<div class="aud-alert-box danger"><strong>❌ CRITICAL: Negative Net Salary Output</strong><span>Jumlah tolakan harian melampaui angka pendapatan pokok staf.</span></div>`; }
-        if (e === 0 && w === 0) { zone.innerHTML = `<div class="aud-alert-box pass"><strong>✅ SYSTEM DATA INTEGRITY: Clean Passed</strong><span>Semua parameter formula kemasukan mematuhi piawaian audit.</span></div>`; }
-    }
-
-    // --- SECURE CONTROLS MATRIX ---
-    function toggleFormEditorSecureSystem() {
-        const secureBtn = document.getElementById('adminSecurityGateBtn'); const toolbarPanel = document.getElementById('adminStudioControlsPanel');
-        if (!isFormAdminUnlocked) {
-            let verifyCode = prompt("🔐 Enter Authorised Personnel Password:");
-            if (verifyCode === "noelethan123") {
-                isFormAdminUnlocked = true; secureBtn.innerText = "🔒 Lock Visuals"; secureBtn.style.background = "#dc3545"; toolbarPanel.style.display = "flex";
-                document.querySelectorAll('.dynamic-form-canvas').forEach(c => { c.classList.remove('staff-mode-locked'); c.classList.add('admin-mode-active'); });
-            }
-        } else {
-            isFormAdminUnlocked = false; secureBtn.innerText = "🔑 Authorised Login"; secureBtn.style.background = "#1e293b"; toolbarPanel.style.display = "none";
-            document.querySelectorAll('.dynamic-form-canvas').forEach(c => { c.classList.remove('admin-mode-active'); c.classList.add('staff-mode-locked'); });
-            deselectAllActiveFormWidgets(); saveFormLayoutDataToMemoryDatabase(true);
-        }
-    }
-
-    function switchActiveFormTab(pageId, tabBtn) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active'); tabBtn.classList.add('active'); globalActiveTab = pageId; deselectAllActiveFormWidgets();
-        if (pageId !== 'calendarPage') {
-            renderDynamicFormPageStructure(pageId); const cCanvas = document.getElementById(`canvas-${pageId}`);
-            if (isFormAdminUnlocked) { cCanvas.classList.add('admin-mode-active'); cCanvas.classList.remove('staff-mode-locked'); }
-            else { cCanvas.classList.add('staff-mode-locked'); cCanvas.classList.remove('admin-mode-active'); }
-        }
-    }
-
-    function insertNewFieldToActiveForm(type) {
-        if (!isFormAdminUnlocked) return; widgetCounter++;
-        const canvas = document.getElementById(`canvas-${globalActiveTab}`); const wDiv = document.createElement('div');
-        wDiv.id = `widget-node-${widgetCounter}`; wDiv.style.left = '0px'; wDiv.style.top = '480px'; wDiv.style.width = '890px'; wDiv.style.height = '80px'; wDiv.setAttribute('data-type', type);
-        if (type === 'input') {
-            wDiv.className = 'form-editable-widget type-input'; wDiv.setAttribute('data-label', 'Custom Field Label'); wDiv.setAttribute('data-varid', `key_${widgetCounter}`);
-            wDiv.innerHTML = `<label class="widget-label-text" id="lbl-${wDiv.id}">Custom Field Label</label><input type="number" class="widget-input-field" id="w-val-${wDiv.id}" value="0" oninput="executeLiveFormMathEngine('${globalActiveTab}')"><div class="widget-resize-handle"></div>`;
-        } else {
-            wDiv.className = 'form-editable-widget type-result'; wDiv.setAttribute('data-label', 'Custom Formula Result Display'); wDiv.setAttribute('data-varid', 'res_key'); wDiv.setAttribute('data-formula', '0');
-            wDiv.innerHTML = `<label class="widget-label-text" id="lbl-${wDiv.id}" style="color:#2563eb; font-weight:800; font-size:12px;">Custom Formula Result Display</label><div class="widget-result-display" id="w-disp-${wDiv.id}">RM 0.00</div><div class="widget-resize-handle"></div>`;
-        }
-        wDiv.addEventListener('click', function(e) { e.stopPropagation(); selectFormWidgetForEditing(wDiv); });
-        makeWidgetDraggableAndResizableInAdmin(wDiv, globalActiveTab); canvas.appendChild(wDiv); selectFormWidgetForEditing(wDiv); executeLiveFormMathEngine(globalActiveTab);
-    }
-
-    function selectFormWidgetForEditing(wEl) {
-        deselectAllActiveFormWidgets(); selectedActiveWidget = wEl; wEl.classList.add('selected'); document.getElementById('formWidgetInspectorPanel').style.display = 'flex';
-        document.getElementById('ins-label').value = wEl.getAttribute('data-label'); document.getElementById('ins-varid').value = wEl.getAttribute('data-varid');
-        if (wEl.getAttribute('data-type') === 'result') { document.getElementById('ins-formula-wrap').style.display = 'block'; document.getElementById('ins-formula').value = wEl.getAttribute('data-formula') || ''; }
-        else { document.getElementById('ins-formula-wrap').style.display = 'none'; }
-    }
-    function deselectAllActiveFormWidgets() { document.querySelectorAll('.form-editable-widget').forEach(w => w.classList.remove('selected')); selectedActiveWidget = null; document.getElementById('formWidgetInspectorPanel').style.display = 'none'; }
-    function syncWidgetPropertiesRealtime() {
-        if (!selectedActiveWidget) return; const txtLabel = document.getElementById('ins-label').value; const txtVarId = document.getElementById('ins-varid').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
-        selectedActiveWidget.setAttribute('data-label', txtLabel); selectedActiveWidget.setAttribute('data-varid', txtVarId);
-        const lblNode = selectedActiveWidget.querySelector('.widget-label-text'); if (lblNode) lblNode.innerText = txtLabel;
-        if (selectedActiveWidget.getAttribute('data-type') === 'result') { selectedActiveWidget.setAttribute('data-formula', document.getElementById('ins-formula').value); }
-        executeLiveFormMathEngine(globalActiveTab);
-    }
-    function deleteSelectedFormWidget() { if (selectedActiveWidget) { selectedActiveWidget.remove(); deselectAllActiveFormWidgets(); executeLiveFormMathEngine(globalActiveTab); } }
+    // --- STATE ---
+    let activeTabId = 'otTab';
     
-    function saveFormLayoutDataToMemoryDatabase(silent = false) {
-        document.querySelectorAll('.dynamic-form-canvas').forEach(cBoard => {
-            const pageKey = cBoard.id.replace('canvas-', ''); let collection = [];
-            cBoard.querySelectorAll('.form-editable-widget').forEach(widget => {
-                let nodeInfo = { type: widget.getAttribute('data-type'), label: widget.getAttribute('data-label'), varid: widget.getAttribute('data-varid'), left: widget.style.left, top: widget.style.top, width: widget.style.width, height: widget.style.height };
-                if (nodeInfo.type === 'input' && nodeInfo.varid !== 'ot_loop') { const inputF = document.getElementById(`w-val-${widget.id}`); if (inputF) nodeInfo.val = inputF.value; }
-                else { nodeInfo.formula = widget.getAttribute('data-formula') || '0'; } collection.push(nodeInfo);
-            });
-            if (collection.length > 0) masterFormLayoutDatabase[pageKey] = collection;
+    // --- FORMULAS ---
+    const defaultFormulas = {
+        pos: { label: "Positive OT", d: 26, h: 7.5, m: 60, r: 1.5 }, neg: { label: "Negative OT", d: 26, h: 7.5, m: 60, r: 1.0 }, hq: { label: "HQ OT", d: 30, h: 8.5, m: 60, r: 1.5 },
+        ph: { label: "PH (Double)", d: 26, r: 2.0 }, ab_nor: { label: "Absent Normal", d: 26, r: 1.0 }, ab_ph: { label: "Absent PH Linked", d: 26, r: 2.0 },
+        sn: { label: "Short Notice", d: 26, r: 1.0 }, al: { label: "YTD AL", d: 26, r: 1.0 }
+    };
+    let currentFormulas = JSON.parse(localStorage.getItem('hrFormulas')) || defaultFormulas;
+    
+    // Validate missing fields in local storage
+    for (let key in defaultFormulas) { if (!currentFormulas[key]) currentFormulas[key] = defaultFormulas[key]; }
+
+    // --- TAB SWITCHER ---
+    function switchTab(tabId, btnElement) {
+        activeTabId = tabId;
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btnElement.classList.add('active');
+        if (tabId === 'reminderTab') renderCalendar();
+    }
+
+    // --- SHARED CALC & DOM ---
+    function addRow(mode) {
+        const container = document.getElementById(mode + 'Container');
+        const newRow = document.createElement('div');
+        newRow.className = 'dynamic-row';
+        newRow.innerHTML = `<input type="number" class="${mode}-input" placeholder="Value..."><button class="btn-remove-day" onclick="this.parentElement.remove();">×</button>`;
+        container.appendChild(newRow);
+    }
+    
+    function getSum(className) {
+        let sum = 0; document.querySelectorAll('.' + className).forEach(inp => { let v = parseFloat(inp.value); if(!isNaN(v)) sum+=v; }); return sum;
+    }
+
+    // OT Calc
+    function calculateOT() {
+        let b = parseFloat(document.getElementById('otBasicSalary').value); let t = document.getElementById('otType').value; let inp = getSum('ot-input');
+        if(isNaN(b) || inp===0) return; let f = currentFormulas[t === 'positive'?'pos': t==='negative'?'neg': t==='hq'?'hq':'ph'];
+        let ans = (t==='ph') ? ((b/f.d)*f.r*inp) : ((((b/f.d)/f.h)/f.m)*f.r*inp);
+        document.getElementById('resultDisplayOT').innerText = ans.toFixed(2); showToast("OT Calculated.");
+    }
+
+    // Absent Calc
+    function calculateAbsent() {
+        let b = parseFloat(document.getElementById('absentBasicSalary').value); let t = document.getElementById('absentType').value; let inp = getSum('absent-input');
+        if(isNaN(b) || inp===0) return; let f = currentFormulas[t==='absent_normal'?'ab_nor':'ab_ph'];
+        document.getElementById('resultDisplayAbsent').innerText = ((b/f.d)*f.r*inp).toFixed(2); showToast("Absent Deducted.");
+    }
+
+    // Resign Calc
+    function calculateResign() {
+        let b = parseFloat(document.getElementById('resignBasicSalary').value); let t = document.getElementById('resignType').value; let inp = getSum('resign-input');
+        if(isNaN(b) || inp===0) return; let f = currentFormulas[t==='short_notice'?'sn':'al'];
+        document.getElementById('resultDisplayResign').innerText = ((b/f.d)*f.r*inp).toFixed(2); showToast("Settlement Calculated.");
+    }
+    function handleResignTypeChange() {
+        let t = document.getElementById('resignType').value;
+        let rBox = document.getElementById('resignResultBox'); let rLbl = document.getElementById('resignResultLabel');
+        document.getElementById('resignDurationLabel').innerText = t==='short_notice'?"Short Notice (Days)":"YTD AL (Days)";
+        rBox.className = t==='short_notice'?"result-wrapper danger":"result-wrapper success";
+        rLbl.innerText = t==='short_notice'?"Total Penalty":"Total AL Encashment";
+        rLbl.style.color = t==='short_notice'?"#fca5a5":"#86efac";
+    }
+    function handleOTTypeChange() {
+        document.getElementById('otDurationLabel').innerText = document.getElementById('otType').value === 'ph' ? "Days" : "Minutes";
+    }
+
+    // Date Calc
+    function toggleDateMode() {
+        let isDiff = document.getElementById('calcMode').value === 'diff';
+        document.getElementById('modeDiff').style.display = isDiff ? 'block' : 'none';
+        document.getElementById('modeAddSub').style.display = !isDiff ? 'block' : 'none';
+    }
+    function calculateDate() {
+        let isDiff = document.getElementById('calcMode').value === 'diff';
+        if(isDiff) {
+            let d1 = new Date(document.getElementById('diffFrom').value); let d2 = new Date(document.getElementById('diffTo').value);
+            if(isNaN(d1)||isNaN(d2)) return;
+            let diffDays = Math.ceil(Math.abs(d2 - d1) / (1000 * 3600 * 24));
+            document.getElementById('dateResultMain').innerText = diffDays + " days diff";
+            document.getElementById('dateResultSub').innerText = "Total Absolute";
+        } else {
+            let base = new Date(document.getElementById('addSubFrom').value); if(isNaN(base)) return;
+            let act = document.querySelector('input[name="addSubType"]:checked').value;
+            let m = act==='add'?1:-1;
+            base.setFullYear(base.getFullYear() + (parseFloat(document.getElementById('valYears').value)||0)*m);
+            base.setMonth(base.getMonth() + (parseFloat(document.getElementById('valMonths').value)||0)*m);
+            base.setDate(base.getDate() + (parseFloat(document.getElementById('valDays').value)||0)*m);
+            document.getElementById('dateResultMain').innerText = base.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+            document.getElementById('dateResultSub').innerText = "Target Date";
+        }
+    }
+
+    // --- CALENDAR & REMINDER LOGIC ---
+    let tasks = JSON.parse(localStorage.getItem('hrReminders')) || [];
+    let calDate = new Date();
+
+    function renderCalendar() {
+        const y = calDate.getFullYear(); const m = calDate.getMonth();
+        const firstDay = new Date(y, m, 1).getDay(); const daysInMonth = new Date(y, m + 1, 0).getDate();
+        
+        document.getElementById('calMonthYearDisplay').innerText = new Date(y, m).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const grid = document.getElementById('calGrid');
+        grid.innerHTML = ['SUN','MON','TUE','WED','THU','FRI','SAT'].map(d => `<div class="cal-day-header">${d}</div>`).join('');
+        
+        // Blank leading days
+        for(let i=0; i<firstDay; i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
+        
+        let today = new Date();
+        for(let i=1; i<=daysInMonth; i++) {
+            let cellDateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+            let hasTask = tasks.some(t => t.date === cellDateStr);
+            let isToday = (i === today.getDate() && m === today.getMonth() && y === today.getFullYear());
+            grid.innerHTML += `<div class="cal-day ${isToday?'today':''} ${hasTask?'has-task':''}" onclick="filterList('${cellDateStr}')"><span>${i}</span></div>`;
+        }
+        renderTaskList(); // Show all initially
+    }
+
+    function changeMonth(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); }
+
+    function addTask() {
+        let d = document.getElementById('taskDate').value; let t = document.getElementById('taskTime').value; let n = document.getElementById('taskNote').value;
+        if(!d || !t || !n) { showToast("Please fill date, time and note.", "error"); return; }
+        tasks.push({ id: Date.now(), date: d, time: t, note: n });
+        tasks.sort((a,b) => new Date(a.date+'T'+a.time) - new Date(b.date+'T'+b.time));
+        localStorage.setItem('hrReminders', JSON.stringify(tasks));
+        document.getElementById('taskNote').value = "";
+        showToast("Task inserted into router!");
+        renderCalendar();
+    }
+
+    function removeTask(id) {
+        tasks = tasks.filter(t => t.id !== id); localStorage.setItem('hrReminders', JSON.stringify(tasks)); renderCalendar();
+    }
+
+    function renderTaskList(filterDate = null) {
+        const listDiv = document.getElementById('taskListDisplay');
+        let filtered = filterDate ? tasks.filter(t => t.date === filterDate) : tasks;
+        
+        if(filtered.length === 0) { listDiv.innerHTML = `<p style="font-size:13px; color:#94a3b8;">No tasks scheduled.</p>`; return; }
+        
+        listDiv.innerHTML = filtered.map(t => {
+            // Encode for WhatsApp Web
+            let text = encodeURIComponent(`*HR REMINDER*\nDate: ${t.date}\nTime: ${t.time}\nNote: ${t.note}`);
+            let waLink = `https://web.whatsapp.com/send?text=${text}`; // Desktop/Web whatsapp link
+            return `
+            <div class="task-item">
+                <div class="task-item-time">${t.date} @ ${t.time}</div>
+                <div>${t.note}</div>
+                <div>
+                    <button class="btn-wa" onclick="window.open('${waLink}', '_blank')">WhatsApp Group WA</button>
+                    <button class="btn-del-task" onclick="removeTask(${t.id})">Delete</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+    function filterList(d) { renderTaskList(d); }
+
+    // --- ADMIN & TOAST ---
+    function openAdminModal() { document.getElementById('authModal').classList.add('active'); document.getElementById('adminPassword').value=''; }
+    function verifyAdmin() {
+        if(document.getElementById('adminPassword').value === "admin123") {
+            document.getElementById('authModal').classList.remove('active'); document.getElementById('adminPanel').style.display = 'block'; buildAdminUI();
+        } else { showToast("Wrong password", "error"); }
+    }
+    
+    function buildAdminUI() {
+        const grid = document.getElementById('adminFormulasRender'); grid.innerHTML = "";
+        for(let key in currentFormulas) {
+            let f = currentFormulas[key];
+            let html = `<div style="padding:10px; border:1px solid #e2e8f0; border-radius:6px;"><strong>${f.label}</strong><br>
+                <label>Div Days:</label><input type="number" id="adm_${key}_d" value="${f.d}" style="padding:5px; margin-bottom:5px;">`;
+            if(f.h) html += `<label>Div Hrs:</label><input type="number" id="adm_${key}_h" value="${f.h}" style="padding:5px; margin-bottom:5px;">`;
+            if(f.m) html += `<label>Div Mins:</label><input type="number" id="adm_${key}_m" value="${f.m}" style="padding:5px; margin-bottom:5px;">`;
+            html += `<label>Mult Rate:</label><input type="number" id="adm_${key}_r" value="${f.r}" style="padding:5px;"></div>`;
+            grid.innerHTML += html;
+        }
+    }
+    
+    function saveFormulas() {
+        for(let key in currentFormulas) {
+            currentFormulas[key].d = parseFloat(document.getElementById(`adm_${key}_d`).value);
+            currentFormulas[key].r = parseFloat(document.getElementById(`adm_${key}_r`).value);
+            if(currentFormulas[key].h) currentFormulas[key].h = parseFloat(document.getElementById(`adm_${key}_h`).value);
+            if(currentFormulas[key].m) currentFormulas[key].m = parseFloat(document.getElementById(`adm_${key}_m`).value);
+        }
+        localStorage.setItem('hrFormulas', JSON.stringify(currentFormulas));
+        showToast("Formulas Saved");
+    }
+
+    function showToast(msg, type="success") {
+        const c = document.getElementById('toastContainer');
+        c.innerHTML += `<div class="toast ${type}">${msg}</div>`;
+        setTimeout(() => { if(c.firstChild) c.firstChild.remove(); }, 2500);
+    }
+
+    // Default Init Date Setup
+    document.addEventListener("DOMContentLoaded", () => {
+        let t = new Date().toISOString().split('T')[0];
+        document.getElementById('diffFrom').value = t; document.getElementById('diffTo').value = t; document.getElementById('addSubFrom').value = t;
+        document.getElementById('taskDate').value = t;
+        
+        // Enter key listeners
+        document.addEventListener('keydown', e => {
+            if(e.key === 'Enter') {
+                if(document.getElementById('authModal').classList.contains('active')) verifyAdmin();
+                else if(activeTabId==='otTab') calculateOT(); else if(activeTabId==='absentTab') calculateAbsent();
+                else if(activeTabId==='resignTab') calculateResign(); else if(activeTabId==='dateTab') calculateDate();
+            }
         });
-        localStorage.setItem('master_form_canvas_db', JSON.stringify(masterFormLayoutDatabase));
-        if (!silent) alert("💾 SYSTEM BINDING OK:\nReka bentuk teks susunan borang korporat berjaya dikunci!");
-    }
-
-    function makeWidgetDraggableAndResizableInAdmin(widgetEl, pageId) {
-        let isDragging = false; let isResizing = false; let startX, startY, startLeft, startTop, startWidth, startHeight; const resizeHandle = widgetEl.querySelector('.widget-resize-handle');
-        widgetEl.addEventListener('mousedown', function(e) { if (!isFormAdminUnlocked || e.target === resizeHandle || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return; isDragging = true; startX = e.clientX; startY = e.clientY; startLeft = parseInt(widgetEl.style.left) || 0; startTop = parseInt(widgetEl.style.top) || 0; document.querySelectorAll('.form-editable-widget').forEach(w => w.style.zIndex = 1); widgetEl.style.zIndex = 10; });
-        resizeHandle.addEventListener('mousedown', function(e) { e.stopPropagation(); isResizing = true; startX = e.clientX; startY = e.clientY; startWidth = widgetEl.offsetWidth; startHeight = widgetEl.offsetHeight; });
-        document.addEventListener('mousemove', function(e) { if (isDragging) { widgetEl.style.left = `${startLeft + (e.clientX - startX)}px`; widgetEl.style.top = `${startTop + (e.clientY - startY)}px`; } if (isResizing) { widgetEl.style.width = `${startWidth + (e.clientX - startX)}px`; widgetEl.style.height = `${startHeight + (e.clientY - startY)}px`; } });
-        document.addEventListener('mouseup', function() { isDragging = false; isResizing = false; });
-    }
-
-    // ================= HR VISUAL SCHEDULER CALENDAR PIPELINES =================
-    function navMonthChange(dir) { currentNavDate.setMonth(currentNavDate.getMonth() + dir); renderVisualCalendarInterface(); }
-    function addNewReminderTask() {
-        const d = document.getElementById('rem-date').value; const t = document.getElementById('rem-time').value; const tTitle = document.getElementById('rem-title').value; if (!d || !t || !tTitle.trim()) return;
-        remindersArray.push({ id: Date.now(), date: d, time: t, message: tTitle, alerted: true });
-        localStorage.setItem('hrReminders', JSON.stringify(remindersArray)); document.getElementById('rem-title').value = ''; renderVisualCalendarInterface(); blastWebhookToFonnteServer(tTitle, d, t);
-    }
-    function removeTaskNode(id) { remindersArray = remindersArray.filter(i => i.id !== id); localStorage.setItem('hrReminders', JSON.stringify(remindersArray)); renderVisualCalendarInterface(); }
-    function blastWebhookToFonnteServer(m, d, t) {
-        const cleanD = new Date(d).toLocaleDateString('en-MY', { year: 'numeric', month: 'short', day: 'numeric' }); const [h, min] = t.split(':'); const msgStr = `📢 *HR TASK ALERT SYSTEM*\n\n📅 *Date:* ${cleanD}\n⏰ *Time:* ${h % 12 || 12}:${min} ${h >= 12 ? 'PM' : 'AM'}\n📝 *Task To Do:* ${m}\n\n_Generated automatically via Noel Ethan Dashboard Scheduler_`;
-        const fData = new FormData(); fData.append('target', "120363410088755340@g.us"); fData.append('message', msgStr); fData.append('countryCode', '60');
-        fetch("https://api.fonnte.com/send", { method: 'POST', headers: { 'Authorization': "71SME9mMhVBZgB7awkZQ" }, body: fData }).catch(e => console.error(e));
-    }
-    function checkAndTriggerBotAlerts() {
-        const now = new Date(); const today = now.toISOString().split('T')[0]; const currTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`; let flag = false;
-        remindersArray.forEach(i => { if (i.date === today && i.time === currTime && !i.alerted) { i.alerted = true; flag = true; blastWebhookToFonnteServer(i.message, i.date, i.time); } }); if (flag) { localStorage.setItem('hrReminders', JSON.stringify(remindersArray)); renderVisualCalendarInterface(); }
-    }
-    function renderVisualCalendarInterface() {
-        const grid = document.getElementById('calGridZone'); const title = document.getElementById('calMonthYearTitle'); const list = document.getElementById('schedListZone'); grid.innerHTML = ''; list.innerHTML = ''; const y = currentNavDate.getFullYear(); const m = currentNavDate.getMonth(); const mNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; title.innerText = `${mNames[m]} ${y}`;
-        if (remindersArray.length === 0) { list.innerHTML = `<p style="font-size:12px; color:#94a3b8; text-align:center; padding:20px;">No tasks scheduled.</p>`; } else {
-            remindersArray.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
-            remindersArray.forEach(i => { const cleanD = new Date(i.date).toLocaleDateString('en-MY', { month: 'short', day: 'numeric' }); const [h, min] = i.time.split(':'); const row = document.createElement('div'); row.className = `task-card ${i.alerted ? 'sent' : ''}`; row.innerHTML = `<div><h4>${i.message}</h4><p>📅 ${cleanD} @ ${h % 12 || 12}:${min} ${h >= 12 ? 'PM' : 'AM'}</p></div><button class="task-del-btn" onclick="removeTaskNode(${i.id})">Del</button>`; list.appendChild(row); });
-        }
-        ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(d => { const el = document.createElement('div'); el.className = 'calendar-day-name'; el.innerText = d; grid.appendChild(el); });
-        const fIdx = new Date(y, m, 1).getDay(); const totalM = new Date(y, m + 1, 0).getDate(); const totalPrev = new Date(y, m, 0).getDate(); const today = new Date().toISOString().split('T')[0];
-        for(let i = fIdx; i > 0; i--) { const c = document.createElement('div'); c.className = 'calendar-cell other-month'; c.innerHTML = `<div class="cell-number">${totalPrev - i + 1}</div>`; grid.appendChild(c); }
-        for(let day = 1; day <= totalM; day++) {
-            const c = document.createElement('div'); c.className = 'calendar-cell'; const loopD = `${y}-${String(m + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`; if(loopD === today) c.classList.add('today'); c.innerHTML = `<div class="cell-number">${day}</div>`;
-            const evts = remindersArray.filter(i => i.date === loopD); evts.sort((a,b) => a.time.localeCompare(b.time)); evts.forEach(e => { const tag = document.createElement('div'); tag.className = 'calendar-event-mini-tag'; if (e.alerted) tag.classList.add('triggered'); tag.innerText = `${e.time} ${e.message}`; c.appendChild(tag); }); grid.appendChild(c);
-        }
-        const remaining = 42 - (fIdx + totalM); for(let i = 1; i <= remaining; i++) { const c = document.createElement('div'); c.className = 'calendar-cell other-month'; c.innerHTML = `<div class="cell-number">${i}</div>`; grid.appendChild(c); }
-    }
+    });
 </script>
 
 </body>
