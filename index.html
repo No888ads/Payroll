@@ -353,6 +353,43 @@
     function changeMonth(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); }
 
     // FUNGSI ADDTASK YANG TELAH DIKEMAS KINI
+async function addTask() {
+        let d = document.getElementById('taskDate').value; 
+        let t = document.getElementById('taskTime').value; 
+        let n = document.getElementById('taskNote').value;
+        
+        if(!d || !t || !n) { showToast("Sila isi tarikh, masa dan nota.", "error"); return; }
+        
+        // 1. Simpan dalam kalendar HTML
+        tasks.push({ id: Date.now(), date: d, time: t, note: n });
+        tasks.sort((a,b) => new Date(a.date+'T'+a.time) - new Date(b.date+'T'+b.time));
+        localStorage.setItem('hrReminders', JSON.stringify(tasks));
+        
+        // 2. Tembak data ke Bot WhatsApp (API Fetch)
+        // GANTIKAN URL DI BAWAH DENGAN LINK YANG ANDA COPY TADI
+        const apiUrl = 'https://vigilant-spork-wrr9pxvrxrxvhvv96-3000.app.github.dev/tambah-task'; 
+        
+        try {
+            let response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date: d, time: t, note: n })
+            });
+            
+            if(response.ok) {
+                showToast("Task berjaya disambung ke Bot WA!");
+            } else {
+                showToast("Ralat pelayan bot", "error");
+            }
+        } catch (error) {
+            console.error("Bot offline:", error);
+            showToast("Bot offline atau port tertutup", "error");
+        }
+        
+        document.getElementById('taskNote').value = "";
+        renderCalendar();
+    }
+    
     async function addTask() {
         let d = document.getElementById('taskDate').value; 
         let t = document.getElementById('taskTime').value; 
