@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR TERMINAL V8.3: CYBERNETIC PROTOCOL</title>
+    <title>HR TERMINAL V8.9: CYBERNETIC PROTOCOL</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- GLOBAL HACKER THEME & ANIMATIONS --- */
@@ -23,10 +23,11 @@
         @keyframes neonFlicker { 0%, 19%, 22%, 62%, 64%, 70%, 100% { opacity: 1; text-shadow: 0 0 5px var(--hacker-green), 0 0 15px var(--hacker-green); } 20%, 21%, 63%, 65%, 69% { opacity: 0.4; text-shadow: none; } }
         @keyframes blinker { 50% { opacity: 0; } }
         @keyframes trailFade { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(0.1); opacity: 0; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
         body {
             font-family: 'Fira Code', monospace; background-color: var(--hacker-bg); color: var(--hacker-green);
-            margin: 0; padding: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            margin: 0; padding: 20px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
             min-height: 100vh; box-sizing: border-box; position: relative; overflow-x: hidden; cursor: crosshair !important;
         }
         
@@ -39,7 +40,7 @@
         #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; opacity: 0.8; }
         .cursor-trail { position: fixed; width: 4px; height: 4px; background: var(--hacker-green); border-radius: 50%; pointer-events: none; z-index: 9999; animation: trailFade 0.5s forwards; }
 
-        h2 { margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; text-shadow: var(--border-glow); cursor: crosshair;}
+        h2, h3 { margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; text-shadow: var(--border-glow); cursor: crosshair;}
         h2:hover { animation: glitch 0.2s linear infinite; }
 
         /* --- BOOT SCREEN (PATCHED) --- */
@@ -51,12 +52,12 @@
         .boot-line { margin-bottom: 8px; text-shadow: 0 0 5px var(--hacker-green); }
         .boot-cursor { display: inline-block; width: 8px; height: 15px; background: var(--hacker-green); animation: blinker 0.8s infinite; vertical-align: middle; margin-left: 5px;}
 
-        /* --- CLOCK HERO (HUD) --- */
+        /* --- CLOCK HERO (HUD) MOVED TO RELATIVE --- */
         .hero-clock-container {
-            position: absolute; top: 20px; right: 20px; background: linear-gradient(90deg, rgba(0, 30, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%);
+            position: relative; background: linear-gradient(90deg, rgba(0, 30, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%);
             padding: 12px 20px; border-radius: 2px; border: 1px solid #111; border-left: 4px solid var(--hacker-green);
-            box-shadow: -5px 0 20px rgba(0, 255, 0, 0.15); z-index: 100; backdrop-filter: blur(5px);
-            display: flex; flex-direction: column; align-items: flex-end; min-width: 200px; cursor: crosshair;
+            box-shadow: inset 0 0 15px rgba(0,255,0,0.05); z-index: 100; backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; align-items: flex-end; width: 100%; box-sizing: border-box; margin-bottom: 25px; cursor: crosshair;
         }
         .hero-clock-container::before { content: 'SYS.DIAGNOSTICS'; position: absolute; top: -7px; left: 8px; font-size: 9px; background: #000; color: var(--hacker-green); padding: 0 4px; font-weight: bold; letter-spacing: 1px; }
         .hud-top-row { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 6px;}
@@ -68,25 +69,72 @@
         .sound-toggle { font-size: 9px; border: 1px solid var(--hacker-green-dim); padding: 2px 5px; cursor: crosshair; background: transparent; color: var(--hacker-green); margin-top: 5px; width: 100%; text-align: center; transition: 0.2s;}
         .sound-toggle:hover { background: var(--hacker-green); color: #000;}
 
-        /* --- MAIN TERMINAL BOX --- */
-        .card {
-            background: var(--box-bg); border-radius: 4px; width: 100%; max-width: 900px; padding: 30px; 
-            margin: auto; box-sizing: border-box; box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-            position: relative; overflow: hidden; border: 1px solid rgba(0, 255, 0, 0.1); margin-top: 60px;
+        /* --- DASHBOARD LAYOUT (2 COLUMNS) --- */
+        .dashboard-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 100%;
+            max-width: 1500px;
+            margin-top: 20px; /* Reduced since clock is no longer floating */
+            z-index: 2;
         }
-        .card::before { content: ''; position: absolute; height: 150%; width: 150%; background: conic-gradient(#00ff00 10deg, transparent 90deg); top: -25%; left: -25%; animation: rotate 4s linear infinite; z-index: 0; opacity: 0.5; }
-        .card::after { content: ''; position: absolute; background: var(--box-bg); inset: 2px; border-radius: 2px; z-index: 1; }
-        .card > * { position: relative; z-index: 2; }
 
+        @media (max-width: 1024px) {
+            .dashboard-container { flex-direction: column; align-items: center; }
+        }
+
+        /* --- CYBER PANEL BASE --- */
+        .cyber-panel {
+            background: var(--box-bg); border-radius: 4px; padding: 30px; 
+            box-sizing: border-box; box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            position: relative; overflow: hidden; border: 1px solid rgba(0, 255, 0, 0.1);
+        }
+        .cyber-panel::before { content: ''; position: absolute; height: 150%; width: 150%; background: conic-gradient(#00ff00 10deg, transparent 90deg); top: -25%; left: -25%; animation: rotate 4s linear infinite; z-index: 0; opacity: 0.5; }
+        .cyber-panel::after { content: ''; position: absolute; background: var(--box-bg); inset: 2px; border-radius: 2px; z-index: 1; }
+        .cyber-panel > * { position: relative; z-index: 2; }
+
+        /* --- SIDEBAR MANUAL --- */
+        .sidebar {
+            width: 350px;
+            flex-shrink: 0;
+            height: fit-content;
+        }
+        @media (max-width: 1024px) { .sidebar { width: 100%; max-width: 1100px; order: 2; } }
+        
+        .manual-title { border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 10px; margin-bottom: 15px; color: #fff; display: flex; justify-content: space-between; align-items: center;}
+        
+        .lang-switcher { display: flex; gap: 5px; }
+        .lang-btn { padding: 4px 8px; font-size: 9px; cursor: crosshair; transition: 0.2s; border: 1px solid #444; background: transparent; color: #888; border-radius: 2px;}
+        .lang-btn.active { background: var(--hacker-green); color: #000; border-color: var(--hacker-green); box-shadow: 0 0 5px var(--hacker-green);}
+        
+        .doc-item { margin-bottom: 15px; border-left: 2px solid var(--hacker-green-dim); padding-left: 10px; animation: slideIn 0.3s ease; display: none; }
+        .doc-item.active { display: block; }
+        .doc-cmd { font-weight: bold; color: #fff; margin-bottom: 6px; font-size: 13px; text-shadow: 0 0 5px rgba(255,255,255,0.2); }
+        
+        .lang-content { display: none; }
+        .lang-content.active-lang { display: block; }
+
+        .doc-desc { font-size: 11px; color: #aaa; line-height: 1.6; margin-bottom: 10px; text-transform: none; }
+        .doc-desc ul { margin-top: 5px; padding-left: 15px; }
+        .doc-desc li { margin-bottom: 5px; }
+        
+        .doc-warn { color: var(--danger); font-size: 9px; margin-top: 25px; font-weight: bold; border-top: 1px dashed #333; padding-top: 10px;}
+
+        /* --- MAIN TERMINAL BOX --- */
+        .main-terminal { flex-grow: 1; width: 100%; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--hacker-green-dim); padding-bottom: 10px;}
-        h2::before { content: '$ '; color: #fff; } label::before { content: '> '; color: #fff; }
+        .header-top h2::before { content: '$ '; color: #fff; } label::before { content: '> '; color: #fff; }
 
-        .tabs-container { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 1px solid var(--hacker-green-dim); padding-bottom: 10px; overflow-x: auto; font-family: monospace;}
-        .tab-btn { background: transparent; border: 1px solid transparent; padding: 10px 12px; font-size: 11px; font-weight: 600; color: #CCCCCC; cursor: crosshair; border-radius: 2px; transition: all 0.2s ease; white-space: nowrap; }
-        .tab-btn:hover { background: #111; color: #fff; border-color: var(--hacker-green-dim);}
-        .tab-btn.active { border-color: var(--hacker-green); color: var(--hacker-green); background: #001f00; box-shadow: var(--border-glow); }
-        .tab-btn.custom-tab { border: 1px dashed var(--hacker-green-dim); } .tab-btn.custom-tab.active { border-style: solid; background-color: #001f00; }
-        .tab-content { display: none; } .tab-content.active { display: block; }
+        /* --- REKAAN TABS (GRID SYSTEM) --- */
+        .tabs-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 25px; border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 20px; font-family: monospace;}
+        @media (max-width: 768px) { .tabs-container { grid-template-columns: repeat(2, 1fr); } }
+
+        .tab-btn { background: #050505; border: 1px solid #333; padding: 12px 10px; font-size: 11px; font-weight: 600; color: #888; cursor: crosshair; border-radius: 2px; transition: all 0.2s ease; white-space: nowrap; text-align: center; letter-spacing: 0.5px;}
+        .tab-btn:hover { background: #111; color: #fff !important; border-color: var(--hacker-green-dim); box-shadow: 0 0 8px rgba(0,255,0,0.1); }
+        .tab-btn.active { border-color: var(--hacker-green) !important; color: var(--hacker-green) !important; background: #001f00; box-shadow: inset 0 0 10px rgba(0,255,0,0.1), 0 0 5px rgba(0,255,0,0.2); text-shadow: 0 0 5px rgba(0,255,0,0.3); }
+        
+        .tab-content { display: none; } .tab-content.active { display: block; animation: slideIn 0.2s ease; }
 
         /* --- FORM ELEMENTS --- */
         .form-group { margin-bottom: 15px; }
@@ -103,10 +151,27 @@
         .cyber-progress-text { font-size: 10px; font-weight: 700; color: var(--hacker-green); margin-bottom: 4px; display: flex; justify-content: space-between; font-family: monospace; }
         .cyber-progress-container { width: 100%; height: 6px; background: #111; border: 1px solid #333; border-radius: 2px; margin-bottom: 10px; overflow: hidden; position: relative;}
         .cyber-progress-bar { height: 100%; background: var(--hacker-green); transition: width 0.4s ease; box-shadow: 0 0 5px var(--hacker-green); }
-        
         .cyber-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; color: #aaa; }
         .cyber-checklist label { display: flex; align-items: center; gap: 6px; margin: 0; text-transform: none; cursor: crosshair; }
         .cyber-checklist input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: crosshair; accent-color: var(--hacker-green); }
+
+        /* --- HEADCOUNT RADAR STYLES --- */
+        .hc-dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .hc-stat-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 15px; text-align: center; }
+        .hc-stat-box.danger { border-color: var(--danger); box-shadow: inset 0 0 10px rgba(255,0,0,0.1); }
+        .hc-stat-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .hc-stat-value { font-size: 28px; font-weight: bold; margin-top: 5px; color: #fff; }
+        .hc-stat-box.danger .hc-stat-value { color: var(--danger); }
+        .hc-outlets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        @media (max-width: 768px) { .hc-outlets-grid { grid-template-columns: 1fr; } }
+        .hc-card { border: 1px solid #222; background: #050505; border-radius: 2px; padding: 15px; position: relative; }
+        .hc-card-header { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 10px; margin-bottom: 10px; font-weight: bold; color: #93c5fd; text-transform: uppercase; font-size: 12px; align-items: center;}
+        .hc-role-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr 30px; gap: 8px; align-items: center; margin-bottom: 8px; font-size: 11px; }
+        .hc-shortage { font-weight: bold; text-align: center; padding: 4px; border-radius: 2px; font-size: 10px; }
+        .hc-shortage.short { background: rgba(255,0,0,0.15); color: var(--danger); border: 1px solid rgba(255,0,0,0.3); }
+        .hc-shortage.ok { background: rgba(0,255,0,0.1); color: var(--hacker-green); border: 1px solid rgba(0,255,0,0.2); }
+        .hc-card-input { width: 100%; padding: 4px; font-size: 11px; text-align: center; background: #000; color: #fff; border: 1px solid #333; }
+        .hc-card-input:focus { border-color: var(--hacker-green); outline: none; }
 
         /* --- BUTTONS --- */
         .btn-primary { width: 100%; padding: 14px; background-color: #001f00; color: #00FF00; border: 1px solid var(--hacker-green); border-radius: 2px; font-size: 13px; font-weight: 600; cursor: crosshair; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
@@ -166,7 +231,16 @@
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
         .toast { background: #000; border: 1px solid var(--hacker-green); border-left: 4px solid var(--hacker-green); padding: 15px 20px; border-radius: 2px; margin-top: 10px; box-shadow: var(--border-glow); font-weight: 600; font-size: 12px; color: #fff; font-family: monospace;}
         
-        @media print { body { background: #fff !important; color: #000 !important; } body::after, #matrixCanvas, #bootScreen, .hero-clock-container, .tabs-container, .header-top button, .form-group, .btn-primary, .btn-add-day, .btn-print, .footer-brand, #adminPanel { display: none !important; } .card { border: none !important; box-shadow: none !important; margin: 0; padding: 0; } .card::before, .card::after { display: none !important; } .result-wrapper { background: transparent !important; border: 2px solid #000 !important; color: #000 !important; box-shadow: none !important; padding: 50px; position: relative; } .result-wrapper::before { content: 'CLASSIFIED'; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 80px; font-weight: 900; color: rgba(255, 0, 0, 0.3); border: 8px solid rgba(255, 0, 0, 0.3); padding: 10px 20px; z-index: -1; letter-spacing: 10px; font-family: 'Courier New', Courier, monospace; } .result-label { color: #000 !important; font-size: 16px; font-weight: bold; } .result-value { font-size: 40px; color: #000 !important;} }
+        @media print { 
+            body { background: #fff !important; color: #000 !important; } 
+            body::after, #matrixCanvas, #bootScreen, .hero-clock-container, .tabs-container, .header-top button, .form-group, .btn-primary, .btn-add-day, .btn-print, .footer-brand, #adminPanel, .sidebar { display: none !important; } 
+            .cyber-panel { border: none !important; box-shadow: none !important; margin: 0; padding: 0; } 
+            .cyber-panel::before, .cyber-panel::after { display: none !important; } 
+            .result-wrapper { background: transparent !important; border: 2px solid #000 !important; color: #000 !important; box-shadow: none !important; padding: 50px; position: relative; } 
+            .result-wrapper::before { content: 'CLASSIFIED'; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 80px; font-weight: 900; color: rgba(255, 0, 0, 0.3); border: 8px solid rgba(255, 0, 0, 0.3); padding: 10px 20px; z-index: -1; letter-spacing: 10px; font-family: 'Courier New', Courier, monospace; } 
+            .result-label { color: #000 !important; font-size: 16px; font-weight: bold; } 
+            .result-value { font-size: 40px; color: #000 !important;} 
+        }
     </style>
 </head>
 <body>
@@ -178,135 +252,379 @@
 
 <canvas id="matrixCanvas"></canvas>
 
-<div class="hero-clock-container">
-    <div class="hud-top-row"><canvas id="cpuGraph"></canvas><div class="hero-time" id="liveTime">00<span class="blink-colon">:</span>00<span class="secs">00</span></div></div>
-    <div class="hero-date" id="liveDate">PROTOCOL DATE</div>
-    <button class="sound-toggle" onclick="toggleSound()" id="soundBtn">[ SOUND: ON ]</button>
-</div>
+<!-- DASHBOARD 2 KOLUM BERSAIZ LEBAR -->
+<div class="dashboard-container">
 
-<div class="card">
-    <div class="header-top">
-        <h2>Cyber HR Terminal</h2>
-        <button class="btn-admin" onclick="openAdminModal()">⚙️ ADMIN TERMINAL</button>
+    <!-- KOLUM KIRI: CLOCK & SYSTEM MANUAL (DYNAMIC) -->
+    <div class="cyber-panel sidebar">
+        
+        <!-- HUD CLOCK (MOVED HERE) -->
+        <div class="hero-clock-container">
+            <div class="hud-top-row">
+                <canvas id="cpuGraph"></canvas>
+                <div class="hero-time" id="liveTime">00<span class="blink-colon">:</span>00<span class="secs">00</span></div>
+            </div>
+            <div class="hero-date" id="liveDate">PROTOCOL DATE</div>
+            <button class="sound-toggle" onclick="toggleSound()" id="soundBtn">[ SOUND: ON ]</button>
+        </div>
+
+        <h3 class="manual-title">
+            <span>[ SYSTEM MANUAL ]</span>
+        </h3>
+        <div class="lang-switcher" style="margin-bottom: 15px;">
+            <button class="lang-btn active" id="btn-lang-ms" onclick="setLang('ms')">MS</button>
+            <button class="lang-btn" id="btn-lang-en" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" id="btn-lang-zh" onclick="setLang('zh')">中文</button>
+        </div>
+        
+        <!-- MANUAL: OT CALC -->
+        <div id="manual-otTab" class="doc-item active">
+            <div class="doc-cmd">$ ot_calc</div>
+            <div class="doc-desc lang-content lang-ms active-lang">
+                Pengiraan bayaran lebih masa (OT) secara automatik.<br>
+                <ul>
+                    <li>Masukkan Gaji Asas.</li>
+                    <li>Pilih jenis kadar OT.</li>
+                    <li>Masukkan durasi bekerja (Minit atau Hari).</li>
+                </ul>
+                Klik <b>Execute</b> untuk jumlah tepat.
+            </div>
+            <div class="doc-desc lang-content lang-en">
+                Automated Overtime (OT) payment calculation.<br>
+                <ul>
+                    <li>Enter Basic Salary.</li>
+                    <li>Select OT rate type.</li>
+                    <li>Enter working duration (Minutes or Days).</li>
+                </ul>
+                Click <b>Execute</b> for the exact amount.
+            </div>
+            <div class="doc-desc lang-content lang-zh">
+                自动计算加班费 (OT)。<br>
+                <ul>
+                    <li>输入基本薪资。</li>
+                    <li>选择加班费率类型。</li>
+                    <li>输入工作时间（分钟或天数）。</li>
+                </ul>
+                点击 <b>Execute</b> 获取准确金额。
+            </div>
+        </div>
+
+        <!-- MANUAL: ABSENT CALC -->
+        <div id="manual-absentTab" class="doc-item">
+            <div class="doc-cmd">$ absent_calc</div>
+            <div class="doc-desc lang-content lang-ms active-lang">
+                Enjin tolakan gaji untuk ketidakhadiran staf.<br>
+                <ul>
+                    <li>Masukkan Gaji Asas.</li>
+                    <li>Pilih jenis tolakan (Normal 1x atau Bersambung PH 2x).</li>
+                    <li>Masukkan jumlah hari tidak hadir.</li>
+                </ul>
+            </div>
+            <div class="doc-desc lang-content lang-en">
+                Salary deduction engine for staff absenteeism.<br>
+                <ul>
+                    <li>Enter Basic Salary.</li>
+                    <li>Select deduction type (Normal 1x or PH Linked 2x).</li>
+                    <li>Enter the number of absent days.</li>
+                </ul>
+            </div>
+            <div class="doc-desc lang-content lang-zh">
+                员工缺勤扣薪计算引擎。<br>
+                <ul>
+                    <li>输入基本薪资。</li>
+                    <li>选择扣款类型（普通 1x 或 连公共假期 2x）。</li>
+                    <li>输入缺勤天数。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- MANUAL: RESIGN CALC -->
+        <div id="manual-resignTab" class="doc-item">
+            <div class="doc-cmd">$ resign_calc</div>
+            <div class="doc-desc lang-content lang-ms active-lang">
+                Pengiraan penyelesaian berhenti kerja.<br>Kira penalti untuk Notis Singkat (Short Notice) dan juga jumlah penebusan baki Cuti Tahunan (AL Encashment) mengikut divisor harian.
+            </div>
+            <div class="doc-desc lang-content lang-en">
+                Resignation settlement calculation.<br>Calculate penalties for Short Notice and the total encashment for remaining Annual Leave (AL) using the standard daily divisor.
+            </div>
+            <div class="doc-desc lang-content lang-zh">
+                离职结算计算。<br>使用标准每日除数计算短期通知 (Short Notice) 的罚款以及剩余年假 (AL) 的折现总额。
+            </div>
+        </div>
+
+        <!-- MANUAL: DATE UTILITY -->
+        <div id="manual-dateTab" class="doc-item">
+            <div class="doc-cmd">$ date_utility</div>
+            <div class="doc-desc lang-content lang-ms active-lang">
+                Alat utiliti pengurusan tarikh.<br>
+                <ul>
+                    <li><b>Mod Diff:</b> Mengira jumlah hari sebenar di antara 2 tarikh.</li>
+                    <li><b>Mod Add/Sub:</b> Meramal tarikh hadapan dengan menambah masa.</li>
+                </ul>
+            </div>
+            <div class="doc-desc lang-content lang-en">
+                Date management utility tool.<br>
+                <ul>
+                    <li><b>Diff Mode:</b> Calculates the exact number of days between 2 dates.</li>
+                    <li><b>Add/Sub Mode:</b> Projects future dates by adding or subtracting time.</li>
+                </ul>
+            </div>
+            <div class="doc-desc lang-content lang-zh">
+                日期管理实用工具。<br>
+                <ul>
+                    <li><b>Diff 模式:</b> 计算两个日期之间的确切天数。</li>
+                    <li><b>Add/Sub 模式:</b> 通过加减时间来预测未来的日期。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- MANUAL: PROTOCOL LOGS -->
+        <div id="manual-reminderTab" class="doc-item">
+            <div class="doc-cmd">$ protocol_logs</div>
+            <div class="doc-desc lang-content lang-ms active-lang">
+                Diari log dan amaran pintar.<br>Set tarikh peringatan penting. Tandakan <b>"Blast to WA Group"</b> jika anda ingin sistem menghantar mesej amaran secara terus ke kumpulan WhatsApp HR.
+            </div>
+            <div class="doc-desc lang-content lang-en">
+                Smart log and alert diary.<br>Set important reminder dates. Check <b>"Blast to WA Group"</b> if you want the system to send alert messages directly to the HR WhatsApp group.
+            </div>
+            <div class="doc-desc lang-content lang-zh">
+                智能日志和警报日记。<br>设置重要的提醒日期。如果您希望系统直接向 HR WhatsApp 群组发送警报消息，请勾选 <b>"Blast to WA Group"</b>。
+            </div>
+        </div>
+
+        <!-- MANUAL: CUSTOM MATH -->
+        <div id="manual-customCalcTab" class="doc-item">
+            <div class="doc-cmd" style="color: #fff;">🧮 Custom Math</div>
+            <div class="doc-desc lang-content lang-ms active-lang">
+                Enjin formula peribadi anda.<br>Gunakan formula yang anda cipta. Untuk mengubahsuai atau mencipta formula baharu, sila akses menu [ADMIN TERMINAL].
+            </div>
+            <div class="doc-desc lang-content lang-en">
+                Your personalized formula engine.<br>Use the formulas you've created. To modify or create new mathematical formulas, please access the [ADMIN TERMINAL].
+            </div>
+            <div class="doc-desc lang-content lang-zh">
+                您的个性化公式引擎。<br>使用您创建的公式。要修改或创建新的数学公式，请访问 [ADMIN TERMINAL] 菜单。
+            </div>
+        </div>
+
+        <!-- MANUAL: PT MATRIX -->
+        <div id="manual-ptStaffTab" class="doc-item" style="border-left-color: #d8b4fe;">
+            <div class="doc-cmd" style="color: #d8b4fe;">$ pt_matrix</div>
+            <div class="doc-desc lang-content lang-ms active-lang">
+                Pangkalan Data Staf Part-Time.<br>
+                <ul>
+                    <li>Daftar info staf & tarikh tamat kontrak (Mesej amaran auto diaktifkan).</li>
+                    <li>Pantau bar kemajuan Onboarding.</li>
+                    <li>Tick status dokumen terus dari jadual.</li>
+                </ul>
+            </div>
+            <div class="doc-desc lang-content lang-en">
+                Part-Time Staff Database.<br>
+                <ul>
+                    <li>Register staff info & contract end date (Auto alert message activated).</li>
+                    <li>Monitor Onboarding progress bar.</li>
+                    <li>Tick document status directly from the table.</li>
+                </ul>
+            </div>
+            <div class="doc-desc lang-content lang-zh">
+                兼职员工数据库。<br>
+                <ul>
+                    <li>注册员工信息和合同结束日期（激活自动警报消息）。</li>
+                    <li>监控入职 (Onboarding) 进度条。</li>
+                    <li>直接从表格中勾选文件状态。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- MANUAL: HEADCOUNT RADAR -->
+        <div id="manual-headcountTab" class="doc-item" style="border-left-color: #3b82f6;">
+            <div class="doc-cmd" style="color: #93c5fd;">$ manpower_radar</div>
+            <div class="doc-desc lang-content lang-ms active-lang">
+                Pemantauan Kuota Pekerja.<br>Tambah cawangan (Outlet) dan posisi pekerja. Sistem akan mengira keseimbangan secara langsung. Kotak MERAH bermaksud staf tidak mencukupi (Shortage).
+            </div>
+            <div class="doc-desc lang-content lang-en">
+                Workforce Quota Monitoring.<br>Add branches (Outlets) and job positions. The system computes the balance in real-time. A RED box indicates insufficient staff (Shortage).
+            </div>
+            <div class="doc-desc lang-content lang-zh">
+                员工配额监控。<br>添加分店 (Outlets) 和职位。系统实时计算平衡。红框表示人员不足 (Shortage)。
+            </div>
+        </div>
+
+        <!-- PERSISTENT FOOTER -->
+        <div class="doc-warn">> Akses Formula Baharu: Buka [ADMIN TERMINAL] (Code: admin123)</div>
     </div>
 
-    <div class="tabs-container">
-        <button class="tab-btn active" onclick="switchTab('otTab', this)">$ ot_calc</button>
-        <button class="tab-btn" onclick="switchTab('absentTab', this)">$ absent_calc</button>
-        <button class="tab-btn" onclick="switchTab('resignTab', this)">$ resign_calc</button>
-        <button class="tab-btn" onclick="switchTab('dateTab', this)">$ date_utility</button>
-        <button class="tab-btn" onclick="switchTab('reminderTab', this)">$ protocol_logs</button>
-        <button class="tab-btn custom-tab" onclick="switchTab('customCalcTab', this)">🧮 Custom Math</button>
-        <button class="tab-btn" onclick="switchTab('ptStaffTab', this)" style="border-color: #a855f7; color: #d8b4fe;">$ personnel_matrix</button>
-    </div>
-    
-    <div id="otTab" class="tab-content active">
-        <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="otBasicSalary"></div>
-        <div class="form-group"><label>Rate Type</label><select id="otType" onchange="handleOTTypeChange()"><option value="pos">Positive OT (1.5x)</option><option value="neg">Negative OT (1.0x)</option><option value="hq">HQ OT (1.5x / 30D)</option><option value="ph">Public Holiday (2.0x)</option></select></div>
-        <div class="form-group" id="otContainer"><label id="otDurationLabel">Duration (Minutes)</label><div class="dynamic-row"><input type="number" class="ot-input" placeholder="Minutes (e.g., 120)"></div></div>
-        <button class="btn-add-day" onclick="addRow('ot')">+ Add Day Duration</button>
-        <button class="btn-primary" onclick="calculateOT()">Execute Calculation</button>
-        <div class="result-wrapper"><div class="result-label">Total Overtime Pay</div><div class="result-value">RM <span id="resultDisplayOT">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
-    </div>
+    <!-- KOLUM KANAN: MAIN TERMINAL -->
+    <div class="cyber-panel main-terminal">
+        <div class="header-top">
+            <h2>Cyber HR Terminal</h2>
+            <button class="btn-admin" onclick="openAdminModal()">⚙️ ADMIN TERMINAL</button>
+        </div>
 
-    <div id="absentTab" class="tab-content">
-        <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="absentBasicSalary"></div>
-        <div class="form-group"><label>Category</label><select id="absentType"><option value="ab_nor">Normal Absent (1x)</option><option value="ab_ph">Linked to PH (2x Deduction)</option></select></div>
-        <div class="form-group" id="absentContainer"><label>Days Absent</label><div class="dynamic-row"><input type="number" class="absent-input" placeholder="Value (e.g., 1)"></div></div>
-        <button class="btn-add-day" onclick="addRow('absent')">+ Add Input</button>
-        <button class="btn-primary" onclick="calculateAbsent()">Execute Deduction</button>
-        <div class="result-wrapper danger"><div class="result-label">Total Deduction</div><div class="result-value">RM <span id="resultDisplayAbsent">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
-    </div>
+        <!-- TABS CONTAINER DENGAN REKAAN GRID KEMAS -->
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('otTab', this)">$ ot_calc</button>
+            <button class="tab-btn" onclick="switchTab('absentTab', this)">$ absent_calc</button>
+            <button class="tab-btn" onclick="switchTab('resignTab', this)">$ resign_calc</button>
+            <button class="tab-btn" onclick="switchTab('dateTab', this)">$ date_utility</button>
+            <button class="tab-btn" onclick="switchTab('reminderTab', this)">$ protocol_logs</button>
+            <button class="tab-btn custom-tab" onclick="switchTab('customCalcTab', this)">🧮 Custom Math</button>
+            <button class="tab-btn" onclick="switchTab('ptStaffTab', this)" style="color: #d8b4fe;">$ pt_matrix</button>
+            <button class="tab-btn" onclick="switchTab('headcountTab', this)" style="color: #93c5fd;">$ manpower_radar</button>
+        </div>
+        
+        <div id="otTab" class="tab-content active">
+            <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="otBasicSalary"></div>
+            <div class="form-group"><label>Rate Type</label><select id="otType" onchange="handleOTTypeChange()"><option value="pos">Positive OT (1.5x)</option><option value="neg">Negative OT (1.0x)</option><option value="hq">HQ OT (1.5x / 30D)</option><option value="ph">Public Holiday (2.0x)</option></select></div>
+            <div class="form-group" id="otContainer"><label id="otDurationLabel">Duration (Minutes)</label><div class="dynamic-row"><input type="number" class="ot-input" placeholder="Minutes (e.g., 120)"></div></div>
+            <button class="btn-add-day" onclick="addRow('ot')">+ Add Day Duration</button>
+            <button class="btn-primary" onclick="calculateOT()">Execute Calculation</button>
+            <div class="result-wrapper"><div class="result-label">Total Overtime Pay</div><div class="result-value">RM <span id="resultDisplayOT">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
+        </div>
 
-    <div id="resignTab" class="tab-content">
-        <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="resignBasicSalary"></div>
-        <div class="form-group"><label>Category</label><select id="resignType" onchange="handleResignTypeChange()"><option value="sn">Short Notice Penalty</option><option value="al">YTD AL Encashment</option></select></div>
-        <div class="form-group" id="resignContainer"><label id="resignDurationLabel">Short Notice (Days)</label><div class="dynamic-row"><input type="number" class="resign-input" placeholder="Value (e.g., 14)"></div></div>
-        <button class="btn-add-day" onclick="addRow('resign')">+ Add Input</button>
-        <button class="btn-primary" onclick="calculateResign()">Execute Settlement</button>
-        <div class="result-wrapper danger" id="resignResultBox"><div class="result-label" id="resignResultLabel">Total Penalty</div><div class="result-value">RM <span id="resultDisplayResign">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
-    </div>
+        <div id="absentTab" class="tab-content">
+            <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="absentBasicSalary"></div>
+            <div class="form-group"><label>Category</label><select id="absentType"><option value="ab_nor">Normal Absent (1x)</option><option value="ab_ph">Linked to PH (2x Deduction)</option></select></div>
+            <div class="form-group" id="absentContainer"><label>Days Absent</label><div class="dynamic-row"><input type="number" class="absent-input" placeholder="Value (e.g., 1)"></div></div>
+            <button class="btn-add-day" onclick="addRow('absent')">+ Add Input</button>
+            <button class="btn-primary" onclick="calculateAbsent()">Execute Deduction</button>
+            <div class="result-wrapper danger"><div class="result-label">Total Deduction</div><div class="result-value">RM <span id="resultDisplayAbsent">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
+        </div>
 
-    <div id="customCalcTab" class="tab-content">
-        <div class="form-group"><label>Select Custom Engine</label><select id="cstType" class="custom-select-box" onchange="handleCustomSelection()"><option value="">-- No Engines Synced --</option></select></div>
-        <div id="cvContainer" class="cv-container"><div class="cv-header-title">🎛️ Dynamic Inputs</div><div class="cv-grid" id="cvDynamicGrid"></div></div>
-        <button class="btn-primary" onclick="calculateCustomDynamic()">Execute Protocol</button>
-        <div class="result-wrapper custom"><div class="result-label">Generated Output</div><div class="result-value"><span id="cstUnitFront" class="result-unit-text" style="display:none;"></span><span id="resultDisplayCst">0</span><span id="cstUnitBack" class="result-unit-text" style="display:none;"></span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
-    </div>
+        <div id="resignTab" class="tab-content">
+            <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="resignBasicSalary"></div>
+            <div class="form-group"><label>Category</label><select id="resignType" onchange="handleResignTypeChange()"><option value="sn">Short Notice Penalty</option><option value="al">YTD AL Encashment</option></select></div>
+            <div class="form-group" id="resignContainer"><label id="resignDurationLabel">Short Notice (Days)</label><div class="dynamic-row"><input type="number" class="resign-input" placeholder="Value (e.g., 14)"></div></div>
+            <button class="btn-add-day" onclick="addRow('resign')">+ Add Input</button>
+            <button class="btn-primary" onclick="calculateResign()">Execute Settlement</button>
+            <div class="result-wrapper danger" id="resignResultBox"><div class="result-label" id="resignResultLabel">Total Penalty</div><div class="result-value">RM <span id="resultDisplayResign">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
+        </div>
 
-    <div id="ptStaffTab" class="tab-content">
-        <div style="background:#000; padding:15px; border:1px solid #333; border-radius:2px; margin-bottom:20px;">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom: 15px;">
-                <div class="form-group"><label>Staff ID</label><input type="text" id="ptId" placeholder="e.g. PT-001"></div>
-                <div class="form-group"><label>Full Name</label><input type="text" id="ptName" placeholder="Staff Name..."></div>
-                <div class="form-group"><label>Outlet</label><input type="text" id="ptOutlet" placeholder="e.g. Siburan / HQ"></div>
-                <div class="form-group"><label>Position</label><input type="text" id="ptPosition" placeholder="e.g. Cashier"></div>
-                <div class="form-group"><label style="color:#d8b4fe;">Contract End Date (Auto-WA)</label><input type="date" id="ptEndDate" style="border-color:#a855f7; color:#d8b4fe;"></div>
-                <div class="form-group"><label style="color:#3b82f6;">Report Duty Date</label><input type="date" id="ptReportDuty" style="border-color:#3b82f6; color:#93c5fd;"></div>
+        <div id="customCalcTab" class="tab-content">
+            <div class="form-group"><label>Select Custom Engine</label><select id="cstType" class="custom-select-box" onchange="handleCustomSelection()"><option value="">-- No Engines Synced --</option></select></div>
+            <div id="cvContainer" class="cv-container"><div class="cv-header-title">🎛️ Dynamic Inputs</div><div class="cv-grid" id="cvDynamicGrid"></div></div>
+            <button class="btn-primary" onclick="calculateCustomDynamic()">Execute Protocol</button>
+            <div class="result-wrapper custom"><div class="result-label">Generated Output</div><div class="result-value"><span id="cstUnitFront" class="result-unit-text" style="display:none;"></span><span id="resultDisplayCst">0</span><span id="cstUnitBack" class="result-unit-text" style="display:none;"></span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
+        </div>
+
+        <div id="ptStaffTab" class="tab-content">
+            <div style="background:#000; padding:15px; border:1px solid #333; border-radius:2px; margin-bottom:20px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom: 15px;">
+                    <div class="form-group"><label>Staff ID</label><input type="text" id="ptId" placeholder="e.g. PT-001"></div>
+                    <div class="form-group"><label>Full Name</label><input type="text" id="ptName" placeholder="Staff Name..."></div>
+                    <div class="form-group"><label>Outlet</label><input type="text" id="ptOutlet" placeholder="e.g. Siburan / HQ"></div>
+                    <div class="form-group"><label>Position</label><input type="text" id="ptPosition" placeholder="e.g. Cashier"></div>
+                    <div class="form-group"><label style="color:#d8b4fe;">Contract End Date (Auto-WA)</label><input type="date" id="ptEndDate" style="border-color:#a855f7; color:#d8b4fe;"></div>
+                    <div class="form-group"><label style="color:#3b82f6;">Report Duty Date</label><input type="date" id="ptReportDuty" style="border-color:#3b82f6; color:#93c5fd;"></div>
+                </div>
+
+                <div style="background: #050505; padding: 12px; border: 1px dashed #333; margin-bottom: 15px; border-radius: 2px;">
+                    <label style="color:#888; font-size:10px; margin-bottom:10px; display:block;">>> ONBOARDING CHECKLIST (INITIAL SETUP)</label>
+                    <div style="display:flex; flex-wrap:wrap; gap:15px; font-size: 11px;">
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptPrepAgreement" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Prepare Agreement</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptLoaDone" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> LOA (Done)</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptLoaPost" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> LOA (Post)</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptUpdateHrms" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Update HRMS</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptScanLoa" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> SCAN LOA</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptFilling" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Filling</label>
+                    </div>
+                </div>
+
+                <button class="btn-primary" style="background:#2e1065; border-color:#9333ea; color:#d8b4fe;" onclick="addPtStaff()">[ ENROLL PT PERSONNEL ]</button>
             </div>
 
-            <!-- CHECKLIST ONBOARDING BARU -->
-            <div style="background: #050505; padding: 12px; border: 1px dashed #333; margin-bottom: 15px; border-radius: 2px;">
-                <label style="color:#888; font-size:10px; margin-bottom:10px; display:block;">>> ONBOARDING CHECKLIST (INITIAL SETUP)</label>
-                <div style="display:flex; flex-wrap:wrap; gap:15px; font-size: 11px;">
-                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptPrepAgreement" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Prepare Agreement</label>
-                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptLoaDone" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> LOA (Done)</label>
-                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptLoaPost" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> LOA (Post)</label>
-                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptUpdateHrms" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Update HRMS</label>
-                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptScanLoa" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> SCAN LOA</label>
-                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptFilling" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Filling</label>
+            <input type="text" id="ptSearch" class="search-bar" onkeyup="searchPtStaff()" placeholder="> SEARCH DATABASE (NAME / ID / OUTLET)...">
+
+            <div class="db-table-wrapper">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Personnel Info</th>
+                            <th>Dates</th>
+                            <th style="min-width: 180px;">Progress & Checklist</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ptStaffTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="headcountTab" class="tab-content">
+            <div class="hc-dashboard">
+                <div class="hc-stat-box">
+                    <div class="hc-stat-label">Total Quota (Target)</div>
+                    <div class="hc-stat-value" id="hcTotalTarget">0</div>
+                </div>
+                <div class="hc-stat-box">
+                    <div class="hc-stat-label">Total Active Staff</div>
+                    <div class="hc-stat-value" id="hcTotalActive" style="color:var(--hacker-green);">0</div>
+                </div>
+                <div class="hc-stat-box danger">
+                    <div class="hc-stat-label">Global Shortage</div>
+                    <div class="hc-stat-value" id="hcTotalShort">0</div>
                 </div>
             </div>
 
-            <button class="btn-primary" style="background:#2e1065; border-color:#9333ea; color:#d8b4fe;" onclick="addPtStaff()">[ ENROLL PERSONNEL ]</button>
+            <button class="btn-add-day" style="border-color: #3b82f6; color: #93c5fd;" onclick="addHCOutlet()">+ INITIALIZE NEW OUTLET ZONE</button>
+            
+            <div class="hc-outlets-grid" id="hcOutletsContainer">
+                <!-- Kad Outlet akan di-render di sini -->
+            </div>
         </div>
 
-        <input type="text" id="ptSearch" class="search-bar" onkeyup="searchPtStaff()" placeholder="> SEARCH DATABASE (NAME / ID / OUTLET)...">
-
-        <div class="db-table-wrapper">
-            <table class="db-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Personnel Info</th>
-                        <th>Dates</th>
-                        <th style="min-width: 180px;">Progress & Checklist</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="ptStaffTableBody">
-                    </tbody>
-            </table>
+        <div id="dateTab" class="tab-content">
+            <div class="form-group"><label>Operation Mode</label><select id="calcMode" onchange="toggleDateMode()"><option value="diff">Difference between dates</option><option value="addsub">Add/Sub days</option></select></div>
+            <div id="modeDiff"><div class="form-group"><label>From</label><input type="date" id="diffFrom"></div><div class="form-group"><label>To</label><input type="date" id="diffTo"></div></div>
+            <div id="modeAddSub" style="display:none;"><div class="form-group"><label>Ref Date</label><input type="date" id="addSubFrom"></div><div style="display:flex; gap:15px; margin-bottom:15px;"><label><input type="radio" name="addSubType" value="add" checked> Add</label><label><input type="radio" name="addSubType" value="sub"> Sub</label></div><div style="display:flex;gap:10px;"><div style="flex:1"><label>Yrs</label><input type="number" id="valYears" value="0"></div><div style="flex:1"><label>Mths</label><input type="number" id="valMonths" value="0"></div><div style="flex:1"><label>Days</label><input type="number" id="valDays" value="0"></div></div></div>
+            <button class="btn-primary" style="margin-top:15px;" onclick="calculateDate()">Run Date Utility</button>
+            <div class="result-wrapper"><div class="result-label">Protocol Result</div><div class="result-value" id="dateResultMain" style="font-size: 20px;">READY</div><div class="result-label" id="dateResultSub" style="margin-top:5px; color:#555;">awaiting input</div></div>
         </div>
-    </div>
 
-    <div id="dateTab" class="tab-content">
-        <div class="form-group"><label>Operation Mode</label><select id="calcMode" onchange="toggleDateMode()"><option value="diff">Difference between dates</option><option value="addsub">Add/Sub days</option></select></div>
-        <div id="modeDiff"><div class="form-group"><label>From</label><input type="date" id="diffFrom"></div><div class="form-group"><label>To</label><input type="date" id="diffTo"></div></div>
-        <div id="modeAddSub" style="display:none;"><div class="form-group"><label>Ref Date</label><input type="date" id="addSubFrom"></div><div style="display:flex; gap:15px; margin-bottom:15px;"><label><input type="radio" name="addSubType" value="add" checked> Add</label><label><input type="radio" name="addSubType" value="sub"> Sub</label></div><div style="display:flex;gap:10px;"><div style="flex:1"><label>Yrs</label><input type="number" id="valYears" value="0"></div><div style="flex:1"><label>Mths</label><input type="number" id="valMonths" value="0"></div><div style="flex:1"><label>Days</label><input type="number" id="valDays" value="0"></div></div></div>
-        <button class="btn-primary" style="margin-top:15px;" onclick="calculateDate()">Run Date Utility</button>
-        <div class="result-wrapper"><div class="result-label">Protocol Result</div><div class="result-value" id="dateResultMain" style="font-size: 20px;">READY</div><div class="result-label" id="dateResultSub" style="margin-top:5px; color:#555;">awaiting input</div></div>
-    </div>
+        <div id="reminderTab" class="tab-content">
+            <div class="input-bar">
+                <div><label>Date</label><input type="date" id="taskDate"></div>
+                <div><label>Time</label><input type="time" id="taskTime" value="08:00"></div>
+                <div><label>Log Note</label><input type="text" id="taskNote"></div>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="taskIsGroup" style="width:16px; height:16px; cursor:crosshair; accent-color:var(--hacker-green);">
+                <label for="taskIsGroup" style="cursor:crosshair; text-transform:none; font-size:11px; margin:0; color:#d8b4fe;">Blast to WhatsApp Group (HR Team)</label>
+            </div>
+            <button class="btn-primary" style="margin-bottom: 25px;" onclick="addTask()">Commit Log</button>
+            <div class="calendar-layout"><div class="task-list-box"><h3>Active Logs</h3><div id="taskListDisplay"></div></div><div class="calendar-box"><div class="cal-header"><button class="cal-nav-btn" onclick="changeMonth(-1)">&lt;</button><span id="calMonthYearDisplay"></span><button class="cal-nav-btn" onclick="changeMonth(1)">&gt;</button></div><div class="cal-grid" id="calGrid"></div></div></div>
+        </div>
 
-    <div id="reminderTab" class="tab-content">
-        <div class="input-bar"><div><label>Date</label><input type="date" id="taskDate"></div><div><label>Time</label><input type="time" id="taskTime" value="08:00"></div><div><label>Log Note</label><input type="text" id="taskNote"></div></div>
-        <button class="btn-primary" style="margin-bottom: 25px;" onclick="addTask()">Commit Log</button>
-        <div class="calendar-layout"><div class="task-list-box"><h3>Active Logs</h3><div id="taskListDisplay"></div></div><div class="calendar-box"><div class="cal-header"><button class="cal-nav-btn" onclick="changeMonth(-1)">&lt;</button><span id="calMonthYearDisplay"></span><button class="cal-nav-btn" onclick="changeMonth(1)">&gt;</button></div><div class="cal-grid" id="calGrid"></div></div></div>
-    </div>
+        <div id="adminPanel">
+            <div class="admin-header"><h3>CYBER_ENGINE V8.9</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
+            <div class="formula-grid" id="adminFormulasRender"></div>
+            <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-primary" onclick="saveFormulas()">💾 Sync & Reload</button><button class="btn-admin" onclick="document.getElementById('adminPanel').style.display='none'">Close Terminal</button></div>
+        </div>
 
-    <div id="adminPanel">
-        <div class="admin-header"><h3>CYBER_ENGINE V8.3</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
-        <div class="formula-grid" id="adminFormulasRender"></div>
-        <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-primary" onclick="saveFormulas()">💾 Sync & Reload</button><button class="btn-admin" onclick="document.getElementById('adminPanel').style.display='none'">Close Terminal</button></div>
-    </div>
-
-    <div class="footer-brand">PROTOCOL MAINTAINED BY NoelEthan.exe</div>
-</div>
+        <div class="footer-brand">PROTOCOL MAINTAINED BY NoelEthan.exe</div>
+    </div> <!-- END MAIN TERMINAL -->
+    
+</div> <!-- END DASHBOARD CONTAINER -->
 
 <div class="modal-overlay" id="authModal"><div class="modal-content"><h3>Terminal Access</h3><input type="password" id="adminPassword" placeholder="Code..."><button class="btn-primary" onclick="verifyAdmin()" style="margin-top:15px;">Unlock</button><button class="btn-admin" onclick="document.getElementById('authModal').classList.remove('active')" style="width:100%; margin-top:10px;">Cancel</button></div></div>
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+    // --- LANGUAGE SWITCHER ---
+    let currentLang = 'ms';
+    function setLang(lang) {
+        currentLang = lang;
+        // Update Buttons
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn-lang-' + lang).classList.add('active');
+        
+        // Update Text Content
+        document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active-lang'));
+        document.querySelectorAll('.lang-' + lang).forEach(el => el.classList.add('active-lang'));
+        playTone(1800, 'sine', 0.05, 0.1);
+    }
+
     // --- WEBAUDIO SFX ENGINE ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioContext(); let isSoundOn = true;
@@ -327,7 +645,7 @@
     const bootLines = [
         "SYS_MEM: 640K OK", "ESTABLISHING SECURE CONNECTION...", "HANDSHAKE ACCEPTED.",
         "LOADING KERNEL MODULES... OK", "BYPASSING SECURITY PROTOCOL... OK",
-        "DECRYPTING PERSONNEL_MATRIX_V8.3... DONE", "WELCOME, NOEL_ETHAN.EXE."
+        "DECRYPTING PERSONNEL_MATRIX_V8.9... DONE", "WELCOME, NOEL_ETHAN.EXE."
     ];
     function runBootSequence() {
         const container = document.getElementById('bootTextContainer');
@@ -364,12 +682,34 @@
     // --- LIVE CLOCK ---
     setInterval(() => { const now = new Date(); document.getElementById('liveTime').innerHTML = `${String(now.getHours()).padStart(2, '0')}<span class="blink-colon">:</span>${String(now.getMinutes()).padStart(2, '0')}<span class="secs">${String(now.getSeconds()).padStart(2, '0')}</span>`; document.getElementById('liveDate').innerText = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase(); }, 1000);
 
-    // --- FORMULAS ENGINE V8 ---
+    // --- FORMULAS ENGINE & TAB SWITCHER ---
     let activeTabId = 'otTab';
     const defaultFormulas = { pos: { label: "Positive OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.5 * INPUT", custom: false }, neg: { label: "Negative OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.0 * INPUT", custom: false }, hq: { label: "HQ OT", expr: "((BASIC / 30) / 8.5 / 60) * 1.5 * INPUT", custom: false }, ph: { label: "PH (Double)", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, ab_nor: { label: "Absent Normal", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, ab_ph: { label: "Absent PH Linked", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, sn: { label: "Short Notice", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, al: { label: "YTD AL", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }};
     let currentFormulas = JSON.parse(localStorage.getItem('hrFormulasV7')) || defaultFormulas;
 
-    function switchTab(tabId, btnElement) { activeTabId = tabId; document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); btnElement.classList.add('active'); if (tabId === 'reminderTab') renderCalendar(); if (tabId === 'customCalcTab') { populateCustomDropdown(); handleCustomSelection(); } if(tabId === 'ptStaffTab') renderPtStaffTable(); }
+    function switchTab(tabId, btnElement) { 
+        activeTabId = tabId; 
+        
+        // Handle Tab Button Highlight
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+        btnElement.classList.add('active'); 
+        
+        // Handle Tab Content Display
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
+        document.getElementById(tabId).classList.add('active'); 
+        
+        // Handle DYNAMIC MANUAL DISPLAY
+        document.querySelectorAll('.doc-item').forEach(doc => doc.classList.remove('active'));
+        const activeManual = document.getElementById('manual-' + tabId);
+        if(activeManual) activeManual.classList.add('active');
+
+        // Specific Tab Render Functions
+        if (tabId === 'reminderTab') renderCalendar(); 
+        if (tabId === 'customCalcTab') { populateCustomDropdown(); handleCustomSelection(); } 
+        if (tabId === 'ptStaffTab') renderPtStaffTable(); 
+        if (tabId === 'headcountTab') renderHeadcount(); 
+    }
+    
     function addRow(mode) { const c = document.getElementById(mode + 'Container'); const r = document.createElement('div'); r.className = 'dynamic-row'; r.innerHTML = `<input type="number" class="${mode}-input" placeholder="Value..."><button class="btn-remove-day" onclick="this.parentElement.remove();">×</button>`; c.appendChild(r); }
     function getSum(className) { let sum = 0; document.querySelectorAll('.' + className).forEach(inp => { let v = parseFloat(inp.value); if(!isNaN(v)) sum+=v; }); return sum; }
 
@@ -390,60 +730,74 @@
     let tasks = JSON.parse(localStorage.getItem('hrReminders')) || []; let calDate = new Date();
     function renderCalendar() { const y = calDate.getFullYear(); const m = calDate.getMonth(); document.getElementById('calMonthYearDisplay').innerText = new Date(y, m).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase(); const grid = document.getElementById('calGrid'); grid.innerHTML = ['SUN','MON','TUE','WED','THU','FRI','SAT'].map(d => `<div class="cal-day-header">${d}</div>`).join(''); for(let i=0; i<new Date(y, m, 1).getDay(); i++) grid.innerHTML += `<div class="cal-day empty"></div>`; for(let i=1; i<=new Date(y, m + 1, 0).getDate(); i++) { let s = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; let isToday = (i === new Date().getDate() && m === new Date().getMonth() && y === new Date().getFullYear()); grid.innerHTML += `<div class="cal-day ${isToday?'today':''} ${tasks.some(t => t.date === s)?'has-task':''}"><span>${i}</span></div>`; } renderTaskList(); }
     function changeMonth(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); }
-    function renderTaskList() { const listDiv = document.getElementById('taskListDisplay'); if(tasks.length === 0) { listDiv.innerHTML = `<p style="font-size:11px; color:#555;">>_ No protocols logged.</p>`; return; } listDiv.innerHTML = tasks.slice().sort((a,b) => new Date(a.date) - new Date(b.date)).map(t => `<div class="task-item"><div class="task-item-time">${t.date} @ ${t.time}</div><div>${t.note}</div><div><button class="btn-danger" style="padding:4px;" onclick="removeTask(${t.id})">DEL</button></div></div>`).join(''); }
+    
+    function renderTaskList() { 
+        const listDiv = document.getElementById('taskListDisplay'); 
+        if(tasks.length === 0) { listDiv.innerHTML = `<p style="font-size:11px; color:#555;">>_ No protocols logged.</p>`; return; } 
+        listDiv.innerHTML = tasks.slice().sort((a,b) => new Date(a.date) - new Date(b.date)).map(t => `
+            <div class="task-item">
+                <div class="task-item-time">${t.date} @ ${t.time} ${t.isGroup ? '📡 [GROUP]' : ''}</div>
+                <div style="white-space: pre-wrap;">${t.note}</div>
+                <div style="margin-top:8px;"><button class="btn-danger" style="padding:4px;" onclick="removeTask(${t.id})">DEL</button></div>
+            </div>
+        `).join(''); 
+    }
+    
     function removeTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('hrReminders', JSON.stringify(tasks)); renderCalendar(); if(activeTabId==='ptStaffTab') renderPtStaffTable(); }
-    async function addTask(silent = false, specificDate, specificTime, specificNote) { let d = specificDate || document.getElementById('taskDate').value; let t = specificTime || document.getElementById('taskTime').value || "08:00"; let n = specificNote || document.getElementById('taskNote').value; if(!d || !t || !n) { if(!silent) showToast("Missing data", "error"); return; } tasks.push({ id: Date.now(), date: d, time: t, note: n }); localStorage.setItem('hrReminders', JSON.stringify(tasks)); try { await fetch('https://vigilant-spork-wrr9pxvrxrxvhvv96-3000.app.github.dev/tambah-task', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ date: d, time: t, note: n }) }); if(!silent) showToast("Commited to WA Server."); } catch (error) { if(!silent) showToast("Server offline", "error"); } if(!silent) { document.getElementById('taskNote').value=""; renderCalendar(); } }
+    
+    async function addTask(silent = false, specificDate, specificTime, specificNote, forceGroup = false) { 
+        let d = specificDate || document.getElementById('taskDate').value; 
+        let t = specificTime || document.getElementById('taskTime').value || "08:00"; 
+        let n = specificNote || document.getElementById('taskNote').value; 
+        
+        let isGroupChecked = specificDate ? forceGroup : document.getElementById('taskIsGroup').checked;
+
+        if(!d || !t || !n) { if(!silent) showToast("Missing data", "error"); return; } 
+        
+        tasks.push({ id: Date.now(), date: d, time: t, note: n, isGroup: isGroupChecked }); 
+        localStorage.setItem('hrReminders', JSON.stringify(tasks)); 
+        
+        try { 
+            await fetch('https://vigilant-spork-wrr9pxvrxrxvhvv96-3000.app.github.dev/tambah-task', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ date: d, time: t, note: n, sendToGroup: isGroupChecked }) 
+            }); 
+            if(!silent) showToast(isGroupChecked ? "Commited to WA GROUP Server." : "Commited to WA Server."); 
+        } catch (error) { 
+            if(!silent) showToast("Server offline", "error"); 
+        } 
+        if(!silent) { 
+            document.getElementById('taskNote').value = ""; 
+            document.getElementById('taskIsGroup').checked = false;
+            renderCalendar(); 
+        } 
+    }
 
     // --- PERSONNEL MATRIX (PART-TIME DB) ---
     let ptStaffArray = JSON.parse(localStorage.getItem('hrPtStaffDB')) || [];
-    
-    // Auto-sort & Render Function (UPDATED WITH PROGRESS BAR)
     function renderPtStaffTable() {
         const tbody = document.getElementById('ptStaffTableBody');
-        if(ptStaffArray.length === 0) { 
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#555;">>_ NO PERSONNEL DATA FOUND</td></tr>`; 
-            return; 
-        }
-        
-        // Auto-sort by Outlet (A-Z), then Name (A-Z)
+        if(ptStaffArray.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#555;">>_ NO PERSONNEL DATA FOUND</td></tr>`; return; }
         const sortedStaff = [...ptStaffArray].sort((a, b) => {
             const outletA = (a.outlet || "").toUpperCase(); const outletB = (b.outlet || "").toUpperCase();
             if (outletA < outletB) return -1; if (outletA > outletB) return 1;
             const nameA = (a.name || "").toUpperCase(); const nameB = (b.name || "").toUpperCase();
-            if (nameA < nameB) return -1; if (nameA > nameB) return 1;
-            return 0;
+            if (nameA < nameB) return -1; if (nameA > nameB) return 1; return 0;
         });
-
         tbody.innerHTML = sortedStaff.map(st => {
-            // Pengiraan Progress
             let checkedCount = 0;
-            if(st.prepAgreement) checkedCount++;
-            if(st.loaDone) checkedCount++;
-            if(st.loaPost) checkedCount++;
-            if(st.updateHrms) checkedCount++;
-            if(st.scanLoa) checkedCount++;
-            if(st.filling) checkedCount++;
+            if(st.prepAgreement) checkedCount++; if(st.loaDone) checkedCount++; if(st.loaPost) checkedCount++;
+            if(st.updateHrms) checkedCount++; if(st.scanLoa) checkedCount++; if(st.filling) checkedCount++;
             let progressPct = Math.round((checkedCount / 6) * 100);
-
             return `
                 <tr>
                     <td style="font-weight:bold; color:var(--hacker-green);">${st.id}</td>
+                    <td><div style="font-weight:bold; color:#fff; font-size:12px;">${st.name}</div><div style="color:#d8b4fe; font-size:10px; margin-top:4px; text-transform:uppercase;">${st.outlet} • ${st.position}</div></td>
+                    <td><div style="color:var(--danger); font-size:10px;"><b>END:</b> ${st.endDate}</div><div style="color:#3b82f6; font-size:10px; margin-top:4px;"><b>DUTY:</b> ${st.reportDuty || '-'}</div></td>
                     <td>
-                        <div style="font-weight:bold; color:#fff; font-size:12px;">${st.name}</div>
-                        <div style="color:#d8b4fe; font-size:10px; margin-top:4px; text-transform:uppercase;">${st.outlet} • ${st.position}</div>
-                    </td>
-                    <td>
-                        <div style="color:var(--danger); font-size:10px;"><b>END:</b> ${st.endDate}</div>
-                        <div style="color:#3b82f6; font-size:10px; margin-top:4px;"><b>DUTY:</b> ${st.reportDuty || '-'}</div>
-                    </td>
-                    <td>
-                        <div class="cyber-progress-text">
-                            <span>ONBOARDING</span>
-                            <span style="color: ${progressPct === 100 ? '#fff' : 'var(--hacker-green)'}">${progressPct}%</span>
-                        </div>
-                        <div class="cyber-progress-container">
-                            <div class="cyber-progress-bar" style="width: ${progressPct}%; background: ${progressPct === 100 ? '#fff' : 'var(--hacker-green)'}; box-shadow: ${progressPct === 100 ? '0 0 10px #fff' : '0 0 5px var(--hacker-green)'};"></div>
-                        </div>
+                        <div class="cyber-progress-text"><span>ONBOARDING</span><span style="color: ${progressPct === 100 ? '#fff' : 'var(--hacker-green)'}">${progressPct}%</span></div>
+                        <div class="cyber-progress-container"><div class="cyber-progress-bar" style="width: ${progressPct}%; background: ${progressPct === 100 ? '#fff' : 'var(--hacker-green)'}; box-shadow: ${progressPct === 100 ? '0 0 10px #fff' : '0 0 5px var(--hacker-green)'};"></div></div>
                         <div class="cyber-checklist">
                             <label><input type="checkbox" ${st.prepAgreement ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'prepAgreement', this.checked)"> Prep Agreement</label>
                             <label><input type="checkbox" ${st.loaDone ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'loaDone', this.checked)"> LOA Done</label>
@@ -459,63 +813,128 @@
         }).join('');
     }
     
-    // UPDATE CHECKLIST INTERACTIVE FUNCTION (AND RE-RENDER PROGRESS)
-    function updatePtChecklist(timestamp, field, isChecked) {
-        let index = ptStaffArray.findIndex(s => s.timestamp === timestamp);
-        if(index !== -1) {
-            ptStaffArray[index][field] = isChecked;
-            localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray));
-            renderPtStaffTable(); // Refresh the table to update the progress bar instantly
-        }
-    }
-
-    // SEARCH FUNCTION (UPDATED)
-    function searchPtStaff() {
-        let filter = document.getElementById('ptSearch').value.toUpperCase();
-        let trs = document.getElementById('ptStaffTableBody').getElementsByTagName('tr');
-        for(let i=0; i<trs.length; i++) {
-            let tdId = trs[i].getElementsByTagName('td')[0];
-            let tdInfo = trs[i].getElementsByTagName('td')[1]; // Gabungan Nama & Outlet
-            if(tdId || tdInfo) {
-                let txtValue = (tdId.textContent || tdId.innerText) + " " + (tdInfo.textContent || tdInfo.innerText);
-                if(txtValue.toUpperCase().indexOf(filter) > -1) { trs[i].style.display = ""; } else { trs[i].style.display = "none"; }
-            }
-        }
-    }
-
+    function updatePtChecklist(timestamp, field, isChecked) { let index = ptStaffArray.findIndex(s => s.timestamp === timestamp); if(index !== -1) { ptStaffArray[index][field] = isChecked; localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray)); renderPtStaffTable(); } }
+    function searchPtStaff() { let filter = document.getElementById('ptSearch').value.toUpperCase(); let trs = document.getElementById('ptStaffTableBody').getElementsByTagName('tr'); for(let i=0; i<trs.length; i++) { let tdId = trs[i].getElementsByTagName('td')[0]; let tdInfo = trs[i].getElementsByTagName('td')[1]; if(tdId || tdInfo) { let txtValue = (tdId.textContent || tdId.innerText) + " " + (tdInfo.textContent || tdInfo.innerText); if(txtValue.toUpperCase().indexOf(filter) > -1) { trs[i].style.display = ""; } else { trs[i].style.display = "none"; } } } }
+    
     async function addPtStaff() {
-        const id = document.getElementById('ptId').value.trim(); const name = document.getElementById('ptName').value.trim(); const outlet = document.getElementById('ptOutlet').value.trim(); const position = document.getElementById('ptPosition').value.trim(); 
-        const endDate = document.getElementById('ptEndDate').value; const reportDuty = document.getElementById('ptReportDuty').value;
+        const id = document.getElementById('ptId').value.trim(); const name = document.getElementById('ptName').value.trim(); const outlet = document.getElementById('ptOutlet').value.trim(); const position = document.getElementById('ptPosition').value.trim(); const endDate = document.getElementById('ptEndDate').value; const reportDuty = document.getElementById('ptReportDuty').value;
+        const prepAgreement = document.getElementById('ptPrepAgreement').checked; const loaDone = document.getElementById('ptLoaDone').checked; const loaPost = document.getElementById('ptLoaPost').checked; const updateHrms = document.getElementById('ptUpdateHrms').checked; const scanLoa = document.getElementById('ptScanLoa').checked; const filling = document.getElementById('ptFilling').checked;
+        if(!id || !name || !outlet || !position || !endDate) { showToast("COMPLETE REQUIRED FIELDS", "error"); return; }
+        const newStaff = { timestamp: Date.now(), id, name, outlet, position, endDate, reportDuty, prepAgreement, loaDone, loaPost, updateHrms, scanLoa, filling }; 
+        ptStaffArray.push(newStaff); localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray));
         
-        // Ambil nilai dari checklist form pendaftaran
-        const prepAgreement = document.getElementById('ptPrepAgreement').checked;
-        const loaDone = document.getElementById('ptLoaDone').checked;
-        const loaPost = document.getElementById('ptLoaPost').checked;
-        const updateHrms = document.getElementById('ptUpdateHrms').checked;
-        const scanLoa = document.getElementById('ptScanLoa').checked;
-        const filling = document.getElementById('ptFilling').checked;
-
-        if(!id || !name || !outlet || !position || !endDate) { showToast("COMPLETE REQUIRED FIELDS (ID to END DATE)", "error"); return; }
+        const reminderNote = `🚨 *ALERT PART-TIME KONTRAK TAMAT* 🚨\n\nSila semak *Headcount Matrix* untuk tindakan lanjut & pengesahan operasi.\n\n📍 *Outlet:* ${outlet.toUpperCase()}\n👤 *Nama:* ${name}\n💼 *Posisi:* ${position.toUpperCase()}\n🆔 *Staff ID:* ${id}`; 
         
-        const newStaff = { 
-            timestamp: Date.now(), id, name, outlet, position, endDate, reportDuty,
-            prepAgreement, loaDone, loaPost, updateHrms, scanLoa, filling 
-        }; 
+        await addTask(true, endDate, "09:00", reminderNote, true);
         
-        ptStaffArray.push(newStaff); 
-        localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray));
-        
-        const reminderNote = `[PT CONTRACT EXPIRY] Outlet: ${outlet} | Name: ${name} | ID: ${id} | Pos: ${position}`;
-        await addTask(true, endDate, "09:00", reminderNote);
-        
-        // Reset Form
         document.getElementById('ptId').value = ""; document.getElementById('ptName').value = ""; document.getElementById('ptOutlet').value = ""; document.getElementById('ptPosition').value = ""; document.getElementById('ptEndDate').value = ""; document.getElementById('ptReportDuty').value = "";
         document.getElementById('ptPrepAgreement').checked = false; document.getElementById('ptLoaDone').checked = false; document.getElementById('ptLoaPost').checked = false; document.getElementById('ptUpdateHrms').checked = false; document.getElementById('ptScanLoa').checked = false; document.getElementById('ptFilling').checked = false;
-        
-        showToast(`PERSONNEL [${id}] ENROLLED & REMINDER SET.`); renderPtStaffTable();
+        showToast(`PERSONNEL [${id}] ENROLLED & GROUP REMINDER SET.`); renderPtStaffTable();
     }
     
     function deletePtStaff(timestamp) { if(confirm("Confirm purge personnel data?")) { ptStaffArray = ptStaffArray.filter(st => st.timestamp !== timestamp); localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray)); renderPtStaffTable(); showToast("DATA PURGED", "error"); } }
+
+    // --- HEADCOUNT RADAR SYSTEM ---
+    let hcDB = JSON.parse(localStorage.getItem('hrHeadcountRadarDB')) || [
+        { id: 1716900000001, name: "SIBURAN", roles: [ { role: "CASHIER", target: 5, active: 3 }, { role: "SUPERVISOR", target: 1, active: 1 } ] },
+        { id: 1716900000002, name: "HQ", roles: [ { role: "ADMIN", target: 2, active: 2 } ] }
+    ];
+
+    function renderHeadcount() {
+        const container = document.getElementById('hcOutletsContainer');
+        let globalTarget = 0, globalActive = 0, globalShort = 0;
+
+        container.innerHTML = hcDB.map(outlet => {
+            let outletTarget = 0, outletActive = 0;
+            const rolesHtml = outlet.roles.map((r, rIdx) => {
+                outletTarget += parseInt(r.target) || 0; 
+                outletActive += parseInt(r.active) || 0;
+                let short = (parseInt(r.target) || 0) - (parseInt(r.active) || 0);
+                
+                let shortClass = short > 0 ? 'short' : 'ok';
+                let shortText = short > 0 ? `-${short} SHORT` : 'OPTIMAL';
+                if(short < 0) { shortClass = 'ok'; shortText = `+${Math.abs(short)} EXTRA`; }
+
+                return `
+                    <div class="hc-role-row">
+                        <div style="color:#ccc; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${r.role}</div>
+                        <div><input type="number" min="0" class="hc-card-input" value="${r.target}" onchange="updateHCRole(${outlet.id}, ${rIdx}, 'target', this.value)"></div>
+                        <div><input type="number" min="0" class="hc-card-input" value="${r.active}" onchange="updateHCRole(${outlet.id}, ${rIdx}, 'active', this.value)"></div>
+                        <div class="hc-shortage ${shortClass}">${shortText}</div>
+                        <button class="db-action-btn" style="padding:2px; font-size:10px;" onclick="deleteHCRole(${outlet.id}, ${rIdx})">X</button>
+                    </div>
+                `;
+            }).join('');
+
+            globalTarget += outletTarget; 
+            globalActive += outletActive; 
+            let outShortage = outletTarget - outletActive;
+            if(outShortage > 0) globalShort += outShortage;
+
+            return `
+                <div class="hc-card">
+                    <div class="hc-card-header">
+                        <span>${outlet.name}</span>
+                        <div>
+                            <button class="btn-admin" style="font-size:9px; padding:3px 6px; border-color:#3b82f6; color:#93c5fd;" onclick="addHCRole(${outlet.id})">+ ROLE</button>
+                            <button class="btn-danger" style="font-size:9px; padding:3px 6px;" onclick="deleteHCOutlet(${outlet.id})">DEL</button>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr 30px; gap: 8px; margin-bottom: 8px; font-size: 9px; color:#555; text-transform:uppercase; font-weight:bold; border-bottom:1px solid #222; padding-bottom:5px;">
+                        <div>Department</div><div style="text-align:center;">Quota</div><div style="text-align:center;">Active</div><div style="text-align:center;">Status</div><div></div>
+                    </div>
+                    ${rolesHtml}
+                    ${outlet.roles.length === 0 ? '<div style="font-size:10px; color:#555; margin-top:10px; text-align:center;">>_ No roles assigned.</div>' : ''}
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('hcTotalTarget').innerText = globalTarget;
+        document.getElementById('hcTotalActive').innerText = globalActive;
+        document.getElementById('hcTotalShort').innerText = globalShort;
+    }
+
+    function addHCOutlet() {
+        let name = prompt("Masukkaan nama Outlet baru (Cth: BINTULU):");
+        if(name && name.trim() !== "") {
+            hcDB.push({ id: Date.now(), name: name.toUpperCase(), roles: [] });
+            saveHC(); showToast(`Outlet [${name.toUpperCase()}] Added.`);
+        }
+    }
+
+    function deleteHCOutlet(id) {
+        if(confirm("Adakah anda pasti untuk memadam outlet ini sepenuhnya?")) {
+            hcDB = hcDB.filter(o => o.id !== id); saveHC(); showToast("Outlet Purged.", "error");
+        }
+    }
+
+    function addHCRole(outletId) {
+        let role = prompt("Masukkan Department/Peranan baru (Cth: PROMOTER):");
+        if(role && role.trim() !== "") {
+            let outlet = hcDB.find(o => o.id === outletId);
+            if(outlet) { outlet.roles.push({ role: role.toUpperCase(), target: 0, active: 0 }); saveHC(); }
+        }
+    }
+
+    function updateHCRole(outletId, roleIndex, field, value) {
+        let outlet = hcDB.find(o => o.id === outletId);
+        if(outlet && outlet.roles[roleIndex]) {
+            outlet.roles[roleIndex][field] = parseInt(value) || 0;
+            saveHC(); 
+        }
+    }
+
+    function deleteHCRole(outletId, roleIndex) {
+        if(confirm("Padam department ini?")) {
+            let outlet = hcDB.find(o => o.id === outletId);
+            if(outlet) { outlet.roles.splice(roleIndex, 1); saveHC(); }
+        }
+    }
+
+    function saveHC() {
+        localStorage.setItem('hrHeadcountRadarDB', JSON.stringify(hcDB));
+        renderHeadcount();
+    }
 
     // Admin Panel
     function openAdminModal() { document.getElementById('authModal').classList.add('active'); document.getElementById('adminPassword').value=''; }
@@ -542,11 +961,13 @@
 
     // Init
     document.addEventListener("DOMContentLoaded", () => {
-        runBootSequence(); // KICK OFF BOOT SEQUENCE
+        runBootSequence(); 
         initMatrix(); initGraph();
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('diffFrom').value = today; document.getElementById('diffTo').value = today; document.getElementById('addSubFrom').value = today; document.getElementById('taskDate').value = today;
         populateCustomDropdown(); renderPtStaffTable();
+        renderHeadcount();
+        setLang('ms'); // Set default language
     });
 </script>
 
