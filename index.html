@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR TERMINAL V7: ULTIMATE CLASSIFIED EDITION</title>
+    <title>HR TERMINAL V8.3: CYBERNETIC PROTOCOL</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- GLOBAL HACKER THEME & ANIMATIONS --- */
@@ -37,23 +37,21 @@
         }
 
         #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; opacity: 0.8; }
-
-        /* Mouse Trail Element */
         .cursor-trail { position: fixed; width: 4px; height: 4px; background: var(--hacker-green); border-radius: 50%; pointer-events: none; z-index: 9999; animation: trailFade 0.5s forwards; }
 
         h2 { margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; text-shadow: var(--border-glow); cursor: crosshair;}
         h2:hover { animation: glitch 0.2s linear infinite; }
 
-        /* --- BOOT SCREEN --- */
+        /* --- BOOT SCREEN (PATCHED) --- */
         #bootScreen {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 10000;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 10000;
             display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start; padding: 40px;
             box-sizing: border-box; font-size: 14px; transition: opacity 0.5s ease;
         }
         .boot-line { margin-bottom: 8px; text-shadow: 0 0 5px var(--hacker-green); }
         .boot-cursor { display: inline-block; width: 8px; height: 15px; background: var(--hacker-green); animation: blinker 0.8s infinite; vertical-align: middle; margin-left: 5px;}
-        
-        /* --- CLOCK HERO (HUD STYLE WITH GRAPH) --- */
+
+        /* --- CLOCK HERO (HUD) --- */
         .hero-clock-container {
             position: absolute; top: 20px; right: 20px; background: linear-gradient(90deg, rgba(0, 30, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%);
             padding: 12px 20px; border-radius: 2px; border: 1px solid #111; border-left: 4px solid var(--hacker-green);
@@ -61,23 +59,20 @@
             display: flex; flex-direction: column; align-items: flex-end; min-width: 200px; cursor: crosshair;
         }
         .hero-clock-container::before { content: 'SYS.DIAGNOSTICS'; position: absolute; top: -7px; left: 8px; font-size: 9px; background: #000; color: var(--hacker-green); padding: 0 4px; font-weight: bold; letter-spacing: 1px; }
-        
         .hud-top-row { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 6px;}
         #cpuGraph { width: 60px; height: 25px; border-bottom: 1px solid var(--hacker-green-dim); opacity: 0.8;}
-        
         .hero-time { font-size: 2.2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4); letter-spacing: 2px; }
         .hero-time span.blink-colon { animation: blinker 1s linear infinite; color: var(--hacker-green); }
         .hero-time span.secs { font-size: 1.1rem; color: var(--hacker-green); margin-left: 4px; text-shadow: 0 0 5px var(--hacker-green); }
         .hero-date { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 3px; border-top: 1px dashed #333; padding-top: 6px; width: 100%; text-align: right; margin-top: 6px;}
-        
         .sound-toggle { font-size: 9px; border: 1px solid var(--hacker-green-dim); padding: 2px 5px; cursor: crosshair; background: transparent; color: var(--hacker-green); margin-top: 5px; width: 100%; text-align: center; transition: 0.2s;}
         .sound-toggle:hover { background: var(--hacker-green); color: #000;}
 
         /* --- MAIN TERMINAL BOX --- */
         .card {
-            background: var(--box-bg); border-radius: 4px; width: 100%; max-width: 850px; padding: 30px; 
+            background: var(--box-bg); border-radius: 4px; width: 100%; max-width: 900px; padding: 30px; 
             margin: auto; box-sizing: border-box; box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-            position: relative; overflow: hidden; border: 1px solid rgba(0, 255, 0, 0.1);
+            position: relative; overflow: hidden; border: 1px solid rgba(0, 255, 0, 0.1); margin-top: 60px;
         }
         .card::before { content: ''; position: absolute; height: 150%; width: 150%; background: conic-gradient(#00ff00 10deg, transparent 90deg); top: -25%; left: -25%; animation: rotate 4s linear infinite; z-index: 0; opacity: 0.5; }
         .card::after { content: ''; position: absolute; background: var(--box-bg); inset: 2px; border-radius: 2px; z-index: 1; }
@@ -87,7 +82,7 @@
         h2::before { content: '$ '; color: #fff; } label::before { content: '> '; color: #fff; }
 
         .tabs-container { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 1px solid var(--hacker-green-dim); padding-bottom: 10px; overflow-x: auto; font-family: monospace;}
-        .tab-btn { background: transparent; border: 1px solid transparent; padding: 10px 12px; font-size: 12px; font-weight: 600; color: #CCCCCC; cursor: crosshair; border-radius: 2px; transition: all 0.2s ease; white-space: nowrap; }
+        .tab-btn { background: transparent; border: 1px solid transparent; padding: 10px 12px; font-size: 11px; font-weight: 600; color: #CCCCCC; cursor: crosshair; border-radius: 2px; transition: all 0.2s ease; white-space: nowrap; }
         .tab-btn:hover { background: #111; color: #fff; border-color: var(--hacker-green-dim);}
         .tab-btn.active { border-color: var(--hacker-green); color: var(--hacker-green); background: #001f00; box-shadow: var(--border-glow); }
         .tab-btn.custom-tab { border: 1px dashed var(--hacker-green-dim); } .tab-btn.custom-tab.active { border-style: solid; background-color: #001f00; }
@@ -98,12 +93,20 @@
         label { display: block; font-weight: 700; font-size: 10px; margin-bottom: 6px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8;}
         input, select { width: 100%; padding: 10px 14px; border: 1px solid var(--hacker-green-dim); border-radius: 2px; font-size: 13px; font-family: 'Fira Code', monospace; box-sizing: border-box; background-color: #000; color: #00FF00; cursor: crosshair;}
         input:focus, select:focus { outline: none; border-color: var(--hacker-green); box-shadow: var(--border-glow); } input::placeholder { color: #005500; font-size: 11px;}
-        .editable-title { font-size: 14px; font-weight: bold; color: var(--hacker-green); border: 1px dashed transparent; background: transparent; padding: 2px; border-radius: 2px; width: 100%; box-sizing: border-box;}
-
+        
         .cv-container { background: #000; border: 1px solid var(--hacker-green-dim); border-radius: 2px; padding: 20px; margin-bottom: 20px; display: none; }
         .cv-header-title { font-size: 10px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
         .cv-header-title::before { content: '||| '; color: var(--hacker-green); }
         .cv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+
+        /* --- CHECKLIST & PROGRESS STYLES --- */
+        .cyber-progress-text { font-size: 10px; font-weight: 700; color: var(--hacker-green); margin-bottom: 4px; display: flex; justify-content: space-between; font-family: monospace; }
+        .cyber-progress-container { width: 100%; height: 6px; background: #111; border: 1px solid #333; border-radius: 2px; margin-bottom: 10px; overflow: hidden; position: relative;}
+        .cyber-progress-bar { height: 100%; background: var(--hacker-green); transition: width 0.4s ease; box-shadow: 0 0 5px var(--hacker-green); }
+        
+        .cyber-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; color: #aaa; }
+        .cyber-checklist label { display: flex; align-items: center; gap: 6px; margin: 0; text-transform: none; cursor: crosshair; }
+        .cyber-checklist input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: crosshair; accent-color: var(--hacker-green); }
 
         /* --- BUTTONS --- */
         .btn-primary { width: 100%; padding: 14px; background-color: #001f00; color: #00FF00; border: 1px solid var(--hacker-green); border-radius: 2px; font-size: 13px; font-weight: 600; cursor: crosshair; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
@@ -113,7 +116,6 @@
         .btn-danger { background-color: #111; color: var(--danger); border: 1px solid var(--danger); padding: 6px 10px; border-radius: 2px; cursor: crosshair; font-size: 10px; font-weight: bold;}
         .btn-add-day { background-color: transparent; color: #CCCCCC; border: 1px dashed #333; width: 100%; padding: 10px; border-radius: 2px; cursor: crosshair; margin-bottom: 10px; font-size: 11px;}
         .btn-remove-day { width: 40px; background-color: var(--danger); color: white; border: none; font-size: 18px; font-weight: bold; border-radius: 2px; cursor: crosshair; display: flex; align-items: center; justify-content: center; }
-
         .btn-print { margin-top: 10px; background: transparent; border: 1px solid #444; color: #888; padding: 6px; width: 100%; font-family: monospace; font-size: 10px; cursor: crosshair; transition: 0.2s;}
         .btn-print:hover { border-color: #fff; color: #fff; }
 
@@ -124,41 +126,19 @@
         .result-wrapper.custom { border-color: #CCCCCC; color: #FFFFFF; }
         .result-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 5px; font-family: monospace;}
         .result-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; justify-content: center; gap: 8px;}
-        .result-unit-text { font-size: 16px; opacity: 0.7; font-weight: 600; letter-spacing: 0; }
         .footer-brand { text-align: center; margin-top: 30px; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; font-family: monospace; color: var(--hacker-green); animation: neonFlicker 4s infinite; }
 
-        /* --- PRINT DOSSIER CSS --- */
-        @media print {
-            body { background: #fff !important; color: #000 !important; }
-            body::after, #matrixCanvas, .hero-clock-container, .tabs-container, .header-top button, .form-group, .btn-primary, .btn-add-day, .btn-print, .footer-brand, #adminPanel { display: none !important; }
-            .card { border: none !important; box-shadow: none !important; margin: 0; padding: 0; }
-            .card::before, .card::after { display: none !important; }
-            .result-wrapper { background: transparent !important; border: 2px solid #000 !important; color: #000 !important; box-shadow: none !important; padding: 50px; position: relative; }
-            .result-wrapper::before {
-                content: 'CLASSIFIED'; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
-                font-size: 80px; font-weight: 900; color: rgba(255, 0, 0, 0.3); border: 8px solid rgba(255, 0, 0, 0.3);
-                padding: 10px 20px; z-index: -1; letter-spacing: 10px; font-family: 'Courier New', Courier, monospace;
-            }
-            .result-label { color: #000 !important; font-size: 16px; font-weight: bold; }
-            .result-value { font-size: 40px; color: #000 !important;}
-        }
+        /* --- TABLE STYLES (FOR PT DB) --- */
+        .db-table-wrapper { overflow-x: auto; margin-top: 10px; border: 1px solid var(--hacker-green-dim); border-radius: 2px; background: #000; max-height: 400px;}
+        .db-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
+        .db-table th { background: #001f00; color: #00FF00; padding: 12px; border-bottom: 1px solid var(--hacker-green-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; position: sticky; top: 0; z-index: 10;}
+        .db-table td { padding: 10px 12px; border-bottom: 1px solid #222; color: #CCCCCC; vertical-align: middle;}
+        .db-table tr:hover td { background: #111; color: #fff; }
+        .db-action-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 4px 8px; border-radius: 2px; font-size: 9px; cursor: crosshair; text-transform: uppercase; }
+        .db-action-btn:hover { background: var(--danger); color: #fff; }
+        .search-bar { background: transparent; border: 1px dashed var(--hacker-green-dim); color: #fff; width: 100%; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 2px; }
 
-        /* ADMIN PANEL & MISC CSS HIDDEN FOR BREVITY - SAME AS BEFORE */
-        #adminPanel { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--hacker-green-dim); }
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
-        .formula-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .formula-card { background: #000; border: 1px solid #222; padding: 15px; border-radius: 2px; position: relative;}
-        .custom-vars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 5px; margin-top: 10px;}
-        .var-input-group label { font-size: 9px; color: #fff; margin-bottom: 4px; display: block; font-weight:bold; opacity:0.7;}
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content { background: var(--box-bg); padding: 30px; border-radius: 2px; width: 90%; max-width: 350px; border: 1px solid var(--hacker-green); box-shadow: var(--border-glow); transform: scale(0.9); transition: 0.3s;}
-        .modal-overlay.active .modal-content { transform: scale(1); }
-        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
-        .toast { background: #000; border: 1px solid var(--hacker-green); border-left: 4px solid var(--hacker-green); padding: 15px 20px; border-radius: 2px; margin-top: 10px; box-shadow: var(--border-glow); font-weight: 600; font-size: 12px; color: #fff; font-family: monospace;}
-        
-        /* Date / Reminder layout */
+        /* --- LAYOUTS --- */
         .calendar-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start; }
         @media (max-width: 768px) { .calendar-layout { grid-template-columns: 1fr; } }
         .task-list-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 20px; min-height: 350px; }
@@ -170,6 +150,23 @@
         .cal-day { border: 1px solid #222; height: 50px; padding: 5px; font-size: 10px; color: #999; cursor: crosshair; display: flex; flex-direction: column; justify-content: space-between;}
         .cal-day.today { background-color: #001f00; border-color: var(--hacker-green); color: #fff; font-weight: bold; }
         .input-bar { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; margin-bottom: 15px; padding: 15px; background: #000; border: 1px solid #333; border-radius: 2px; }
+
+        /* ADMIN PANEL & TOASTS */
+        #adminPanel { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--hacker-green-dim); }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
+        .formula-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .formula-card { background: #000; border: 1px solid #222; padding: 15px; border-radius: 2px; position: relative;}
+        .custom-vars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 5px; margin-top: 10px;}
+        .var-input-group label { font-size: 9px; color: #fff; margin-bottom: 4px; display: block; opacity:0.7;}
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-content { background: var(--box-bg); padding: 30px; border-radius: 2px; width: 90%; max-width: 350px; border: 1px solid var(--hacker-green); box-shadow: var(--border-glow); transform: scale(0.9); transition: 0.3s;}
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .toast { background: #000; border: 1px solid var(--hacker-green); border-left: 4px solid var(--hacker-green); padding: 15px 20px; border-radius: 2px; margin-top: 10px; box-shadow: var(--border-glow); font-weight: 600; font-size: 12px; color: #fff; font-family: monospace;}
+        
+        @media print { body { background: #fff !important; color: #000 !important; } body::after, #matrixCanvas, #bootScreen, .hero-clock-container, .tabs-container, .header-top button, .form-group, .btn-primary, .btn-add-day, .btn-print, .footer-brand, #adminPanel { display: none !important; } .card { border: none !important; box-shadow: none !important; margin: 0; padding: 0; } .card::before, .card::after { display: none !important; } .result-wrapper { background: transparent !important; border: 2px solid #000 !important; color: #000 !important; box-shadow: none !important; padding: 50px; position: relative; } .result-wrapper::before { content: 'CLASSIFIED'; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 80px; font-weight: 900; color: rgba(255, 0, 0, 0.3); border: 8px solid rgba(255, 0, 0, 0.3); padding: 10px 20px; z-index: -1; letter-spacing: 10px; font-family: 'Courier New', Courier, monospace; } .result-label { color: #000 !important; font-size: 16px; font-weight: bold; } .result-value { font-size: 40px; color: #000 !important;} }
     </style>
 </head>
 <body>
@@ -182,10 +179,7 @@
 <canvas id="matrixCanvas"></canvas>
 
 <div class="hero-clock-container">
-    <div class="hud-top-row">
-        <canvas id="cpuGraph"></canvas>
-        <div class="hero-time" id="liveTime">00<span class="blink-colon">:</span>00<span class="secs">00</span></div>
-    </div>
+    <div class="hud-top-row"><canvas id="cpuGraph"></canvas><div class="hero-time" id="liveTime">00<span class="blink-colon">:</span>00<span class="secs">00</span></div></div>
     <div class="hero-date" id="liveDate">PROTOCOL DATE</div>
     <button class="sound-toggle" onclick="toggleSound()" id="soundBtn">[ SOUND: ON ]</button>
 </div>
@@ -203,6 +197,7 @@
         <button class="tab-btn" onclick="switchTab('dateTab', this)">$ date_utility</button>
         <button class="tab-btn" onclick="switchTab('reminderTab', this)">$ protocol_logs</button>
         <button class="tab-btn custom-tab" onclick="switchTab('customCalcTab', this)">🧮 Custom Math</button>
+        <button class="tab-btn" onclick="switchTab('ptStaffTab', this)" style="border-color: #a855f7; color: #d8b4fe;">$ personnel_matrix</button>
     </div>
     
     <div id="otTab" class="tab-content active">
@@ -211,10 +206,7 @@
         <div class="form-group" id="otContainer"><label id="otDurationLabel">Duration (Minutes)</label><div class="dynamic-row"><input type="number" class="ot-input" placeholder="Minutes (e.g., 120)"></div></div>
         <button class="btn-add-day" onclick="addRow('ot')">+ Add Day Duration</button>
         <button class="btn-primary" onclick="calculateOT()">Execute Calculation</button>
-        <div class="result-wrapper">
-            <div class="result-label">Total Overtime Pay</div><div class="result-value">RM <span id="resultDisplayOT">0.00</span></div>
-            <button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button>
-        </div>
+        <div class="result-wrapper"><div class="result-label">Total Overtime Pay</div><div class="result-value">RM <span id="resultDisplayOT">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
     </div>
 
     <div id="absentTab" class="tab-content">
@@ -223,10 +215,7 @@
         <div class="form-group" id="absentContainer"><label>Days Absent</label><div class="dynamic-row"><input type="number" class="absent-input" placeholder="Value (e.g., 1)"></div></div>
         <button class="btn-add-day" onclick="addRow('absent')">+ Add Input</button>
         <button class="btn-primary" onclick="calculateAbsent()">Execute Deduction</button>
-        <div class="result-wrapper danger">
-            <div class="result-label">Total Deduction</div><div class="result-value">RM <span id="resultDisplayAbsent">0.00</span></div>
-            <button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button>
-        </div>
+        <div class="result-wrapper danger"><div class="result-label">Total Deduction</div><div class="result-value">RM <span id="resultDisplayAbsent">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
     </div>
 
     <div id="resignTab" class="tab-content">
@@ -235,20 +224,59 @@
         <div class="form-group" id="resignContainer"><label id="resignDurationLabel">Short Notice (Days)</label><div class="dynamic-row"><input type="number" class="resign-input" placeholder="Value (e.g., 14)"></div></div>
         <button class="btn-add-day" onclick="addRow('resign')">+ Add Input</button>
         <button class="btn-primary" onclick="calculateResign()">Execute Settlement</button>
-        <div class="result-wrapper danger" id="resignResultBox">
-            <div class="result-label" id="resignResultLabel">Total Penalty</div><div class="result-value">RM <span id="resultDisplayResign">0.00</span></div>
-            <button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button>
-        </div>
+        <div class="result-wrapper danger" id="resignResultBox"><div class="result-label" id="resignResultLabel">Total Penalty</div><div class="result-value">RM <span id="resultDisplayResign">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
     </div>
 
     <div id="customCalcTab" class="tab-content">
         <div class="form-group"><label>Select Custom Engine</label><select id="cstType" class="custom-select-box" onchange="handleCustomSelection()"><option value="">-- No Engines Synced --</option></select></div>
         <div id="cvContainer" class="cv-container"><div class="cv-header-title">🎛️ Dynamic Inputs</div><div class="cv-grid" id="cvDynamicGrid"></div></div>
         <button class="btn-primary" onclick="calculateCustomDynamic()">Execute Protocol</button>
-        <div class="result-wrapper custom">
-            <div class="result-label">Generated Output</div>
-            <div class="result-value"><span id="cstUnitFront" class="result-unit-text" style="display:none;"></span><span id="resultDisplayCst">0</span><span id="cstUnitBack" class="result-unit-text" style="display:none;"></span></div>
-            <button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button>
+        <div class="result-wrapper custom"><div class="result-label">Generated Output</div><div class="result-value"><span id="cstUnitFront" class="result-unit-text" style="display:none;"></span><span id="resultDisplayCst">0</span><span id="cstUnitBack" class="result-unit-text" style="display:none;"></span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
+    </div>
+
+    <div id="ptStaffTab" class="tab-content">
+        <div style="background:#000; padding:15px; border:1px solid #333; border-radius:2px; margin-bottom:20px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom: 15px;">
+                <div class="form-group"><label>Staff ID</label><input type="text" id="ptId" placeholder="e.g. PT-001"></div>
+                <div class="form-group"><label>Full Name</label><input type="text" id="ptName" placeholder="Staff Name..."></div>
+                <div class="form-group"><label>Outlet</label><input type="text" id="ptOutlet" placeholder="e.g. Siburan / HQ"></div>
+                <div class="form-group"><label>Position</label><input type="text" id="ptPosition" placeholder="e.g. Cashier"></div>
+                <div class="form-group"><label style="color:#d8b4fe;">Contract End Date (Auto-WA)</label><input type="date" id="ptEndDate" style="border-color:#a855f7; color:#d8b4fe;"></div>
+                <div class="form-group"><label style="color:#3b82f6;">Report Duty Date</label><input type="date" id="ptReportDuty" style="border-color:#3b82f6; color:#93c5fd;"></div>
+            </div>
+
+            <!-- CHECKLIST ONBOARDING BARU -->
+            <div style="background: #050505; padding: 12px; border: 1px dashed #333; margin-bottom: 15px; border-radius: 2px;">
+                <label style="color:#888; font-size:10px; margin-bottom:10px; display:block;">>> ONBOARDING CHECKLIST (INITIAL SETUP)</label>
+                <div style="display:flex; flex-wrap:wrap; gap:15px; font-size: 11px;">
+                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptPrepAgreement" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Prepare Agreement</label>
+                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptLoaDone" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> LOA (Done)</label>
+                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptLoaPost" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> LOA (Post)</label>
+                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptUpdateHrms" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Update HRMS</label>
+                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptScanLoa" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> SCAN LOA</label>
+                    <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptFilling" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Filling</label>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="background:#2e1065; border-color:#9333ea; color:#d8b4fe;" onclick="addPtStaff()">[ ENROLL PERSONNEL ]</button>
+        </div>
+
+        <input type="text" id="ptSearch" class="search-bar" onkeyup="searchPtStaff()" placeholder="> SEARCH DATABASE (NAME / ID / OUTLET)...">
+
+        <div class="db-table-wrapper">
+            <table class="db-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Personnel Info</th>
+                        <th>Dates</th>
+                        <th style="min-width: 180px;">Progress & Checklist</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="ptStaffTableBody">
+                    </tbody>
+            </table>
         </div>
     </div>
 
@@ -261,13 +289,13 @@
     </div>
 
     <div id="reminderTab" class="tab-content">
-        <div class="input-bar"><div><label>Date</label><input type="date" id="taskDate"></div><div><label>Time</label><input type="time" id="taskTime"></div><div><label>Log Note</label><input type="text" id="taskNote"></div></div>
+        <div class="input-bar"><div><label>Date</label><input type="date" id="taskDate"></div><div><label>Time</label><input type="time" id="taskTime" value="08:00"></div><div><label>Log Note</label><input type="text" id="taskNote"></div></div>
         <button class="btn-primary" style="margin-bottom: 25px;" onclick="addTask()">Commit Log</button>
         <div class="calendar-layout"><div class="task-list-box"><h3>Active Logs</h3><div id="taskListDisplay"></div></div><div class="calendar-box"><div class="cal-header"><button class="cal-nav-btn" onclick="changeMonth(-1)">&lt;</button><span id="calMonthYearDisplay"></span><button class="cal-nav-btn" onclick="changeMonth(1)">&gt;</button></div><div class="cal-grid" id="calGrid"></div></div></div>
     </div>
 
     <div id="adminPanel">
-        <div class="admin-header"><h3>CYBER_ENGINE V7</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
+        <div class="admin-header"><h3>CYBER_ENGINE V8.3</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
         <div class="formula-grid" id="adminFormulasRender"></div>
         <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-primary" onclick="saveFormulas()">💾 Sync & Reload</button><button class="btn-admin" onclick="document.getElementById('adminPanel').style.display='none'">Close Terminal</button></div>
     </div>
@@ -281,27 +309,14 @@
 <script>
     // --- WEBAUDIO SFX ENGINE ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const audioCtx = new AudioContext();
-    let isSoundOn = true;
-
-    function toggleSound() {
-        isSoundOn = !isSoundOn;
-        document.getElementById('soundBtn').innerText = isSoundOn ? '[ SOUND: ON ]' : '[ SOUND: MUTED ]';
-    }
-
+    const audioCtx = new AudioContext(); let isSoundOn = true;
+    function toggleSound() { isSoundOn = !isSoundOn; document.getElementById('soundBtn').innerText = isSoundOn ? '[ SOUND: ON ]' : '[ SOUND: MUTED ]'; }
     function playTone(freq, type, duration, vol) {
-        if(!isSoundOn) return;
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-        osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + duration);
+        if(!isSoundOn) return; if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); gainNode.gain.setValueAtTime(vol, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
     }
-    
-    // Bind sounds to interactions
     document.addEventListener('keydown', (e) => { if(e.target.tagName === 'INPUT') playTone(800, 'square', 0.05, 0.05); });
     document.addEventListener('click', (e) => { 
         if(e.target.tagName === 'BUTTON' && !e.target.classList.contains('btn-primary')) playTone(1200, 'sine', 0.1, 0.1); 
@@ -312,9 +327,9 @@
     const bootLines = [
         "SYS_MEM: 640K OK", "ESTABLISHING SECURE CONNECTION...", "HANDSHAKE ACCEPTED.",
         "LOADING KERNEL MODULES... OK", "BYPASSING SECURITY PROTOCOL... OK",
-        "DECRYPTING HR_DATABASE_V7... DONE", "WELCOME, NOEL_ETHAN.EXE."
+        "DECRYPTING PERSONNEL_MATRIX_V8.3... DONE", "WELCOME, NOEL_ETHAN.EXE."
     ];
-    window.onload = () => {
+    function runBootSequence() {
         const container = document.getElementById('bootTextContainer');
         const bootScreen = document.getElementById('bootScreen');
         let delay = 0;
@@ -323,73 +338,38 @@
                 const div = document.createElement('div'); div.className = 'boot-line'; div.innerText = '> ' + line;
                 container.appendChild(div); playTone(1500, 'square', 0.05, 0.1);
             }, delay);
-            delay += Math.random() * 400 + 200; // Random delay between lines
+            delay += Math.random() * 400 + 200;
         });
         setTimeout(() => {
             bootScreen.style.opacity = '0';
             setTimeout(() => bootScreen.style.display = 'none', 500);
-            playTone(400, 'sine', 0.5, 0.3); // Boot complete chime
-        }, delay + 500);
-        
-        // Init other systems
-        initMatrix(); initGraph(); populateCustomDropdown();
-    };
-
-    // --- CYBER CROSSHAIR TRAIL ---
-    document.addEventListener('mousemove', (e) => {
-        const trail = document.createElement('div'); trail.className = 'cursor-trail';
-        trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px';
-        document.body.appendChild(trail);
-        setTimeout(() => trail.remove(), 500);
-    });
-
-    // --- CPU DIAGNOSTICS GRAPH ---
-    const graphCanvas = document.getElementById('cpuGraph');
-    const gCtx = graphCanvas.getContext('2d');
-    let graphData = Array(30).fill(10);
-    function initGraph() {
-        graphData.push(Math.random() * 20 + 5); graphData.shift();
-        gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
-        gCtx.beginPath(); gCtx.strokeStyle = '#00FF00'; gCtx.lineWidth = 1;
-        for(let i=0; i<graphData.length; i++) {
-            let x = i * (graphCanvas.width / graphData.length);
-            let y = graphCanvas.height - graphData[i];
-            if(i===0) gCtx.moveTo(x, y); else gCtx.lineTo(x, y);
-        }
-        gCtx.stroke(); requestAnimationFrame(initGraph);
+            playTone(400, 'sine', 0.5, 0.3);
+        }, delay + 800);
     }
 
-    // --- MATRIX DIGITAL RAIN EFFECT ---
+    // --- CYBER CROSSHAIR & GRAPH ---
+    document.addEventListener('mousemove', (e) => { const trail = document.createElement('div'); trail.className = 'cursor-trail'; trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; document.body.appendChild(trail); setTimeout(() => trail.remove(), 500); });
+    const graphCanvas = document.getElementById('cpuGraph'); const gCtx = graphCanvas.getContext('2d'); let graphData = Array(30).fill(10);
+    function initGraph() { graphData.push(Math.random() * 20 + 5); graphData.shift(); gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height); gCtx.beginPath(); gCtx.strokeStyle = '#00FF00'; gCtx.lineWidth = 1; for(let i=0; i<graphData.length; i++) { let x = i * (graphCanvas.width / graphData.length); let y = graphCanvas.height - graphData[i]; if(i===0) gCtx.moveTo(x, y); else gCtx.lineTo(x, y); } gCtx.stroke(); requestAnimationFrame(initGraph); }
+
+    // --- MATRIX DIGITAL RAIN ---
     function initMatrix() {
-        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"; const charsArray = matrixChars.split("");
-        const fontSize = 14; const columns = canvas.width / fontSize; const drops = [];
-        for(let x = 0; x < columns; x++) drops[x] = 1;
-        setInterval(() => {
-            ctx.fillStyle = "rgba(5, 5, 5, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#00FF00"; ctx.font = fontSize + "px monospace";
-            for(let i = 0; i < drops.length; i++) {
-                ctx.fillText(charsArray[Math.floor(Math.random() * charsArray.length)], i * fontSize, drops[i] * fontSize);
-                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
-            }
-        }, 35);
+        const fontSize = 14; const columns = canvas.width / fontSize; const drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
+        setInterval(() => { ctx.fillStyle = "rgba(5, 5, 5, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = "#00FF00"; ctx.font = fontSize + "px monospace"; for(let i = 0; i < drops.length; i++) { ctx.fillText(charsArray[Math.floor(Math.random() * charsArray.length)], i * fontSize, drops[i] * fontSize); if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; } }, 35);
         window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
     }
 
     // --- LIVE CLOCK ---
-    setInterval(() => {
-        const now = new Date();
-        document.getElementById('liveTime').innerHTML = `${String(now.getHours()).padStart(2, '0')}<span class="blink-colon">:</span>${String(now.getMinutes()).padStart(2, '0')}<span class="secs">${String(now.getSeconds()).padStart(2, '0')}</span>`;
-        document.getElementById('liveDate').innerText = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase();
-    }, 1000);
+    setInterval(() => { const now = new Date(); document.getElementById('liveTime').innerHTML = `${String(now.getHours()).padStart(2, '0')}<span class="blink-colon">:</span>${String(now.getMinutes()).padStart(2, '0')}<span class="secs">${String(now.getSeconds()).padStart(2, '0')}</span>`; document.getElementById('liveDate').innerText = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase(); }, 1000);
 
-    // --- FORMULAS ENGINE V7 (Preserved V5 Data Logic) ---
+    // --- FORMULAS ENGINE V8 ---
     let activeTabId = 'otTab';
-    const defaultFormulas = { pos: { label: "Positive OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.5 * INPUT", custom: false }, neg: { label: "Negative OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.0 * INPUT", custom: false }, hq: { label: "HQ OT", expr: "((BASIC / 30) / 8.5 / 60) * 1.5 * INPUT", custom: false }, ph: { label: "PH (Double)", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, ab_nor: { label: "Absent Normal", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, ab_ph: { label: "Absent PH Linked", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, sn: { label: "Short Notice", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, al: { label: "YTD AL", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, cst_demo: { label: "Protocol Base", custom: true, vars: ["Var Alpha", "Var Beta"], expr: "VAL1 + VAL2", unit: "Unit" } };
+    const defaultFormulas = { pos: { label: "Positive OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.5 * INPUT", custom: false }, neg: { label: "Negative OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.0 * INPUT", custom: false }, hq: { label: "HQ OT", expr: "((BASIC / 30) / 8.5 / 60) * 1.5 * INPUT", custom: false }, ph: { label: "PH (Double)", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, ab_nor: { label: "Absent Normal", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, ab_ph: { label: "Absent PH Linked", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, sn: { label: "Short Notice", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, al: { label: "YTD AL", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }};
     let currentFormulas = JSON.parse(localStorage.getItem('hrFormulasV7')) || defaultFormulas;
 
-    function switchTab(tabId, btnElement) { activeTabId = tabId; document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); btnElement.classList.add('active'); if (tabId === 'reminderTab') renderCalendar(); if (tabId === 'customCalcTab') { populateCustomDropdown(); handleCustomSelection(); } }
+    function switchTab(tabId, btnElement) { activeTabId = tabId; document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(tabId).classList.add('active'); btnElement.classList.add('active'); if (tabId === 'reminderTab') renderCalendar(); if (tabId === 'customCalcTab') { populateCustomDropdown(); handleCustomSelection(); } if(tabId === 'ptStaffTab') renderPtStaffTable(); }
     function addRow(mode) { const c = document.getElementById(mode + 'Container'); const r = document.createElement('div'); r.className = 'dynamic-row'; r.innerHTML = `<input type="number" class="${mode}-input" placeholder="Value..."><button class="btn-remove-day" onclick="this.parentElement.remove();">×</button>`; c.appendChild(r); }
     function getSum(className) { let sum = 0; document.querySelectorAll('.' + className).forEach(inp => { let v = parseFloat(inp.value); if(!isNaN(v)) sum+=v; }); return sum; }
 
@@ -398,54 +378,150 @@
     function calculateAbsent() { let b = parseFloat(document.getElementById('absentBasicSalary').value); let t = document.getElementById('absentType').value; let inp = getSum('absent-input'); if(isNaN(b) || inp===0) return showToast("Missing parameters", "error"); document.getElementById('resultDisplayAbsent').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Calculation executed"); }
     function calculateResign() { let b = parseFloat(document.getElementById('resignBasicSalary').value); let t = document.getElementById('resignType').value; let inp = getSum('resign-input'); if(isNaN(b) || inp===0) return showToast("Missing parameters", "error"); document.getElementById('resultDisplayResign').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Calculation executed"); }
 
-    function handleCustomSelection() {
-        let t = document.getElementById('cstType').value; let f = currentFormulas[t]; let cvContainer = document.getElementById('cvContainer'); let dynamicGrid = document.getElementById('cvDynamicGrid');
-        cvContainer.style.display = 'none'; dynamicGrid.innerHTML = ''; document.getElementById('resultDisplayCst').innerText = "0"; document.getElementById('cstUnitFront').style.display = 'none'; document.getElementById('cstUnitBack').style.display = 'none';
-        if(f && f.custom && f.vars && f.vars.length > 0) { f.vars.forEach((varLabel, idx) => { dynamicGrid.innerHTML += `<div class="cv-group"><label>[VAL${idx+1}] ${varLabel}</label><input type="number" id="cstDynVal${idx+1}" placeholder="Enter Value..."></div>`; }); cvContainer.style.display = 'block'; }
-    }
-    function calculateCustomDynamic() {
-        let t = document.getElementById('cstType').value; let f = currentFormulas[t]; if(!f || !f.custom) return showToast("Select active engine.", "error");
-        let argNames = []; let argValues = [];
-        if(f.vars && f.vars.length > 0) { f.vars.forEach((_, idx) => { argNames.push('VAL'+(idx+1)); argValues.push(parseFloat(document.getElementById('cstDynVal'+(idx+1)).value) || 0); }); }
-        try {
-            let calcFunc = new Function(...argNames, 'return ' + f.expr); let ans = calcFunc(...argValues); if(!isFinite(ans)) throw new Error("Math Error");
-            document.getElementById('resultDisplayCst').innerText = (ans % 1 !== 0) ? ans.toFixed(2) : ans.toString();
-            let uF = document.getElementById('cstUnitFront'); let uB = document.getElementById('cstUnitBack'); uF.style.display = 'none'; uB.style.display = 'none';
-            if (f.unit && f.unit.trim() !== '') { let u = f.unit.trim(); if(['RM', '$', '£'].includes(u.toUpperCase()) || u==='$') { uF.innerText = u; uF.style.display = 'inline-block'; } else { uB.innerText = u; uB.style.display = 'inline-block'; } }
-            showToast("Protocol executed successfully!");
-        } catch(e) { document.getElementById('resultDisplayCst').innerText = "ERROR"; showToast("Math Expression failure.", "error"); }
-    }
+    function handleCustomSelection() { let t = document.getElementById('cstType').value; let f = currentFormulas[t]; let cvContainer = document.getElementById('cvContainer'); let dynamicGrid = document.getElementById('cvDynamicGrid'); cvContainer.style.display = 'none'; dynamicGrid.innerHTML = ''; document.getElementById('resultDisplayCst').innerText = "0"; document.getElementById('cstUnitFront').style.display = 'none'; document.getElementById('cstUnitBack').style.display = 'none'; if(f && f.custom && f.vars && f.vars.length > 0) { f.vars.forEach((varLabel, idx) => { dynamicGrid.innerHTML += `<div class="cv-group"><label>[VAL${idx+1}] ${varLabel}</label><input type="number" id="cstDynVal${idx+1}" placeholder="Enter Value..."></div>`; }); cvContainer.style.display = 'block'; } }
+    function calculateCustomDynamic() { let t = document.getElementById('cstType').value; let f = currentFormulas[t]; if(!f || !f.custom) return showToast("Select active engine.", "error"); let argNames = []; let argValues = []; if(f.vars && f.vars.length > 0) { f.vars.forEach((_, idx) => { argNames.push('VAL'+(idx+1)); argValues.push(parseFloat(document.getElementById('cstDynVal'+(idx+1)).value) || 0); }); } try { let calcFunc = new Function(...argNames, 'return ' + f.expr); let ans = calcFunc(...argValues); if(!isFinite(ans)) throw new Error("Math Error"); document.getElementById('resultDisplayCst').innerText = (ans % 1 !== 0) ? ans.toFixed(2) : ans.toString(); let uF = document.getElementById('cstUnitFront'); let uB = document.getElementById('cstUnitBack'); uF.style.display = 'none'; uB.style.display = 'none'; if (f.unit && f.unit.trim() !== '') { let u = f.unit.trim(); if(['RM', '$', '£'].includes(u.toUpperCase()) || u==='$') { uF.innerText = u; uF.style.display = 'inline-block'; } else { uB.innerText = u; uB.style.display = 'inline-block'; } } showToast("Protocol executed successfully!"); } catch(e) { document.getElementById('resultDisplayCst').innerText = "ERROR"; showToast("Math Expression failure.", "error"); } }
 
-    // Dates / Toggles
     function handleResignTypeChange() { let t = document.getElementById('resignType').value; document.getElementById('resignDurationLabel').innerText = t==='sn'?"Short Notice (Days)":"YTD AL (Days)"; document.getElementById('resignResultBox').className = t==='sn'?"result-wrapper danger":"result-wrapper custom"; document.getElementById('resignResultLabel').innerText = t==='sn'?"Total Penalty":"Total AL Encashment"; }
     function handleOTTypeChange() { document.getElementById('otDurationLabel').innerText = document.getElementById('otType').value === 'ph' ? "Days" : "Minutes"; }
     function toggleDateMode() { let isDiff = document.getElementById('calcMode').value === 'diff'; document.getElementById('modeDiff').style.display = isDiff ? 'block' : 'none'; document.getElementById('modeAddSub').style.display = !isDiff ? 'block' : 'none'; }
-    function calculateDate() {
-        let isDiff = document.getElementById('calcMode').value === 'diff';
-        if(isDiff) { let d1 = new Date(document.getElementById('diffFrom').value); let d2 = new Date(document.getElementById('diffTo').value); if(isNaN(d1)||isNaN(d2)) return; document.getElementById('dateResultMain').innerText = Math.ceil(Math.abs(d2 - d1) / (1000 * 3600 * 24)) + " DAYS DIFF"; } 
-        else { let base = new Date(document.getElementById('addSubFrom').value); if(isNaN(base)) return; let m = document.querySelector('input[name="addSubType"]:checked').value==='add'?1:-1; base.setFullYear(base.getFullYear() + (parseFloat(document.getElementById('valYears').value)||0)*m); base.setMonth(base.getMonth() + (parseFloat(document.getElementById('valMonths').value)||0)*m); base.setDate(base.getDate() + (parseFloat(document.getElementById('valDays').value)||0)*m); document.getElementById('dateResultMain').innerText = base.toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' }).toUpperCase(); }
-        document.getElementById('dateResultSub').innerText = "CALCULATION COMPLETE";
+    function calculateDate() { let isDiff = document.getElementById('calcMode').value === 'diff'; if(isDiff) { let d1 = new Date(document.getElementById('diffFrom').value); let d2 = new Date(document.getElementById('diffTo').value); if(isNaN(d1)||isNaN(d2)) return; document.getElementById('dateResultMain').innerText = Math.ceil(Math.abs(d2 - d1) / (1000 * 3600 * 24)) + " DAYS DIFF"; } else { let base = new Date(document.getElementById('addSubFrom').value); if(isNaN(base)) return; let m = document.querySelector('input[name="addSubType"]:checked').value==='add'?1:-1; base.setFullYear(base.getFullYear() + (parseFloat(document.getElementById('valYears').value)||0)*m); base.setMonth(base.getMonth() + (parseFloat(document.getElementById('valMonths').value)||0)*m); base.setDate(base.getDate() + (parseFloat(document.getElementById('valDays').value)||0)*m); document.getElementById('dateResultMain').innerText = base.toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' }).toUpperCase(); } document.getElementById('dateResultSub').innerText = "CALCULATION COMPLETE"; }
+
+    // --- REMINDERS & PROTOCOL LOGS ---
+    let tasks = JSON.parse(localStorage.getItem('hrReminders')) || []; let calDate = new Date();
+    function renderCalendar() { const y = calDate.getFullYear(); const m = calDate.getMonth(); document.getElementById('calMonthYearDisplay').innerText = new Date(y, m).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase(); const grid = document.getElementById('calGrid'); grid.innerHTML = ['SUN','MON','TUE','WED','THU','FRI','SAT'].map(d => `<div class="cal-day-header">${d}</div>`).join(''); for(let i=0; i<new Date(y, m, 1).getDay(); i++) grid.innerHTML += `<div class="cal-day empty"></div>`; for(let i=1; i<=new Date(y, m + 1, 0).getDate(); i++) { let s = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; let isToday = (i === new Date().getDate() && m === new Date().getMonth() && y === new Date().getFullYear()); grid.innerHTML += `<div class="cal-day ${isToday?'today':''} ${tasks.some(t => t.date === s)?'has-task':''}"><span>${i}</span></div>`; } renderTaskList(); }
+    function changeMonth(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); }
+    function renderTaskList() { const listDiv = document.getElementById('taskListDisplay'); if(tasks.length === 0) { listDiv.innerHTML = `<p style="font-size:11px; color:#555;">>_ No protocols logged.</p>`; return; } listDiv.innerHTML = tasks.slice().sort((a,b) => new Date(a.date) - new Date(b.date)).map(t => `<div class="task-item"><div class="task-item-time">${t.date} @ ${t.time}</div><div>${t.note}</div><div><button class="btn-danger" style="padding:4px;" onclick="removeTask(${t.id})">DEL</button></div></div>`).join(''); }
+    function removeTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('hrReminders', JSON.stringify(tasks)); renderCalendar(); if(activeTabId==='ptStaffTab') renderPtStaffTable(); }
+    async function addTask(silent = false, specificDate, specificTime, specificNote) { let d = specificDate || document.getElementById('taskDate').value; let t = specificTime || document.getElementById('taskTime').value || "08:00"; let n = specificNote || document.getElementById('taskNote').value; if(!d || !t || !n) { if(!silent) showToast("Missing data", "error"); return; } tasks.push({ id: Date.now(), date: d, time: t, note: n }); localStorage.setItem('hrReminders', JSON.stringify(tasks)); try { await fetch('https://vigilant-spork-wrr9pxvrxrxvhvv96-3000.app.github.dev/tambah-task', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ date: d, time: t, note: n }) }); if(!silent) showToast("Commited to WA Server."); } catch (error) { if(!silent) showToast("Server offline", "error"); } if(!silent) { document.getElementById('taskNote').value=""; renderCalendar(); } }
+
+    // --- PERSONNEL MATRIX (PART-TIME DB) ---
+    let ptStaffArray = JSON.parse(localStorage.getItem('hrPtStaffDB')) || [];
+    
+    // Auto-sort & Render Function (UPDATED WITH PROGRESS BAR)
+    function renderPtStaffTable() {
+        const tbody = document.getElementById('ptStaffTableBody');
+        if(ptStaffArray.length === 0) { 
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#555;">>_ NO PERSONNEL DATA FOUND</td></tr>`; 
+            return; 
+        }
+        
+        // Auto-sort by Outlet (A-Z), then Name (A-Z)
+        const sortedStaff = [...ptStaffArray].sort((a, b) => {
+            const outletA = (a.outlet || "").toUpperCase(); const outletB = (b.outlet || "").toUpperCase();
+            if (outletA < outletB) return -1; if (outletA > outletB) return 1;
+            const nameA = (a.name || "").toUpperCase(); const nameB = (b.name || "").toUpperCase();
+            if (nameA < nameB) return -1; if (nameA > nameB) return 1;
+            return 0;
+        });
+
+        tbody.innerHTML = sortedStaff.map(st => {
+            // Pengiraan Progress
+            let checkedCount = 0;
+            if(st.prepAgreement) checkedCount++;
+            if(st.loaDone) checkedCount++;
+            if(st.loaPost) checkedCount++;
+            if(st.updateHrms) checkedCount++;
+            if(st.scanLoa) checkedCount++;
+            if(st.filling) checkedCount++;
+            let progressPct = Math.round((checkedCount / 6) * 100);
+
+            return `
+                <tr>
+                    <td style="font-weight:bold; color:var(--hacker-green);">${st.id}</td>
+                    <td>
+                        <div style="font-weight:bold; color:#fff; font-size:12px;">${st.name}</div>
+                        <div style="color:#d8b4fe; font-size:10px; margin-top:4px; text-transform:uppercase;">${st.outlet} • ${st.position}</div>
+                    </td>
+                    <td>
+                        <div style="color:var(--danger); font-size:10px;"><b>END:</b> ${st.endDate}</div>
+                        <div style="color:#3b82f6; font-size:10px; margin-top:4px;"><b>DUTY:</b> ${st.reportDuty || '-'}</div>
+                    </td>
+                    <td>
+                        <div class="cyber-progress-text">
+                            <span>ONBOARDING</span>
+                            <span style="color: ${progressPct === 100 ? '#fff' : 'var(--hacker-green)'}">${progressPct}%</span>
+                        </div>
+                        <div class="cyber-progress-container">
+                            <div class="cyber-progress-bar" style="width: ${progressPct}%; background: ${progressPct === 100 ? '#fff' : 'var(--hacker-green)'}; box-shadow: ${progressPct === 100 ? '0 0 10px #fff' : '0 0 5px var(--hacker-green)'};"></div>
+                        </div>
+                        <div class="cyber-checklist">
+                            <label><input type="checkbox" ${st.prepAgreement ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'prepAgreement', this.checked)"> Prep Agreement</label>
+                            <label><input type="checkbox" ${st.loaDone ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'loaDone', this.checked)"> LOA Done</label>
+                            <label><input type="checkbox" ${st.loaPost ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'loaPost', this.checked)"> LOA Post</label>
+                            <label><input type="checkbox" ${st.updateHrms ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'updateHrms', this.checked)"> Update HRMS</label>
+                            <label><input type="checkbox" ${st.scanLoa ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'scanLoa', this.checked)"> SCAN LOA</label>
+                            <label><input type="checkbox" ${st.filling ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'filling', this.checked)"> Filling</label>
+                        </div>
+                    </td>
+                    <td><button class="db-action-btn" onclick="deletePtStaff(${st.timestamp})">PURGE</button></td>
+                </tr>
+            `;
+        }).join('');
+    }
+    
+    // UPDATE CHECKLIST INTERACTIVE FUNCTION (AND RE-RENDER PROGRESS)
+    function updatePtChecklist(timestamp, field, isChecked) {
+        let index = ptStaffArray.findIndex(s => s.timestamp === timestamp);
+        if(index !== -1) {
+            ptStaffArray[index][field] = isChecked;
+            localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray));
+            renderPtStaffTable(); // Refresh the table to update the progress bar instantly
+        }
     }
 
-    // Reminders (Truncated for space, works same as V6)
-    let tasks = JSON.parse(localStorage.getItem('hrReminders')) || []; let calDate = new Date();
-    function renderCalendar() {
-        const y = calDate.getFullYear(); const m = calDate.getMonth(); document.getElementById('calMonthYearDisplay').innerText = new Date(y, m).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
-        const grid = document.getElementById('calGrid'); grid.innerHTML = ['SUN','MON','TUE','WED','THU','FRI','SAT'].map(d => `<div class="cal-day-header">${d}</div>`).join('');
-        for(let i=0; i<new Date(y, m, 1).getDay(); i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
-        for(let i=1; i<=new Date(y, m + 1, 0).getDate(); i++) { let s = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; let isToday = (i === new Date().getDate() && m === new Date().getMonth() && y === new Date().getFullYear()); grid.innerHTML += `<div class="cal-day ${isToday?'today':''} ${tasks.some(t => t.date === s)?'has-task':''}"><span>${i}</span></div>`; }
-        renderTaskList();
+    // SEARCH FUNCTION (UPDATED)
+    function searchPtStaff() {
+        let filter = document.getElementById('ptSearch').value.toUpperCase();
+        let trs = document.getElementById('ptStaffTableBody').getElementsByTagName('tr');
+        for(let i=0; i<trs.length; i++) {
+            let tdId = trs[i].getElementsByTagName('td')[0];
+            let tdInfo = trs[i].getElementsByTagName('td')[1]; // Gabungan Nama & Outlet
+            if(tdId || tdInfo) {
+                let txtValue = (tdId.textContent || tdId.innerText) + " " + (tdInfo.textContent || tdInfo.innerText);
+                if(txtValue.toUpperCase().indexOf(filter) > -1) { trs[i].style.display = ""; } else { trs[i].style.display = "none"; }
+            }
+        }
     }
-    function changeMonth(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); }
-    function renderTaskList() { const listDiv = document.getElementById('taskListDisplay'); if(tasks.length === 0) { listDiv.innerHTML = `<p style="font-size:11px; color:#555;">>_ No protocols logged.</p>`; return; } listDiv.innerHTML = tasks.map(t => `<div class="task-item"><div class="task-item-time">${t.date} @ ${t.time}</div><div>${t.note}</div><div><button class="btn-wa" onclick="window.open('https://web.whatsapp.com/send?text=${encodeURIComponent('*CYBER REMINDER*\n'+t.date+' '+t.time+'\n'+t.note)}', '_blank')">WA</button> <button class="btn-danger" style="padding:4px;" onclick="removeTask(${t.id})">DEL</button></div></div>`).join(''); }
-    function removeTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('hrReminders', JSON.stringify(tasks)); renderCalendar(); }
-    async function addTask() { let d = document.getElementById('taskDate').value; let t = document.getElementById('taskTime').value; let n = document.getElementById('taskNote').value; if(!d || !t || !n) return showToast("Missing data", "error"); tasks.push({ id: Date.now(), date: d, time: t, note: n }); localStorage.setItem('hrReminders', JSON.stringify(tasks)); showToast("Committed"); document.getElementById('taskNote').value=""; renderCalendar(); }
+
+    async function addPtStaff() {
+        const id = document.getElementById('ptId').value.trim(); const name = document.getElementById('ptName').value.trim(); const outlet = document.getElementById('ptOutlet').value.trim(); const position = document.getElementById('ptPosition').value.trim(); 
+        const endDate = document.getElementById('ptEndDate').value; const reportDuty = document.getElementById('ptReportDuty').value;
+        
+        // Ambil nilai dari checklist form pendaftaran
+        const prepAgreement = document.getElementById('ptPrepAgreement').checked;
+        const loaDone = document.getElementById('ptLoaDone').checked;
+        const loaPost = document.getElementById('ptLoaPost').checked;
+        const updateHrms = document.getElementById('ptUpdateHrms').checked;
+        const scanLoa = document.getElementById('ptScanLoa').checked;
+        const filling = document.getElementById('ptFilling').checked;
+
+        if(!id || !name || !outlet || !position || !endDate) { showToast("COMPLETE REQUIRED FIELDS (ID to END DATE)", "error"); return; }
+        
+        const newStaff = { 
+            timestamp: Date.now(), id, name, outlet, position, endDate, reportDuty,
+            prepAgreement, loaDone, loaPost, updateHrms, scanLoa, filling 
+        }; 
+        
+        ptStaffArray.push(newStaff); 
+        localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray));
+        
+        const reminderNote = `[PT CONTRACT EXPIRY] Outlet: ${outlet} | Name: ${name} | ID: ${id} | Pos: ${position}`;
+        await addTask(true, endDate, "09:00", reminderNote);
+        
+        // Reset Form
+        document.getElementById('ptId').value = ""; document.getElementById('ptName').value = ""; document.getElementById('ptOutlet').value = ""; document.getElementById('ptPosition').value = ""; document.getElementById('ptEndDate').value = ""; document.getElementById('ptReportDuty').value = "";
+        document.getElementById('ptPrepAgreement').checked = false; document.getElementById('ptLoaDone').checked = false; document.getElementById('ptLoaPost').checked = false; document.getElementById('ptUpdateHrms').checked = false; document.getElementById('ptScanLoa').checked = false; document.getElementById('ptFilling').checked = false;
+        
+        showToast(`PERSONNEL [${id}] ENROLLED & REMINDER SET.`); renderPtStaffTable();
+    }
+    
+    function deletePtStaff(timestamp) { if(confirm("Confirm purge personnel data?")) { ptStaffArray = ptStaffArray.filter(st => st.timestamp !== timestamp); localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray)); renderPtStaffTable(); showToast("DATA PURGED", "error"); } }
 
     // Admin Panel
     function openAdminModal() { document.getElementById('authModal').classList.add('active'); document.getElementById('adminPassword').value=''; }
     function verifyAdmin() { if(document.getElementById('adminPassword').value === "admin123") { document.getElementById('authModal').classList.remove('active'); document.getElementById('adminPanel').style.display = 'block'; buildAdminUI(); } else showToast("Unauthorized access", "error"); }
-    function addNewCustomFormula() { let newId = 'cst_' + Date.now(); currentFormulas[newId] = { label: "Blank Protocol Engine", custom: true, vars: ["Var Alpha", "Var Beta"], expr: "VAL1 + VAL2", unit: "" }; buildAdminUI(); showToast("New Engine initialized."); }
-    function deleteCustomFormula(key) { if(confirm("Confirm protocol purge?")) { delete currentFormulas[key]; buildAdminUI(); showToast("Protocol purged", "error"); } }
+    function addNewCustomFormula() { let newId = 'cst_' + Date.now(); currentFormulas[newId] = { label: "Blank Engine", custom: true, vars: ["Var Alpha", "Var Beta"], expr: "VAL1 + VAL2", unit: "" }; buildAdminUI(); showToast("New Engine initialized."); }
+    function deleteCustomFormula(key) { if(confirm("Confirm purge?")) { delete currentFormulas[key]; buildAdminUI(); showToast("Purged", "error"); } }
     function addVarToAdmin(key) { let grid = document.getElementById(`vars_grid_${key}`); let div = document.createElement('div'); div.className = 'var-input-group'; div.innerHTML = `<label>VAL${grid.querySelectorAll('.var-input-group').length + 1} Label:</label><input type="text" class="adm-var-input-${key}" placeholder="Label name...">`; grid.appendChild(div); }
     function buildAdminUI() {
         const grid = document.getElementById('adminFormulasRender'); grid.innerHTML = "";
@@ -461,12 +537,17 @@
         }
         localStorage.setItem('hrFormulasV7', JSON.stringify(currentFormulas)); showToast("Sync Complete."); populateCustomDropdown(); if(activeTabId === 'customCalcTab') handleCustomSelection(); buildAdminUI();
     }
-    function populateCustomDropdown() {
-        let select = document.getElementById('cstType'); select.innerHTML = ""; let hasCustom = false;
-        for(let key in currentFormulas) { if(currentFormulas[key].custom) { hasCustom = true; select.innerHTML += `<option value="${key}">${currentFormulas[key].label}</option>`; } }
-        if(!hasCustom) { select.innerHTML = `<option value="">-- No Engines Synced --</option>`; document.getElementById('btnCalculateCustom').disabled = true; } else { document.getElementById('btnCalculateCustom').disabled = false; }
-    }
+    function populateCustomDropdown() { let select = document.getElementById('cstType'); select.innerHTML = ""; let hasCustom = false; for(let key in currentFormulas) { if(currentFormulas[key].custom) { hasCustom = true; select.innerHTML += `<option value="${key}">${currentFormulas[key].label}</option>`; } } if(!hasCustom) { select.innerHTML = `<option value="">-- No Engines Synced --</option>`; document.getElementById('btnCalculateCustom').disabled = true; } else { document.getElementById('btnCalculateCustom').disabled = false; } }
     function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); c.innerHTML += `<div class="toast ${type}">[INFO] ${msg}</div>`; setTimeout(() => { if(c.firstChild) c.firstChild.remove(); }, 3000); }
+
+    // Init
+    document.addEventListener("DOMContentLoaded", () => {
+        runBootSequence(); // KICK OFF BOOT SEQUENCE
+        initMatrix(); initGraph();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('diffFrom').value = today; document.getElementById('diffTo').value = today; document.getElementById('addSubFrom').value = today; document.getElementById('taskDate').value = today;
+        populateCustomDropdown(); renderPtStaffTable();
+    });
 </script>
 
 </body>
