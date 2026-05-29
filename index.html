@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR TERMINAL V8.9: CYBERNETIC PROTOCOL</title>
+    <title>HR TERMINAL V9.2: CYBERNETIC PROTOCOL (H&L EDITION)</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- GLOBAL HACKER THEME & ANIMATIONS --- */
@@ -52,7 +52,7 @@
         .boot-line { margin-bottom: 8px; text-shadow: 0 0 5px var(--hacker-green); }
         .boot-cursor { display: inline-block; width: 8px; height: 15px; background: var(--hacker-green); animation: blinker 0.8s infinite; vertical-align: middle; margin-left: 5px;}
 
-        /* --- CLOCK HERO (HUD) MOVED TO RELATIVE --- */
+        /* --- CLOCK HERO (HUD) --- */
         .hero-clock-container {
             position: relative; background: linear-gradient(90deg, rgba(0, 30, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%);
             padding: 12px 20px; border-radius: 2px; border: 1px solid #111; border-left: 4px solid var(--hacker-green);
@@ -76,7 +76,7 @@
             gap: 20px;
             width: 100%;
             max-width: 1500px;
-            margin-top: 20px; /* Reduced since clock is no longer floating */
+            margin-top: 20px; 
             z-index: 2;
         }
 
@@ -102,6 +102,44 @@
         }
         @media (max-width: 1024px) { .sidebar { width: 100%; max-width: 1100px; order: 2; } }
         
+        /* --- BRAND LOGO STYLES (MAGIC FORMULA) --- */
+        .brand-logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed var(--hacker-green-dim);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .brand-logo {
+            max-width: 200px;
+            width: 100%;
+            height: auto;
+            /* 
+               FORMULA AJAIB:
+               1. invert(1) -> Menukarkan background putih menjadi HITAM. Tulisan biru menjadi OREN.
+               2. hue-rotate(90deg) -> Menukarkan dakwat OREN tadi menjadi HIJAU.
+               3. saturate & brightness -> Memastikan hijau tersebut terang benderang (neon).
+               4. mix-blend-mode: screen -> Menyembunyikan keseluruhan background HITAM tadi, jadikan ia lutsinar (transparent)!
+            */
+            filter: invert(1) hue-rotate(90deg) saturate(3) brightness(1.5);
+            mix-blend-mode: screen; 
+            transition: all 0.3s ease;
+        }
+        .brand-logo:hover {
+            filter: invert(1) hue-rotate(90deg) saturate(4) brightness(2) drop-shadow(0 0 10px rgba(0,255,0,0.5));
+            transform: scale(1.02);
+        }
+        .brand-subtext {
+            font-size: 9px;
+            color: var(--hacker-green);
+            letter-spacing: 2px;
+            margin-top: 15px;
+            text-transform: uppercase;
+            animation: blinker 2s infinite;
+        }
+
         .manual-title { border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 10px; margin-bottom: 15px; color: #fff; display: flex; justify-content: space-between; align-items: center;}
         
         .lang-switcher { display: flex; gap: 5px; }
@@ -258,7 +296,13 @@
     <!-- KOLUM KIRI: CLOCK & SYSTEM MANUAL (DYNAMIC) -->
     <div class="cyber-panel sidebar">
         
-        <!-- HUD CLOCK (MOVED HERE) -->
+        <!-- H&L BRAND LOGO (MAGIC GREEN FORMULA) -->
+        <div class="brand-logo-container">
+            <img src="hl.png" alt="H&L Retail Logo" class="brand-logo">
+            <div class="brand-subtext">AUTHORIZED HR PERSONNEL ONLY</div>
+        </div>
+
+        <!-- HUD CLOCK -->
         <div class="hero-clock-container">
             <div class="hud-top-row">
                 <canvas id="cpuGraph"></canvas>
@@ -597,7 +641,7 @@
         </div>
 
         <div id="adminPanel">
-            <div class="admin-header"><h3>CYBER_ENGINE V8.9</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
+            <div class="admin-header"><h3>CYBER_ENGINE V9.2</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
             <div class="formula-grid" id="adminFormulasRender"></div>
             <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-primary" onclick="saveFormulas()">💾 Sync & Reload</button><button class="btn-admin" onclick="document.getElementById('adminPanel').style.display='none'">Close Terminal</button></div>
         </div>
@@ -645,7 +689,7 @@
     const bootLines = [
         "SYS_MEM: 640K OK", "ESTABLISHING SECURE CONNECTION...", "HANDSHAKE ACCEPTED.",
         "LOADING KERNEL MODULES... OK", "BYPASSING SECURITY PROTOCOL... OK",
-        "DECRYPTING PERSONNEL_MATRIX_V8.9... DONE", "WELCOME, NOEL_ETHAN.EXE."
+        "DECRYPTING PERSONNEL_MATRIX_V9.2... DONE", "WELCOME, NOEL_ETHAN.EXE."
     ];
     function runBootSequence() {
         const container = document.getElementById('bootTextContainer');
