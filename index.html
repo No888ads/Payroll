@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR TERMINAL V9.2: CYBERNETIC PROTOCOL (H&L EDITION)</title>
+    <title>HR TERMINAL V9.4: CYBERNETIC PROTOCOL (H&L EDITION)</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- GLOBAL HACKER THEME & ANIMATIONS --- */
@@ -102,7 +102,7 @@
         }
         @media (max-width: 1024px) { .sidebar { width: 100%; max-width: 1100px; order: 2; } }
         
-        /* --- BRAND LOGO STYLES (MAGIC FORMULA) --- */
+        /* --- BRAND LOGO STYLES (MAGIC GREEN FORMULA) --- */
         .brand-logo-container {
             text-align: center;
             margin-bottom: 25px;
@@ -113,29 +113,23 @@
             align-items: center;
         }
         .brand-logo {
-            max-width: 200px;
+            max-width: 190px;
             width: 100%;
             height: auto;
-            /* 
-               FORMULA AJAIB:
-               1. invert(1) -> Menukarkan background putih menjadi HITAM. Tulisan biru menjadi OREN.
-               2. hue-rotate(90deg) -> Menukarkan dakwat OREN tadi menjadi HIJAU.
-               3. saturate & brightness -> Memastikan hijau tersebut terang benderang (neon).
-               4. mix-blend-mode: screen -> Menyembunyikan keseluruhan background HITAM tadi, jadikan ia lutsinar (transparent)!
-            */
-            filter: invert(1) hue-rotate(90deg) saturate(3) brightness(1.5);
+            /* Formula membuang background putih & tukar warna biru ke hijau neon */
+            filter: invert(1) hue-rotate(85deg) saturate(5) brightness(1.5);
             mix-blend-mode: screen; 
             transition: all 0.3s ease;
         }
         .brand-logo:hover {
-            filter: invert(1) hue-rotate(90deg) saturate(4) brightness(2) drop-shadow(0 0 10px rgba(0,255,0,0.5));
-            transform: scale(1.02);
+            filter: invert(1) hue-rotate(85deg) saturate(6) brightness(2) drop-shadow(0 0 15px rgba(0,255,0,0.8));
+            transform: scale(1.03);
         }
         .brand-subtext {
             font-size: 9px;
             color: var(--hacker-green);
             letter-spacing: 2px;
-            margin-top: 15px;
+            margin-top: 10px;
             text-transform: uppercase;
             animation: blinker 2s infinite;
         }
@@ -164,8 +158,9 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--hacker-green-dim); padding-bottom: 10px;}
         .header-top h2::before { content: '$ '; color: #fff; } label::before { content: '> '; color: #fff; }
 
-        /* --- REKAAN TABS (GRID SYSTEM) --- */
-        .tabs-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 25px; border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 20px; font-family: monospace;}
+        /* --- REKAAN TABS (GRID SYSTEM 4x2 + 1) --- */
+        .tabs-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 25px; border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 20px; font-family: monospace;}
+        @media (max-width: 1200px) { .tabs-container { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 768px) { .tabs-container { grid-template-columns: repeat(2, 1fr); } }
 
         .tab-btn { background: #050505; border: 1px solid #333; padding: 12px 10px; font-size: 11px; font-weight: 600; color: #888; cursor: crosshair; border-radius: 2px; transition: all 0.2s ease; white-space: nowrap; text-align: center; letter-spacing: 0.5px;}
@@ -193,8 +188,8 @@
         .cyber-checklist label { display: flex; align-items: center; gap: 6px; margin: 0; text-transform: none; cursor: crosshair; }
         .cyber-checklist input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: crosshair; accent-color: var(--hacker-green); }
 
-        /* --- HEADCOUNT RADAR STYLES --- */
-        .hc-dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        /* --- HEADCOUNT RADAR & REPORT STYLES --- */
+        .hc-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
         .hc-stat-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 15px; text-align: center; }
         .hc-stat-box.danger { border-color: var(--danger); box-shadow: inset 0 0 10px rgba(255,0,0,0.1); }
         .hc-stat-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
@@ -231,8 +226,8 @@
         .result-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; justify-content: center; gap: 8px;}
         .footer-brand { text-align: center; margin-top: 30px; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; font-family: monospace; color: var(--hacker-green); animation: neonFlicker 4s infinite; }
 
-        /* --- TABLE STYLES (FOR PT DB) --- */
-        .db-table-wrapper { overflow-x: auto; margin-top: 10px; border: 1px solid var(--hacker-green-dim); border-radius: 2px; background: #000; max-height: 400px;}
+        /* --- TABLE STYLES --- */
+        .db-table-wrapper { overflow-x: auto; margin-top: 10px; border: 1px solid var(--hacker-green-dim); border-radius: 2px; background: #000; max-height: 500px;}
         .db-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
         .db-table th { background: #001f00; color: #00FF00; padding: 12px; border-bottom: 1px solid var(--hacker-green-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; position: sticky; top: 0; z-index: 10;}
         .db-table td { padding: 10px 12px; border-bottom: 1px solid #222; color: #CCCCCC; vertical-align: middle;}
@@ -269,15 +264,26 @@
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
         .toast { background: #000; border: 1px solid var(--hacker-green); border-left: 4px solid var(--hacker-green); padding: 15px 20px; border-radius: 2px; margin-top: 10px; box-shadow: var(--border-glow); font-weight: 600; font-size: 12px; color: #fff; font-family: monospace;}
         
+        /* --- PRINT STYLES (CLEAN FORMAT FOR BOSS) --- */
         @media print { 
             body { background: #fff !important; color: #000 !important; } 
             body::after, #matrixCanvas, #bootScreen, .hero-clock-container, .tabs-container, .header-top button, .form-group, .btn-primary, .btn-add-day, .btn-print, .footer-brand, #adminPanel, .sidebar { display: none !important; } 
             .cyber-panel { border: none !important; box-shadow: none !important; margin: 0; padding: 0; } 
             .cyber-panel::before, .cyber-panel::after { display: none !important; } 
+            .tab-content:not(.active) { display: none !important; }
+
             .result-wrapper { background: transparent !important; border: 2px solid #000 !important; color: #000 !important; box-shadow: none !important; padding: 50px; position: relative; } 
             .result-wrapper::before { content: 'CLASSIFIED'; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 80px; font-weight: 900; color: rgba(255, 0, 0, 0.3); border: 8px solid rgba(255, 0, 0, 0.3); padding: 10px 20px; z-index: -1; letter-spacing: 10px; font-family: 'Courier New', Courier, monospace; } 
             .result-label { color: #000 !important; font-size: 16px; font-weight: bold; } 
             .result-value { font-size: 40px; color: #000 !important;} 
+
+            #reportTab.active .db-table-wrapper { border: none !important; max-height: none !important; overflow: visible !important; }
+            #reportTab.active .db-table th { background-color: #f0f0f0 !important; color: #000 !important; border: 1px solid #000 !important; }
+            #reportTab.active .db-table td { color: #000 !important; border: 1px solid #000 !important; }
+            #reportTab.active .hc-dashboard { display: flex !important; gap: 10px !important; margin-bottom: 20px !important; }
+            #reportTab.active .hc-stat-box { border: 1px solid #000 !important; color: #000 !important; flex: 1 !important; background: transparent !important; box-shadow: none !important; padding: 10px !important;}
+            #reportTab.active .hc-stat-label, #reportTab.active .hc-stat-value { color: #000 !important; }
+            #reportTab.active { color: #000 !important; }
         }
     </style>
 </head>
@@ -493,6 +499,23 @@
             </div>
         </div>
 
+        <!-- MANUAL: MANPOWER REPORT -->
+        <div id="manual-reportTab" class="doc-item" style="border-left-color: #fde047;">
+            <div class="doc-cmd" style="color: #fde047;">$ manpower_report</div>
+            <div class="doc-desc lang-content lang-ms active-lang">
+                Laporan Eksekutif Manpower.<br>
+                Paparan ringkasan keseluruhan data dari Manpower Radar. Dirumus khas dengan jadual yang kemas untuk dicetak dan dibentangkan kepada pihak pengurusan.
+            </div>
+            <div class="doc-desc lang-content lang-en">
+                Executive Manpower Report.<br>
+                A comprehensive summary view of all data from the Manpower Radar. Specially formatted with clean tables, ideal for printing and management presentations.
+            </div>
+            <div class="doc-desc lang-content lang-zh">
+                人力资源执行报告。<br>
+                汇总来自 Manpower Radar 的所有数据。采用整洁的表格格式，非常适合打印并向管理层汇报。
+            </div>
+        </div>
+
         <!-- PERSISTENT FOOTER -->
         <div class="doc-warn">> Akses Formula Baharu: Buka [ADMIN TERMINAL] (Code: admin123)</div>
     </div>
@@ -514,6 +537,7 @@
             <button class="tab-btn custom-tab" onclick="switchTab('customCalcTab', this)">🧮 Custom Math</button>
             <button class="tab-btn" onclick="switchTab('ptStaffTab', this)" style="color: #d8b4fe;">$ pt_matrix</button>
             <button class="tab-btn" onclick="switchTab('headcountTab', this)" style="color: #93c5fd;">$ manpower_radar</button>
+            <button class="tab-btn" onclick="switchTab('reportTab', this)" style="color: #fde047;">$ manpower_report</button>
         </div>
         
         <div id="otTab" class="tab-content active">
@@ -618,6 +642,35 @@
             </div>
         </div>
 
+        <div id="reportTab" class="tab-content">
+            <div class="header-top" style="border-bottom:none; margin-bottom:0; padding-bottom: 0;">
+                <h3 style="color:#fde047;">EXECUTIVE MANPOWER REPORT</h3>
+                <button class="btn-print" style="width:auto; padding:8px 15px; border-color:#fde047; color:#fde047;" onclick="window.print()">[ 🖨️ PRINT REPORT ]</button>
+            </div>
+            
+            <div class="hc-dashboard" id="reportSummaryCards" style="margin-top: 20px;">
+                <!-- Summary cards generated by JS -->
+            </div>
+
+            <div class="db-table-wrapper" style="max-height: 600px;">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>OUTLET</th>
+                            <th>DEPARTMENT</th>
+                            <th style="text-align:center;">QUOTA</th>
+                            <th style="text-align:center;">ACTIVE</th>
+                            <th style="text-align:center;">VARIANCE</th>
+                            <th style="text-align:center;">STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody">
+                        <!-- Auto-Generated Report Rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div id="dateTab" class="tab-content">
             <div class="form-group"><label>Operation Mode</label><select id="calcMode" onchange="toggleDateMode()"><option value="diff">Difference between dates</option><option value="addsub">Add/Sub days</option></select></div>
             <div id="modeDiff"><div class="form-group"><label>From</label><input type="date" id="diffFrom"></div><div class="form-group"><label>To</label><input type="date" id="diffTo"></div></div>
@@ -641,7 +694,7 @@
         </div>
 
         <div id="adminPanel">
-            <div class="admin-header"><h3>CYBER_ENGINE V9.2</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
+            <div class="admin-header"><h3>CYBER_ENGINE V9.4</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
             <div class="formula-grid" id="adminFormulasRender"></div>
             <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-primary" onclick="saveFormulas()">💾 Sync & Reload</button><button class="btn-admin" onclick="document.getElementById('adminPanel').style.display='none'">Close Terminal</button></div>
         </div>
@@ -689,7 +742,7 @@
     const bootLines = [
         "SYS_MEM: 640K OK", "ESTABLISHING SECURE CONNECTION...", "HANDSHAKE ACCEPTED.",
         "LOADING KERNEL MODULES... OK", "BYPASSING SECURITY PROTOCOL... OK",
-        "DECRYPTING PERSONNEL_MATRIX_V9.2... DONE", "WELCOME, NOEL_ETHAN.EXE."
+        "DECRYPTING PERSONNEL_MATRIX_V9.4... DONE", "WELCOME, NOEL_ETHAN.EXE."
     ];
     function runBootSequence() {
         const container = document.getElementById('bootTextContainer');
@@ -752,6 +805,7 @@
         if (tabId === 'customCalcTab') { populateCustomDropdown(); handleCustomSelection(); } 
         if (tabId === 'ptStaffTab') renderPtStaffTable(); 
         if (tabId === 'headcountTab') renderHeadcount(); 
+        if (tabId === 'reportTab') renderManpowerReport();
     }
     
     function addRow(mode) { const c = document.getElementById(mode + 'Container'); const r = document.createElement('div'); r.className = 'dynamic-row'; r.innerHTML = `<input type="number" class="${mode}-input" placeholder="Value..."><button class="btn-remove-day" onclick="this.parentElement.remove();">×</button>`; c.appendChild(r); }
@@ -936,6 +990,9 @@
         document.getElementById('hcTotalTarget').innerText = globalTarget;
         document.getElementById('hcTotalActive').innerText = globalActive;
         document.getElementById('hcTotalShort').innerText = globalShort;
+        
+        // Auto-update report if tab is currently open
+        if(activeTabId === 'reportTab') renderManpowerReport();
     }
 
     function addHCOutlet() {
@@ -978,6 +1035,102 @@
     function saveHC() {
         localStorage.setItem('hrHeadcountRadarDB', JSON.stringify(hcDB));
         renderHeadcount();
+    }
+
+    // --- MANPOWER EXECUTIVE REPORT ---
+    function renderManpowerReport() {
+        const tbody = document.getElementById('reportTableBody');
+        const summaryCards = document.getElementById('reportSummaryCards');
+        
+        if (!hcDB || hcDB.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#555;">>_ NO MANPOWER DATA TO REPORT</td></tr>`;
+            return;
+        }
+
+        let globalTarget = 0;
+        let globalActive = 0;
+        let globalShort = 0;
+        let htmlRows = '';
+
+        hcDB.forEach(outlet => {
+            if (outlet.roles.length === 0) {
+                htmlRows += `
+                    <tr>
+                        <td style="font-weight:bold; color:#93c5fd; border-right:1px solid #222;">${outlet.name}</td>
+                        <td colspan="5" style="text-align:center; color:#555;">NO DEPARTMENTS CONFIGURED</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let outletTarget = 0;
+            let outletActive = 0;
+
+            outlet.roles.forEach((r, idx) => {
+                let target = parseInt(r.target) || 0;
+                let active = parseInt(r.active) || 0;
+                let variance = active - target; 
+                
+                outletTarget += target;
+                outletActive += active;
+                
+                let varText = variance < 0 ? `${variance}` : `+${variance}`;
+                let varColor = variance < 0 ? 'var(--danger)' : (variance === 0 ? '#fff' : 'var(--hacker-green)');
+                let statusText = variance < 0 ? 'SHORTAGE' : (variance === 0 ? 'OPTIMAL' : 'SURPLUS');
+                let statusColor = variance < 0 ? 'var(--danger)' : (variance === 0 ? '#fff' : 'var(--hacker-green)');
+
+                if (idx === 0) {
+                    htmlRows += `
+                        <tr>
+                            <td rowspan="${outlet.roles.length}" style="font-weight:bold; color:#93c5fd; border-right:1px solid #222; vertical-align:top;">${outlet.name}</td>
+                            <td style="color:#ccc; font-weight:bold;">${r.role}</td>
+                            <td style="text-align:center;">${target}</td>
+                            <td style="text-align:center; color:var(--hacker-green); font-weight:bold;">${active}</td>
+                            <td style="text-align:center; color:${varColor}; font-weight:bold;">${varText}</td>
+                            <td style="text-align:center; color:${statusColor}; font-weight:bold;">${statusText}</td>
+                        </tr>
+                    `;
+                } else {
+                    htmlRows += `
+                        <tr>
+                            <td style="color:#ccc; font-weight:bold;">${r.role}</td>
+                            <td style="text-align:center;">${target}</td>
+                            <td style="text-align:center; color:var(--hacker-green); font-weight:bold;">${active}</td>
+                            <td style="text-align:center; color:${varColor}; font-weight:bold;">${varText}</td>
+                            <td style="text-align:center; color:${statusColor}; font-weight:bold;">${statusText}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            globalTarget += outletTarget;
+            globalActive += outletActive;
+            if (outletTarget > outletActive) {
+                globalShort += (outletTarget - outletActive);
+            }
+        });
+
+        tbody.innerHTML = htmlRows;
+
+        // Update Report Summary Cards
+        summaryCards.innerHTML = `
+            <div class="hc-stat-box" style="border-color:#333;">
+                <div class="hc-stat-label">Total Outlets</div>
+                <div class="hc-stat-value">${hcDB.length}</div>
+            </div>
+            <div class="hc-stat-box" style="border-color:#333;">
+                <div class="hc-stat-label">Total Quota</div>
+                <div class="hc-stat-value">${globalTarget}</div>
+            </div>
+            <div class="hc-stat-box" style="border-color:var(--hacker-green);">
+                <div class="hc-stat-label">Total Active</div>
+                <div class="hc-stat-value" style="color:var(--hacker-green);">${globalActive}</div>
+            </div>
+            <div class="hc-stat-box ${globalShort > 0 ? 'danger' : ''}">
+                <div class="hc-stat-label">Total Shortage</div>
+                <div class="hc-stat-value">${globalShort}</div>
+            </div>
+        `;
     }
 
     // Admin Panel
