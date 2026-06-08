@@ -6,74 +6,1055 @@
     <title>HR TERMINAL V9.4: CYBERNETIC PROTOCOL (H&L EDITION)</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- GLOBAL HACKER THEME --- */
-        :root { --hacker-green: #00FF00; --hacker-bg: #050505; --box-bg: rgba(10, 10, 10, 0.95); --danger: #FF0033; }
-        body.god-mode { --hacker-green: #ff003c; --hacker-bg: #0a0000; }
-        body { font-family: 'Fira Code', monospace; background-color: var(--hacker-bg); color: var(--hacker-green); margin: 0; padding: 20px; min-height: 100vh; }
+        /* --- GLOBAL HACKER THEME & ANIMATIONS --- */
+        :root {
+            --hacker-green: #00FF00;
+            --hacker-green-dim: rgba(0, 255, 0, 0.4);
+            --hacker-bg: #050505;
+            --box-bg: rgba(10, 10, 10, 0.95);
+            --border-glow: 0 0 10px rgba(0, 255, 0, 0.3);
+            --primary: #00FF00;
+            --danger: #FF0033;
+            --text-dark: #CCCCCC;
+        }
+
+        /* --- GOD MODE OVERRIDE (SECRET THEME) --- */
+        body.god-mode {
+            --hacker-green: #ff003c;
+            --hacker-green-dim: rgba(255, 0, 60, 0.4);
+            --hacker-bg: #0a0000;
+            --box-bg: rgba(15, 0, 0, 0.95);
+            --border-glow: 0 0 15px rgba(255, 0, 60, 0.5);
+            --primary: #ff003c;
+        }
+        body.god-mode .brand-logo { filter: invert(1) hue-rotate(0deg) saturate(10) brightness(1.2) drop-shadow(0 0 10px #ff003c); mix-blend-mode: normal; }
+        body.god-mode .cyber-panel::before { background: conic-gradient(#ff003c 10deg, transparent 90deg); animation-duration: 2s; }
+        body.god-mode .tab-btn.active { background: #1a0000; text-shadow: 0 0 8px #ff003c; }
+
+        @keyframes glitch { 0% { text-shadow: 1px 0 0 red, -1px 0 0 blue; } 100% { text-shadow: -1px 0 0 red, 1px 0 0 blue; } }
+        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes neonFlicker { 0%, 19%, 22%, 62%, 64%, 70%, 100% { opacity: 1; text-shadow: 0 0 5px var(--hacker-green), 0 0 15px var(--hacker-green); } 20%, 21%, 63%, 65%, 69% { opacity: 0.4; text-shadow: none; } }
+        @keyframes blinker { 50% { opacity: 0; } }
+        @keyframes trailFade { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(0.1); opacity: 0; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        body {
+            font-family: 'Fira Code', monospace; background-color: var(--hacker-bg); color: var(--hacker-green);
+            margin: 0; padding: 20px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
+            min-height: 100vh; box-sizing: border-box; position: relative; overflow-x: hidden; cursor: crosshair !important;
+            transition: background-color 0.5s ease;
+        }
         
-        #bootScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .cyber-panel { background: var(--box-bg); padding: 30px; border: 1px solid rgba(0, 255, 0, 0.1); }
-        .tab-content { display: none; } .tab-content.active { display: block; }
-        .tab-btn.active { border-color: var(--hacker-green) !important; color: var(--hacker-green) !important; }
-        .ai-terminal-box { background: #000; border: 1px solid #ff003c; padding: 20px; height: 300px; overflow-y: auto; color: #ff003c; }
-        .ai-log { margin-bottom: 10px; }
-        #aiCommandInput { background: transparent; border: none; color: #ff003c; width: 100%; font-family: monospace; }
-        #aiCommandInput:focus { outline: none; }
+        body::after {
+            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px);
+            z-index: -1; pointer-events: none;
+        }
+
+        #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; opacity: 0.8; }
+        .cursor-trail { position: fixed; width: 4px; height: 4px; background: var(--hacker-green); border-radius: 50%; pointer-events: none; z-index: 9999; animation: trailFade 0.5s forwards; }
+
+        h2, h3 { margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; text-shadow: var(--border-glow); cursor: crosshair;}
+        h2:hover { animation: glitch 0.2s linear infinite; }
+
+        /* --- BOOT SCREEN & LOGO GLITCH PROGRESS --- */
+        #bootScreen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 10000;
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start; padding: 40px;
+            box-sizing: border-box; font-size: 14px; transition: opacity 0.5s ease;
+        }
+        .boot-line { margin-bottom: 8px; text-shadow: 0 0 5px var(--hacker-green); }
+        .boot-cursor { display: inline-block; width: 8px; height: 15px; background: var(--hacker-green); animation: blinker 0.8s infinite; vertical-align: middle; margin-left: 5px;}
+
+        #bootLogoContainer {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10001; pointer-events: none; width: 300px;
+        }
+
+        #bootLogo {
+            max-width: 160px;
+            filter: invert(1) hue-rotate(85deg) saturate(5) brightness(1.5) drop-shadow(3px 0px 0px rgba(255,0,0,0.4)) drop-shadow(-3px 0px 0px rgba(0,0,255,0.4));
+            animation: tvGlitch 0.2s infinite linear; opacity: 0.85;
+        }
+
+        #bootLoaderText {
+            margin-top: 25px; color: var(--hacker-green); font-family: 'Fira Code', monospace;
+            font-size: 13px; font-weight: 600; letter-spacing: 2px; text-shadow: 0 0 5px var(--hacker-green); text-align: center; width: 100%;
+        }
+
+        #bootProgressContainer { width: 100%; height: 4px; background: #111; border: 1px solid #333; margin-top: 8px; border-radius: 2px; overflow: hidden; position: relative; }
+        #bootProgressBar { height: 100%; width: 0%; background: var(--hacker-green); box-shadow: 0 0 10px var(--hacker-green); transition: width 0.1s linear; }
+
+        @keyframes tvGlitch {
+            0% { transform: translate(0) skew(0deg); }
+            20% { transform: translate(-3px, 2px) skew(2deg); filter: invert(1) hue-rotate(85deg) saturate(6) brightness(2) drop-shadow(-3px 0 0 red) drop-shadow(3px 0 0 blue); }
+            40% { transform: translate(-2px, -2px) skew(-2deg); }
+            60% { transform: translate(3px, 2px) skew(3deg); opacity: 0.5; }
+            80% { transform: translate(2px, -2px) skew(-1deg); opacity: 1; }
+            100% { transform: translate(0) skew(0deg); }
+        }
+
+        /* --- CLOCK HERO (HUD) --- */
+        .hero-clock-container {
+            position: relative; background: linear-gradient(90deg, rgba(0, 30, 0, 0.85) 0%, rgba(0, 0, 0, 0.9) 100%);
+            padding: 12px 20px; border-radius: 2px; border: 1px solid #111; border-left: 4px solid var(--hacker-green);
+            box-shadow: inset 0 0 15px rgba(0,255,0,0.05); z-index: 100; backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; align-items: flex-end; width: 100%; box-sizing: border-box; margin-bottom: 25px; cursor: crosshair;
+        }
+        .hero-clock-container::before { content: 'SYS.DIAGNOSTICS'; position: absolute; top: -7px; left: 8px; font-size: 9px; background: #000; color: var(--hacker-green); padding: 0 4px; font-weight: bold; letter-spacing: 1px; }
+        .hud-top-row { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 6px;}
+        #cpuGraph { width: 60px; height: 25px; border-bottom: 1px solid var(--hacker-green-dim); opacity: 0.8;}
+        .hero-time { font-size: 2.2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4); letter-spacing: 2px; }
+        .hero-time span.blink-colon { animation: blinker 1s linear infinite; color: var(--hacker-green); }
+        .hero-time span.secs { font-size: 1.1rem; color: var(--hacker-green); margin-left: 4px; text-shadow: 0 0 5px var(--hacker-green); }
+        .hero-date { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 3px; border-top: 1px dashed #333; padding-top: 6px; width: 100%; text-align: right; margin-top: 6px;}
+        .sound-toggle { font-size: 9px; border: 1px solid var(--hacker-green-dim); padding: 2px 5px; cursor: crosshair; background: transparent; color: var(--hacker-green); margin-top: 5px; width: 100%; text-align: center; transition: 0.2s;}
+        .sound-toggle:hover { background: var(--hacker-green); color: #000;}
+
+        /* --- DASHBOARD LAYOUT --- */
+        .dashboard-container { display: flex; flex-direction: row; gap: 20px; width: 100%; max-width: 1500px; margin-top: 20px; z-index: 2; }
+        @media (max-width: 1024px) { .dashboard-container { flex-direction: column; align-items: center; } }
+
+        /* --- CYBER PANEL BASE --- */
+        .cyber-panel {
+            background: var(--box-bg); border-radius: 4px; padding: 30px; box-sizing: border-box; box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            position: relative; overflow: hidden; border: 1px solid rgba(0, 255, 0, 0.1);
+        }
+        .cyber-panel::before { content: ''; position: absolute; height: 150%; width: 150%; background: conic-gradient(var(--hacker-green) 10deg, transparent 90deg); top: -25%; left: -25%; animation: rotate 4s linear infinite; z-index: 0; opacity: 0.5; }
+        .cyber-panel::after { content: ''; position: absolute; background: var(--box-bg); inset: 2px; border-radius: 2px; z-index: 1; }
+        .cyber-panel > * { position: relative; z-index: 2; }
+
+        /* --- SIDEBAR MANUAL --- */
+        .sidebar { width: 350px; flex-shrink: 0; height: fit-content; }
+        @media (max-width: 1024px) { .sidebar { width: 100%; max-width: 1100px; order: 2; } }
+        
+        .brand-logo-container { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--hacker-green-dim); display: flex; flex-direction: column; align-items: center; }
+        .brand-logo { max-width: 190px; width: 100%; height: auto; filter: invert(1) hue-rotate(85deg) saturate(5) brightness(1.5); mix-blend-mode: screen; transition: all 0.3s ease; cursor: pointer;}
+        .brand-logo:hover { filter: invert(1) hue-rotate(85deg) saturate(6) brightness(2) drop-shadow(0 0 15px rgba(0,255,0,0.8)); transform: scale(1.03); }
+        .brand-subtext { font-size: 9px; color: var(--hacker-green); letter-spacing: 2px; margin-top: 10px; text-transform: uppercase; animation: blinker 2s infinite; }
+
+        .manual-title { border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 10px; margin-bottom: 15px; color: #fff; display: flex; justify-content: space-between; align-items: center;}
+        
+        .lang-switcher { display: flex; gap: 5px; }
+        .lang-btn { padding: 4px 8px; font-size: 9px; cursor: crosshair; transition: 0.2s; border: 1px solid #444; background: transparent; color: #888; border-radius: 2px;}
+        .lang-btn.active { background: var(--hacker-green); color: #000; border-color: var(--hacker-green); box-shadow: 0 0 5px var(--hacker-green);}
+        
+        .doc-item { margin-bottom: 15px; border-left: 2px solid var(--hacker-green-dim); padding-left: 10px; animation: slideIn 0.3s ease; display: none; }
+        .doc-item.active { display: block; }
+        .doc-cmd { font-weight: bold; color: #fff; margin-bottom: 6px; font-size: 13px; text-shadow: 0 0 5px rgba(255,255,255,0.2); }
+        .lang-content { display: none; } .lang-content.active-lang { display: block; }
+        .doc-desc { font-size: 11px; color: #aaa; line-height: 1.6; margin-bottom: 10px; text-transform: none; }
+        .doc-desc ul { margin-top: 5px; padding-left: 15px; } .doc-desc li { margin-bottom: 5px; }
+        .doc-warn { color: var(--danger); font-size: 9px; margin-top: 25px; font-weight: bold; border-top: 1px dashed #333; padding-top: 10px;}
+
+        /* --- MAIN TERMINAL BOX --- */
+        .main-terminal { flex-grow: 1; width: 100%; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--hacker-green-dim); padding-bottom: 10px;}
+        .header-top h2::before { content: '$ '; color: #fff; } label::before { content: '> '; color: #fff; }
+
+        /* --- REKAAN TABS --- */
+        .tabs-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 25px; border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 20px; font-family: monospace;}
+        @media (max-width: 1200px) { .tabs-container { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .tabs-container { grid-template-columns: repeat(2, 1fr); } }
+
+        .tab-btn { background: #050505; border: 1px solid #333; padding: 12px 10px; font-size: 11px; font-weight: 600; color: #888; cursor: crosshair; border-radius: 2px; transition: all 0.2s ease; white-space: nowrap; text-align: center; letter-spacing: 0.5px;}
+        .tab-btn:hover { background: #111; color: #fff !important; border-color: var(--hacker-green-dim); box-shadow: 0 0 8px rgba(0,255,0,0.1); }
+        .tab-btn.active { border-color: var(--hacker-green) !important; color: var(--hacker-green) !important; background: rgba(0, 255, 0, 0.05); box-shadow: inset 0 0 10px rgba(0,255,0,0.1), 0 0 5px rgba(0,255,0,0.2); text-shadow: 0 0 5px rgba(0,255,0,0.3); }
+        
+        #hiddenGodTabBtn { display: none; border-color: #ff003c; color: #ff003c; animation: neonFlicker 2s infinite; font-weight: 800; grid-column: span 2; }
+        
+        .tab-content { display: none; } .tab-content.active { display: block; animation: slideIn 0.2s ease; }
+
+        /* --- FORM ELEMENTS --- */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 700; font-size: 10px; margin-bottom: 6px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8;}
+        input, select { width: 100%; padding: 10px 14px; border: 1px solid var(--hacker-green-dim); border-radius: 2px; font-size: 13px; font-family: 'Fira Code', monospace; box-sizing: border-box; background-color: #000; color: var(--hacker-green); cursor: crosshair;}
+        input:focus, select:focus { outline: none; border-color: var(--hacker-green); box-shadow: var(--border-glow); } input::placeholder { color: rgba(0,255,0,0.3); font-size: 11px;}
+        
+        .cv-container { background: #000; border: 1px solid var(--hacker-green-dim); border-radius: 2px; padding: 20px; margin-bottom: 20px; display: none; }
+        .cv-header-title { font-size: 10px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
+        .cv-header-title::before { content: '||| '; color: var(--hacker-green); }
+        .cv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+
+        /* --- CHECKLIST & PROGRESS STYLES --- */
+        .cyber-progress-text { font-size: 10px; font-weight: 700; color: var(--hacker-green); margin-bottom: 4px; display: flex; justify-content: space-between; font-family: monospace; }
+        .cyber-progress-container { width: 100%; height: 6px; background: #111; border: 1px solid #333; border-radius: 2px; margin-bottom: 10px; overflow: hidden; position: relative;}
+        .cyber-progress-bar { height: 100%; background: var(--hacker-green); transition: width 0.4s ease; box-shadow: 0 0 5px var(--hacker-green); }
+        .cyber-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 10px; color: #aaa; }
+        .cyber-checklist label { display: flex; align-items: center; gap: 6px; margin: 0; text-transform: none; cursor: crosshair; }
+        .cyber-checklist input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: crosshair; accent-color: var(--hacker-green); }
+
+        /* --- HEADCOUNT RADAR & REPORT STYLES --- */
+        .hc-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .hc-stat-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 15px; text-align: center; }
+        .hc-stat-box.danger { border-color: var(--danger); box-shadow: inset 0 0 10px rgba(255,0,0,0.1); }
+        .hc-stat-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .hc-stat-value { font-size: 28px; font-weight: bold; margin-top: 5px; color: #fff; }
+        .hc-stat-box.danger .hc-stat-value { color: var(--danger); }
+        .hc-outlets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        @media (max-width: 768px) { .hc-outlets-grid { grid-template-columns: 1fr; } }
+        .hc-card { border: 1px solid #222; background: #050505; border-radius: 2px; padding: 15px; position: relative; }
+        .hc-card-header { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 10px; margin-bottom: 10px; font-weight: bold; color: #93c5fd; text-transform: uppercase; font-size: 12px; align-items: center;}
+        .hc-role-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr 30px; gap: 8px; align-items: center; margin-bottom: 8px; font-size: 11px; }
+        .hc-shortage { font-weight: bold; text-align: center; padding: 4px; border-radius: 2px; font-size: 10px; }
+        .hc-shortage.short { background: rgba(255,0,0,0.15); color: var(--danger); border: 1px solid rgba(255,0,0,0.3); }
+        .hc-shortage.ok { background: rgba(0,255,0,0.1); color: var(--hacker-green); border: 1px solid rgba(0,255,0,0.2); }
+        .hc-card-input { width: 100%; padding: 4px; font-size: 11px; text-align: center; background: #000; color: #fff; border: 1px solid #333; }
+        .hc-card-input:focus { border-color: var(--hacker-green); outline: none; }
+
+        /* --- SECRET AI TERMINAL STYLES (GEMINI INTEGRATION) --- */
+        .ai-terminal-box { background: #000; border: 1px solid #ff003c; border-radius: 2px; padding: 20px; height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #ff003c; box-shadow: inset 0 0 20px rgba(255,0,60,0.1); margin-bottom: 15px; position: relative;}
+        .ai-terminal-box::-webkit-scrollbar { width: 5px; } .ai-terminal-box::-webkit-scrollbar-thumb { background: #ff003c; }
+        .ai-log { margin-bottom: 12px; line-height: 1.6; text-shadow: 0 0 3px rgba(255,0,60,0.5); white-space: pre-wrap; word-wrap: break-word;}
+        .ai-log.system { color: #ccc; opacity: 0.8; font-style: italic; }
+        .ai-log.error { color: #ff003c; font-weight: bold; }
+        .ai-log.gemini-reply { color: #fff; border-left: 2px solid #ff003c; padding-left: 10px; }
+        .ai-input-wrapper { display: flex; align-items: center; gap: 10px; border-top: 1px dashed #ff003c; padding-top: 15px; margin-top: 10px;}
+        .ai-input-wrapper span { color: #fff; font-weight: bold; }
+        #aiCommandInput { flex: 1; background: transparent; border: none; color: #ff003c; font-size: 14px; font-family: monospace; text-shadow: 0 0 5px rgba(255,0,60,0.5); }
+        #aiCommandInput:focus { outline: none; box-shadow: none; border: none; }
+        .ai-glitch-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,0,60,0.1) 2px, rgba(255,0,60,0.1) 4px); pointer-events: none; z-index: 10; opacity: 0.5;}
+
+        /* --- BUTTONS --- */
+        .btn-primary { width: 100%; padding: 14px; background-color: rgba(0,31,0,0.8); color: var(--hacker-green); border: 1px solid var(--hacker-green); border-radius: 2px; font-size: 13px; font-weight: 600; cursor: crosshair; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
+        .btn-primary:hover { background-color: var(--hacker-green); color: #000; box-shadow: var(--border-glow); transform: translateY(-1px); }
+        .btn-admin { padding: 8px 12px; font-size: 11px; font-weight: 600; background-color: transparent; color: #CCCCCC; border: 1px solid #444; border-radius: 2px; cursor: crosshair; text-transform: uppercase;}
+        .btn-admin:hover { background-color: #111; color: #fff; border-color: var(--hacker-green-dim); }
+        .btn-danger { background-color: #111; color: var(--danger); border: 1px solid var(--danger); padding: 6px 10px; border-radius: 2px; cursor: crosshair; font-size: 10px; font-weight: bold;}
+        .btn-add-day { background-color: transparent; color: #CCCCCC; border: 1px dashed #333; width: 100%; padding: 10px; border-radius: 2px; cursor: crosshair; margin-bottom: 10px; font-size: 11px;}
+        .btn-remove-day { width: 40px; background-color: var(--danger); color: white; border: none; font-size: 18px; font-weight: bold; border-radius: 2px; cursor: crosshair; display: flex; align-items: center; justify-content: center; }
+        .btn-print { margin-top: 10px; background: transparent; border: 1px solid #444; color: #888; padding: 6px; width: 100%; font-family: monospace; font-size: 10px; cursor: crosshair; transition: 0.2s;}
+        .btn-print:hover { border-color: #fff; color: #fff; }
+
+        /* --- OTHERS --- */
+        .dynamic-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .result-wrapper { margin-top: 15px; background: #0a0a0a; border-radius: 2px; padding: 20px; text-align: center; color: var(--hacker-green); border: 1px solid var(--hacker-green-dim); box-shadow: inset 0 0 10px rgba(0,0,0,0.5);}
+        .result-wrapper.danger { border-color: var(--danger); color: var(--danger); box-shadow: inset 0 0 10px rgba(255,0,0,0.1); }
+        .result-wrapper.custom { border-color: #CCCCCC; color: #FFFFFF; }
+        .result-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 5px; font-family: monospace;}
+        .result-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .footer-brand { text-align: center; margin-top: 30px; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; font-family: monospace; color: var(--hacker-green); animation: neonFlicker 4s infinite; }
+
+        /* --- TABLE STYLES --- */
+        .db-table-wrapper { overflow-x: auto; margin-top: 10px; border: 1px solid var(--hacker-green-dim); border-radius: 2px; background: #000; max-height: 500px;}
+        .db-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
+        .db-table th { background: #001f00; color: #00FF00; padding: 12px; border-bottom: 1px solid var(--hacker-green-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; position: sticky; top: 0; z-index: 10;}
+        .db-table td { padding: 10px 12px; border-bottom: 1px solid #222; color: #CCCCCC; vertical-align: middle;}
+        .db-table tr:hover td { background: #111; color: #fff; }
+        .db-action-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 4px 8px; border-radius: 2px; font-size: 9px; cursor: crosshair; text-transform: uppercase; }
+        .db-action-btn:hover { background: var(--danger); color: #fff; }
+        .search-bar { background: transparent; border: 1px dashed var(--hacker-green-dim); color: #fff; width: 100%; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 2px; }
+
+        /* --- LAYOUTS --- */
+        .calendar-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start; }
+        @media (max-width: 768px) { .calendar-layout { grid-template-columns: 1fr; } }
+        .task-list-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 20px; min-height: 350px; }
+        .task-item { background: #050505; border-left: 2px solid var(--hacker-green); padding: 12px; margin-bottom: 10px; border-radius: 2px; font-size: 12px; }
+        .calendar-box { background: #000; border: 1px solid #333; border-radius: 2px; padding: 15px; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; font-size:12px;}
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+        .cal-day-header { text-align: center; font-size: 9px; font-weight: bold; color: #777; padding-bottom: 10px; text-transform: uppercase; }
+        .cal-day { border: 1px solid #222; height: 50px; padding: 5px; font-size: 10px; color: #999; cursor: crosshair; display: flex; flex-direction: column; justify-content: space-between;}
+        .cal-day.today { background-color: #001f00; border-color: var(--hacker-green); color: #fff; font-weight: bold; }
+        .input-bar { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; margin-bottom: 15px; padding: 15px; background: #000; border: 1px solid #333; border-radius: 2px; }
+
+        /* ADMIN PANEL & TOASTS */
+        #adminPanel { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--hacker-green-dim); }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
+        .formula-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .formula-card { background: #000; border: 1px solid #222; padding: 15px; border-radius: 2px; position: relative;}
+        .custom-vars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 5px; margin-top: 10px;}
+        .var-input-group label { font-size: 9px; color: #fff; margin-bottom: 4px; display: block; opacity:0.7;}
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-content { background: var(--box-bg); padding: 30px; border-radius: 2px; width: 90%; max-width: 350px; border: 1px solid var(--hacker-green); box-shadow: var(--border-glow); transform: scale(0.9); transition: 0.3s;}
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .toast { background: #000; border: 1px solid var(--hacker-green); border-left: 4px solid var(--hacker-green); padding: 15px 20px; border-radius: 2px; margin-top: 10px; box-shadow: var(--border-glow); font-weight: 600; font-size: 12px; color: #fff; font-family: monospace;}
+        
+        /* --- PRINT STYLES --- */
+        @media print { 
+            body { background: #fff !important; color: #000 !important; } 
+            body::after, #matrixCanvas, #bootScreen, .hero-clock-container, .tabs-container, .header-top button, .form-group, .btn-primary, .btn-add-day, .btn-print, .footer-brand, #adminPanel, .sidebar { display: none !important; } 
+            .cyber-panel { border: none !important; box-shadow: none !important; margin: 0; padding: 0; } 
+            .cyber-panel::before, .cyber-panel::after { display: none !important; } 
+            .tab-content:not(.active) { display: none !important; }
+
+            .result-wrapper { background: transparent !important; border: 2px solid #000 !important; color: #000 !important; box-shadow: none !important; padding: 50px; position: relative; } 
+            .result-wrapper::before { content: 'CLASSIFIED'; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 80px; font-weight: 900; color: rgba(255, 0, 0, 0.3); border: 8px solid rgba(255, 0, 0, 0.3); padding: 10px 20px; z-index: -1; letter-spacing: 10px; font-family: 'Courier New', Courier, monospace; } 
+            .result-label { color: #000 !important; font-size: 16px; font-weight: bold; } 
+            .result-value { font-size: 40px; color: #000 !important;} 
+
+            #reportTab.active .db-table-wrapper { border: none !important; max-height: none !important; overflow: visible !important; }
+            #reportTab.active .db-table th { background-color: #f0f0f0 !important; color: #000 !important; border: 1px solid #000 !important; }
+            #reportTab.active .db-table td { color: #000 !important; border: 1px solid #000 !important; }
+            #reportTab.active .hc-dashboard { display: flex !important; gap: 10px !important; margin-bottom: 20px !important; }
+            #reportTab.active .hc-stat-box { border: 1px solid #000 !important; color: #000 !important; flex: 1 !important; background: transparent !important; box-shadow: none !important; padding: 10px !important;}
+            #reportTab.active .hc-stat-label, #reportTab.active .hc-stat-value { color: #000 !important; }
+            #reportTab.active { color: #000 !important; }
+        }
     </style>
 </head>
 <body>
 
 <div id="bootScreen">
-    <div style="color:var(--hacker-green)">> INITIALIZING SYSTEM...</div>
+    <div id="bootTextContainer"></div>
+    <div class="boot-cursor"></div>
+    <div id="bootLogoContainer">
+        <img src="hl.png" alt="H&L Logo" id="bootLogo">
+        <div id="bootLoaderText">SYSTEM_BOOT: <span id="bootPercent">0</span>%</div>
+        <div id="bootProgressContainer"><div id="bootProgressBar"></div></div>
+    </div>
 </div>
 
+<canvas id="matrixCanvas"></canvas>
+
 <div class="dashboard-container">
+
     <div class="cyber-panel sidebar">
-        <img src="hl.png" id="secretLogoTrigger" style="width:150px; cursor:pointer;">
-        <div class="tabs-container">
-            <button class="tab-btn active" onclick="switchTab('otTab', this)">$ ot_calc</button>
-            <button class="tab-btn" id="hiddenGodTabBtn" onclick="switchTab('godModeTab', this)" style="display:block; color:#ff003c;">[ 👁️ GEMINI CORE ]</button>
+        
+        <div class="brand-logo-container">
+            <img src="hl.png" alt="H&L Retail Logo" class="brand-logo" id="secretLogoTrigger">
+            <div class="brand-subtext">AUTHORIZED HR PERSONNEL ONLY</div>
         </div>
+
+        <div class="hero-clock-container">
+            <div class="hud-top-row">
+                <canvas id="cpuGraph"></canvas>
+                <div class="hero-time" id="liveTime">00<span class="blink-colon">:</span>00<span class="secs">00</span></div>
+            </div>
+            <div class="hero-date" id="liveDate">PROTOCOL DATE</div>
+            <button class="sound-toggle" onclick="toggleSound()" id="soundBtn">[ SOUND: ON ]</button>
+        </div>
+
+        <h3 class="manual-title"><span>[ SYSTEM MANUAL ]</span></h3>
+        <div class="lang-switcher" style="margin-bottom: 15px;">
+            <button class="lang-btn active" id="btn-lang-ms" onclick="setLang('ms')">MS</button>
+            <button class="lang-btn" id="btn-lang-en" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" id="btn-lang-zh" onclick="setLang('zh')">中文</button>
+        </div>
+        
+        <div id="manual-otTab" class="doc-item active">
+            <div class="doc-cmd">$ ot_calc</div>
+            <div class="doc-desc lang-content lang-ms active-lang">Pengiraan bayaran lebih masa (OT) secara automatik.<br><ul><li>Masukkan Gaji Asas.</li><li>Pilih jenis kadar OT.</li><li>Masukkan durasi bekerja.</li></ul></div>
+            <div class="doc-desc lang-content lang-en">Automated Overtime (OT) payment calculation.<br><ul><li>Enter Basic Salary.</li><li>Select OT rate type.</li><li>Enter working duration.</li></ul></div>
+            <div class="doc-desc lang-content lang-zh">自动计算加班费 (OT)。<br><ul><li>输入基本薪资。</li><li>选择加班费率类型。</li><li>输入工作时间。</li></ul></div>
+        </div>
+
+        <div id="manual-absentTab" class="doc-item">
+            <div class="doc-cmd">$ absent_calc</div>
+            <div class="doc-desc lang-content lang-ms active-lang">Enjin tolakan gaji untuk ketidakhadiran staf.<br><ul><li>Masukkan Gaji Asas.</li><li>Pilih jenis tolakan.</li><li>Masukkan jumlah hari tidak hadir.</li></ul></div>
+            <div class="doc-desc lang-content lang-en">Salary deduction engine for staff absenteeism.<br><ul><li>Enter Basic Salary.</li><li>Select deduction type.</li><li>Enter absent days.</li></ul></div>
+            <div class="doc-desc lang-content lang-zh">员工缺勤扣薪计算引擎。<br><ul><li>输入基本薪资。</li><li>选择扣款类型。</li><li>输入缺勤天数。</li></ul></div>
+        </div>
+
+        <div id="manual-resignTab" class="doc-item">
+            <div class="doc-cmd">$ resign_calc</div>
+            <div class="doc-desc lang-content lang-ms active-lang">Pengiraan penyelesaian berhenti kerja.<br>Kira penalti untuk Notis Singkat (Short Notice) dan juga jumlah penebusan baki Cuti Tahunan (AL Encashment).</div>
+            <div class="doc-desc lang-content lang-en">Resignation settlement calculation.<br>Calculate penalties for Short Notice and the total encashment for remaining Annual Leave (AL).</div>
+            <div class="doc-desc lang-content lang-zh">离职结算计算。<br>计算短期通知 (Short Notice) 的罚款以及剩余年假 (AL) 的折现总额。</div>
+        </div>
+
+        <div id="manual-dateTab" class="doc-item">
+            <div class="doc-cmd">$ date_utility</div>
+            <div class="doc-desc lang-content lang-ms active-lang">Alat utiliti pengurusan tarikh.<br><ul><li><b>Mod Diff:</b> Mengira jumlah hari sebenar.</li><li><b>Mod Add/Sub:</b> Meramal tarikh hadapan.</li></ul></div>
+            <div class="doc-desc lang-content lang-en">Date management utility tool.<br><ul><li><b>Diff Mode:</b> Calculates exact days.</li><li><b>Add/Sub Mode:</b> Projects future dates.</li></ul></div>
+            <div class="doc-desc lang-content lang-zh">日期管理实用工具。<br><ul><li><b>Diff 模式:</b> 计算确切天数。</li><li><b>Add/Sub 模式:</b> 预测未来日期。</li></ul></div>
+        </div>
+
+        <div id="manual-reminderTab" class="doc-item">
+            <div class="doc-cmd">$ protocol_logs</div>
+            <div class="doc-desc lang-content lang-ms active-lang">Diari log dan amaran pintar.<br>Set tarikh peringatan penting. Tandakan <b>"Blast to WA Group"</b> untuk mesej kumpulan WhatsApp HR.</div>
+            <div class="doc-desc lang-content lang-en">Smart log and alert diary.<br>Set reminder dates. Check <b>"Blast to WA Group"</b> for HR WhatsApp group alerts.</div>
+            <div class="doc-desc lang-content lang-zh">智能日志和警报日记。<br>设置提醒日期。勾选 <b>"Blast to WA Group"</b> 向 HR WhatsApp 群组发送警报。</div>
+        </div>
+
+        <div id="manual-customCalcTab" class="doc-item">
+            <div class="doc-cmd" style="color: #fff;">🧮 Custom Math</div>
+            <div class="doc-desc lang-content lang-ms active-lang">Enjin formula peribadi anda.<br>Gunakan formula yang anda cipta di [ADMIN TERMINAL].</div>
+            <div class="doc-desc lang-content lang-en">Your personalized formula engine.<br>Use the formulas created in [ADMIN TERMINAL].</div>
+            <div class="doc-desc lang-content lang-zh">您的个性化公式引擎。<br>使用在 [ADMIN TERMINAL] 中创建的公式。</div>
+        </div>
+
+        <div id="manual-ptStaffTab" class="doc-item" style="border-left-color: #d8b4fe;">
+            <div class="doc-cmd" style="color: #d8b4fe;">$ pt_matrix</div>
+            <div class="doc-desc lang-content lang-ms active-lang">Pangkalan Data Staf Part-Time.<br>Pantau bar kemajuan Onboarding & tarikh kontrak.</div>
+            <div class="doc-desc lang-content lang-en">Part-Time Staff Database.<br>Monitor Onboarding progress & contract dates.</div>
+            <div class="doc-desc lang-content lang-zh">兼职员工数据库。<br>监控入职进度和合同日期。</div>
+        </div>
+
+        <div id="manual-headcountTab" class="doc-item" style="border-left-color: #3b82f6;">
+            <div class="doc-cmd" style="color: #93c5fd;">$ manpower_radar</div>
+            <div class="doc-desc lang-content lang-ms active-lang">Pemantauan Kuota Pekerja.<br>Kira keseimbangan pekerja secara langsung. Kotak MERAH bermaksud staf tidak mencukupi.</div>
+            <div class="doc-desc lang-content lang-en">Workforce Quota Monitoring.<br>Computes balance in real-time. A RED box indicates insufficient staff.</div>
+            <div class="doc-desc lang-content lang-zh">员工配额监控。<br>实时计算平衡。红框表示人员不足。</div>
+        </div>
+
+        <div id="manual-reportTab" class="doc-item" style="border-left-color: #fde047;">
+            <div class="doc-cmd" style="color: #fde047;">$ manpower_report</div>
+            <div class="doc-desc lang-content lang-ms active-lang">Laporan Eksekutif Manpower.<br>Paparan ringkasan keseluruhan data dari Manpower Radar untuk dicetak.</div>
+            <div class="doc-desc lang-content lang-en">Executive Manpower Report.<br>A comprehensive summary view of all data from the Manpower Radar.</div>
+            <div class="doc-desc lang-content lang-zh">人力资源执行报告。<br>汇总来自 Manpower Radar 的所有数据。</div>
+        </div>
+
+        <div id="manual-godModeTab" class="doc-item" style="border-left-color: #ff003c;">
+            <div class="doc-cmd" style="color: #ff003c;">$ omniscient_core (GEMINI)</div>
+            <div class="doc-desc lang-content lang-ms active-lang" style="color: #ccc;">
+                <b>GHOST PROTOCOL ACTIVATED.</b><br>
+                Terminal ini diintegrasikan secara terus dengan <b>Google Gemini AI</b>.<br><br>
+                Anda boleh bertanya apa sahaja, suruh dia tulis skrip korporat untuk Kin, minta kod Python, atau tanya tentang motosikal. AI ini hidup.
+            </div>
+        </div>
+
+        <div class="doc-warn">> Akses Formula Baharu: Buka [ADMIN TERMINAL] (Code: admin123)</div>
     </div>
 
     <div class="cyber-panel main-terminal">
+        <div class="header-top">
+            <h2>Cyber HR Terminal</h2>
+            <button class="btn-admin" onclick="openAdminModal()">⚙️ ADMIN TERMINAL</button>
+        </div>
+
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('otTab', this)">$ ot_calc</button>
+            <button class="tab-btn" onclick="switchTab('absentTab', this)">$ absent_calc</button>
+            <button class="tab-btn" onclick="switchTab('resignTab', this)">$ resign_calc</button>
+            <button class="tab-btn" onclick="switchTab('dateTab', this)">$ date_utility</button>
+            <button class="tab-btn" onclick="switchTab('reminderTab', this)">$ protocol_logs</button>
+            <button class="tab-btn custom-tab" onclick="switchTab('customCalcTab', this)">🧮 Custom Math</button>
+            <button class="tab-btn" onclick="switchTab('ptStaffTab', this)" style="color: #d8b4fe;">$ pt_matrix</button>
+            <button class="tab-btn" onclick="switchTab('headcountTab', this)" style="color: #93c5fd;">$ manpower_radar</button>
+            <button class="tab-btn" onclick="switchTab('reportTab', this)" style="color: #fde047;">$ manpower_report</button>
+            
+            <button class="tab-btn" id="hiddenGodTabBtn" onclick="switchTab('godModeTab', this)">[ 👁️ GEMINI CORE ]</button>
+        </div>
+        
         <div id="otTab" class="tab-content active">
-            <h2>HR Terminal</h2>
+            <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="otBasicSalary"></div>
+            <div class="form-group"><label>Rate Type</label><select id="otType" onchange="handleOTTypeChange()"><option value="pos">Positive OT (1.5x)</option><option value="neg">Negative OT (1.0x)</option><option value="hq">HQ OT (1.5x / 30D)</option><option value="ph">Public Holiday (2.0x)</option></select></div>
+            <div class="form-group" id="otContainer"><label id="otDurationLabel">Duration (Minutes)</label><div class="dynamic-row"><input type="number" class="ot-input" placeholder="Minutes (e.g., 120)"></div></div>
+            <button class="btn-add-day" onclick="addRow('ot')">+ Add Day Duration</button>
+            <button class="btn-primary" onclick="calculateOT()">Execute Calculation</button>
+            <div class="result-wrapper"><div class="result-label">Total Overtime Pay</div><div class="result-value">RM <span id="resultDisplayOT">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
+        </div>
+
+        <div id="absentTab" class="tab-content">
+            <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="absentBasicSalary"></div>
+            <div class="form-group"><label>Category</label><select id="absentType"><option value="ab_nor">Normal Absent (1x)</option><option value="ab_ph">Linked to PH (2x Deduction)</option></select></div>
+            <div class="form-group" id="absentContainer"><label>Days Absent</label><div class="dynamic-row"><input type="number" class="absent-input" placeholder="Value (e.g., 1)"></div></div>
+            <button class="btn-add-day" onclick="addRow('absent')">+ Add Input</button>
+            <button class="btn-primary" onclick="calculateAbsent()">Execute Deduction</button>
+            <div class="result-wrapper danger"><div class="result-label">Total Deduction</div><div class="result-value">RM <span id="resultDisplayAbsent">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
+        </div>
+
+        <div id="resignTab" class="tab-content">
+            <div class="form-group"><label>Basic Salary (RM)</label><input type="number" id="resignBasicSalary"></div>
+            <div class="form-group"><label>Category</label><select id="resignType" onchange="handleResignTypeChange()"><option value="sn">Short Notice Penalty</option><option value="al">YTD AL Encashment</option></select></div>
+            <div class="form-group" id="resignContainer"><label id="resignDurationLabel">Short Notice (Days)</label><div class="dynamic-row"><input type="number" class="resign-input" placeholder="Value (e.g., 14)"></div></div>
+            <button class="btn-add-day" onclick="addRow('resign')">+ Add Input</button>
+            <button class="btn-primary" onclick="calculateResign()">Execute Settlement</button>
+            <div class="result-wrapper danger" id="resignResultBox"><div class="result-label" id="resignResultLabel">Total Penalty</div><div class="result-value">RM <span id="resultDisplayResign">0.00</span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
+        </div>
+
+        <div id="customCalcTab" class="tab-content">
+            <div class="form-group"><label>Select Custom Engine</label><select id="cstType" class="custom-select-box" onchange="handleCustomSelection()"><option value="">-- No Engines Synced --</option></select></div>
+            <div id="cvContainer" class="cv-container"><div class="cv-header-title">🎛️ Dynamic Inputs</div><div class="cv-grid" id="cvDynamicGrid"></div></div>
+            <button class="btn-primary" id="btnCalculateCustom" onclick="calculateCustomDynamic()">Execute Protocol</button>
+            <div class="result-wrapper custom"><div class="result-label">Generated Output</div><div class="result-value"><span id="cstUnitFront" class="result-unit-text" style="display:none;"></span><span id="resultDisplayCst">0</span><span id="cstUnitBack" class="result-unit-text" style="display:none;"></span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
+        </div>
+
+        <div id="ptStaffTab" class="tab-content">
+            <div style="background:#000; padding:15px; border:1px solid #333; border-radius:2px; margin-bottom:20px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom: 15px;">
+                    <div class="form-group"><label>Staff ID</label><input type="text" id="ptId" placeholder="e.g. PT-001"></div>
+                    <div class="form-group"><label>Full Name</label><input type="text" id="ptName" placeholder="Staff Name..."></div>
+                    <div class="form-group"><label>Outlet</label><input type="text" id="ptOutlet" placeholder="e.g. Siburan / HQ"></div>
+                    <div class="form-group"><label>Position</label><input type="text" id="ptPosition" placeholder="e.g. Cashier"></div>
+                    <div class="form-group"><label style="color:#d8b4fe;">Contract End Date (Auto-WA)</label><input type="date" id="ptEndDate" style="border-color:#a855f7; color:#d8b4fe;"></div>
+                    <div class="form-group"><label style="color:#3b82f6;">Report Duty Date</label><input type="date" id="ptReportDuty" style="border-color:#3b82f6; color:#93c5fd;"></div>
+                </div>
+
+                <div style="background: #050505; padding: 12px; border: 1px dashed #333; margin-bottom: 15px; border-radius: 2px;">
+                    <label style="color:#888; font-size:10px; margin-bottom:10px; display:block;">>> ONBOARDING CHECKLIST (INITIAL SETUP)</label>
+                    <div style="display:flex; flex-wrap:wrap; gap:15px; font-size: 11px;">
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptPrepAgreement" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Prepare Agreement</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptLoaDone" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> LOA (Done)</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptLoaPost" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> LOA (Post)</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptUpdateHrms" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Update HRMS</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptScanLoa" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> SCAN LOA</label>
+                        <label style="display:flex; align-items:center; gap:5px; text-transform:none; cursor:crosshair;"><input type="checkbox" id="ptFilling" style="width:auto; cursor:crosshair; accent-color:var(--hacker-green);"> Filling</label>
+                    </div>
+                </div>
+
+                <button class="btn-primary" style="background:#2e1065; border-color:#9333ea; color:#d8b4fe;" onclick="addPtStaff()">[ ENROLL PT PERSONNEL ]</button>
+            </div>
+
+            <input type="text" id="ptSearch" class="search-bar" onkeyup="searchPtStaff()" placeholder="> SEARCH DATABASE (NAME / ID / OUTLET)...">
+
+            <div class="db-table-wrapper">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Personnel Info</th>
+                            <th>Dates</th>
+                            <th style="min-width: 180px;">Progress & Checklist</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ptStaffTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="headcountTab" class="tab-content">
+            <div class="hc-dashboard">
+                <div class="hc-stat-box">
+                    <div class="hc-stat-label">Total Quota (Target)</div>
+                    <div class="hc-stat-value" id="hcTotalTarget">0</div>
+                </div>
+                <div class="hc-stat-box">
+                    <div class="hc-stat-label">Total Active Staff</div>
+                    <div class="hc-stat-value" id="hcTotalActive" style="color:var(--hacker-green);">0</div>
+                </div>
+                <div class="hc-stat-box danger">
+                    <div class="hc-stat-label">Global Shortage</div>
+                    <div class="hc-stat-value" id="hcTotalShort">0</div>
+                </div>
+            </div>
+
+            <button class="btn-add-day" style="border-color: #3b82f6; color: #93c5fd;" onclick="addHCOutlet()">+ INITIALIZE NEW OUTLET ZONE</button>
+            <div class="hc-outlets-grid" id="hcOutletsContainer"></div>
+        </div>
+
+        <div id="reportTab" class="tab-content">
+            <div class="header-top" style="border-bottom:none; margin-bottom:0; padding-bottom: 0;">
+                <h3 style="color:#fde047;">EXECUTIVE MANPOWER REPORT</h3>
+                <button class="btn-print" style="width:auto; padding:8px 15px; border-color:#fde047; color:#fde047;" onclick="window.print()">[ 🖨️ PRINT REPORT ]</button>
+            </div>
+            <div class="hc-dashboard" id="reportSummaryCards" style="margin-top: 20px;"></div>
+            <div class="db-table-wrapper" style="max-height: 600px;">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>OUTLET</th>
+                            <th>DEPARTMENT</th>
+                            <th style="text-align:center;">QUOTA</th>
+                            <th style="text-align:center;">ACTIVE</th>
+                            <th style="text-align:center;">VARIANCE</th>
+                            <th style="text-align:center;">STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="dateTab" class="tab-content">
+            <div class="form-group"><label>Operation Mode</label><select id="calcMode" onchange="toggleDateMode()"><option value="diff">Difference between dates</option><option value="addsub">Add/Sub days</option></select></div>
+            <div id="modeDiff"><div class="form-group"><label>From</label><input type="date" id="diffFrom"></div><div class="form-group"><label>To</label><input type="date" id="diffTo"></div></div>
+            <div id="modeAddSub" style="display:none;"><div class="form-group"><label>Ref Date</label><input type="date" id="addSubFrom"></div><div style="display:flex; gap:15px; margin-bottom:15px;"><label><input type="radio" name="addSubType" value="add" checked> Add</label><label><input type="radio" name="addSubType" value="sub"> Sub</label></div><div style="display:flex;gap:10px;"><div style="flex:1"><label>Yrs</label><input type="number" id="valYears" value="0"></div><div style="flex:1"><label>Mths</label><input type="number" id="valMonths" value="0"></div><div style="flex:1"><label>Days</label><input type="number" id="valDays" value="0"></div></div></div>
+            <button class="btn-primary" style="margin-top:15px;" onclick="calculateDate()">Run Date Utility</button>
+            <div class="result-wrapper"><div class="result-label">Protocol Result</div><div class="result-value" id="dateResultMain" style="font-size: 20px;">READY</div><div class="result-label" id="dateResultSub" style="margin-top:5px; color:#555;">awaiting input</div></div>
+        </div>
+
+        <div id="reminderTab" class="tab-content">
+            <div class="input-bar">
+                <div><label>Date</label><input type="date" id="taskDate"></div>
+                <div><label>Time</label><input type="time" id="taskTime" value="08:00"></div>
+                <div><label>Log Note</label><input type="text" id="taskNote"></div>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="taskIsGroup" style="width:16px; height:16px; cursor:crosshair; accent-color:var(--hacker-green);">
+                <label for="taskIsGroup" style="cursor:crosshair; text-transform:none; font-size:11px; margin:0; color:#d8b4fe;">Blast to WhatsApp Group (HR Team)</label>
+            </div>
+            <button class="btn-primary" style="margin-bottom: 25px;" onclick="addTask()">Commit Log</button>
+            <div class="calendar-layout"><div class="task-list-box"><h3>Active Logs</h3><div id="taskListDisplay"></div></div><div class="calendar-box"><div class="cal-header"><button class="cal-nav-btn" onclick="changeMonth(-1)">&lt;</button><span id="calMonthYearDisplay"></span><button class="cal-nav-btn" onclick="changeMonth(1)">&gt;</button></div><div class="cal-grid" id="calGrid"></div></div></div>
         </div>
 
         <div id="godModeTab" class="tab-content">
-            <h3 style="color:#ff003c;">GEMINI NEURAL CORE</h3>
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
+                <h3 style="color:#ff003c; text-shadow: 0 0 10px #ff003c; margin:0;">GEMINI NEURAL CORE</h3>
+                <span style="font-size:10px; color:#ff003c; animation:blinker 1s infinite;">[ CONNECTION SECURED ]</span>
+            </div>
+            
             <div class="ai-terminal-box" id="aiTerminalWindow">
+                <div class="ai-glitch-overlay"></div>
                 <div id="aiTerminalOutput">
-                    <div class="ai-log">> SYSTEM READY. AI CONNECTED.</div>
+                    <div class="ai-log system">> INITIALIZING GEMINI CONNECTION...</div>
+                    <div class="ai-log system">> API KEY EMBEDDED. BYPASSING SECURITY PROTOCOL... OK.</div>
+                    <div class="ai-log success">> HELLO NOEL ETHAN. I AM READY. WHAT DO YOU REQUIRE?</div>
                 </div>
             </div>
-            <input type="text" id="aiCommandInput" placeholder="> Arahan untuk Gemini..." autocomplete="off">
+
+            <div class="ai-input-wrapper">
+                <span>user@ethan:~#</span>
+                <input type="text" id="aiCommandInput" placeholder="Ask Gemini anything..." autocomplete="off">
+            </div>
         </div>
-    </div>
-</div>
+
+        <div id="adminPanel">
+            <div class="admin-header"><h3>CYBER_ENGINE V9.4</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
+            <div class="formula-grid" id="adminFormulasRender"></div>
+            <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-primary" onclick="saveFormulas()">💾 Sync & Reload</button><button class="btn-admin" onclick="document.getElementById('adminPanel').style.display='none'">Close Terminal</button></div>
+        </div>
+
+        <div class="footer-brand">PROTOCOL MAINTAINED BY NoelEthan.exe</div>
+    </div> 
+</div> 
+
+<div class="modal-overlay" id="authModal"><div class="modal-content"><h3>Terminal Access</h3><input type="password" id="adminPassword" placeholder="Code..."><button class="btn-primary" onclick="verifyAdmin()" style="margin-top:15px;">Unlock</button><button class="btn-admin" onclick="document.getElementById('authModal').classList.remove('active')" style="width:100%; margin-top:10px;">Cancel</button></div></div>
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
-    // --- GEMINI INTEGRATION ---
+    // --- LANGUAGE SWITCHER ---
+    let currentLang = 'ms';
+    function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn-lang-' + lang).classList.add('active');
+        document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active-lang'));
+        document.querySelectorAll('.lang-' + lang).forEach(el => el.classList.add('active-lang'));
+        playTone(1800, 'sine', 0.05, 0.1);
+    }
+
+    // --- WEBAUDIO SFX ENGINE ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext(); let isSoundOn = true;
+    function toggleSound() { isSoundOn = !isSoundOn; document.getElementById('soundBtn').innerText = isSoundOn ? '[ SOUND: ON ]' : '[ SOUND: MUTED ]'; }
+    function playTone(freq, type, duration, vol) {
+        if(!isSoundOn) return; if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); gainNode.gain.setValueAtTime(vol, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+    }
+    document.addEventListener('keydown', (e) => { if(e.target.tagName === 'INPUT') playTone(800, 'square', 0.05, 0.05); });
+    document.addEventListener('click', (e) => { 
+        if(e.target.tagName === 'BUTTON' && !e.target.classList.contains('btn-primary')) playTone(1200, 'sine', 0.1, 0.1); 
+        if(e.target.classList.contains('btn-primary')) { playTone(600, 'sawtooth', 0.1, 0.2); setTimeout(()=>playTone(900, 'sawtooth', 0.2, 0.2), 100); }
+    });
+
+    // --- BOOT UP SEQUENCE WITH PROGRESS ---
+    const bootLines = [
+        "SYS_MEM: 640K OK", "ESTABLISHING SECURE CONNECTION...", "HANDSHAKE ACCEPTED.",
+        "LOADING KERNEL MODULES... OK", "BYPASSING SECURITY PROTOCOL... OK",
+        "DECRYPTING PERSONNEL_MATRIX_V9.4... DONE", "WELCOME, NOEL_ETHAN.EXE."
+    ];
+    function runBootSequence() {
+        const container = document.getElementById('bootTextContainer');
+        const bootScreen = document.getElementById('bootScreen');
+        const loaderText = document.getElementById('bootLoaderText'); 
+        const bootPercent = document.getElementById('bootPercent'); 
+        const bootProgressBar = document.getElementById('bootProgressBar');
+        let delay = 0;
+        let progress = 0;
+        let progressInterval = setInterval(() => {
+            progress += Math.floor(Math.random() * 5) + 1;
+            if(progress >= 99) progress = 99;
+            bootPercent.innerText = progress;
+            bootProgressBar.style.width = progress + '%';
+        }, 50);
+
+        bootLines.forEach((line, index) => {
+            setTimeout(() => {
+                const div = document.createElement('div'); div.className = 'boot-line'; div.innerText = '> ' + line;
+                container.appendChild(div); playTone(1500, 'square', 0.05, 0.1);
+            }, delay);
+            delay += Math.random() * 400 + 200;
+        });
+
+        setTimeout(() => {
+            clearInterval(progressInterval);
+            bootPercent.innerText = '100'; bootProgressBar.style.width = '100%';
+            loaderText.style.animation = "blinker 0.15s infinite";
+            setTimeout(() => { bootScreen.style.opacity = '0'; setTimeout(() => bootScreen.style.display = 'none', 500); playTone(400, 'sine', 0.5, 0.3); }, 600);
+        }, delay + 800);
+    }
+
+    // --- CYBER CROSSHAIR & GRAPH ---
+    document.addEventListener('mousemove', (e) => { const trail = document.createElement('div'); trail.className = 'cursor-trail'; trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; document.body.appendChild(trail); setTimeout(() => trail.remove(), 500); });
+    const graphCanvas = document.getElementById('cpuGraph'); const gCtx = graphCanvas.getContext('2d'); let graphData = Array(30).fill(10);
+    function initGraph() { 
+        graphData.push(Math.random() * 20 + 5); graphData.shift(); 
+        gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height); gCtx.beginPath(); 
+        gCtx.strokeStyle = document.body.classList.contains('god-mode') ? '#ff003c' : '#00FF00'; 
+        gCtx.lineWidth = 1; 
+        for(let i=0; i<graphData.length; i++) { let x = i * (graphCanvas.width / graphData.length); let y = graphCanvas.height - graphData[i]; if(i===0) gCtx.moveTo(x, y); else gCtx.lineTo(x, y); } gCtx.stroke(); requestAnimationFrame(initGraph); 
+    }
+
+    // --- MATRIX DIGITAL RAIN ---
+    const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
+    function initMatrix() {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const charsArray = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()".split("");
+        const fontSize = 14; const columns = canvas.width / fontSize; const drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
+        setInterval(() => { 
+            ctx.fillStyle = "rgba(5, 5, 5, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height); 
+            ctx.fillStyle = document.body.classList.contains('god-mode') ? "#ff003c" : "#00FF00"; 
+            ctx.font = fontSize + "px monospace"; 
+            for(let i = 0; i < drops.length; i++) { ctx.fillText(charsArray[Math.floor(Math.random() * charsArray.length)], i * fontSize, drops[i] * fontSize); if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; } 
+        }, 35);
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    }
+
+    // --- LIVE CLOCK ---
+    setInterval(() => { const now = new Date(); document.getElementById('liveTime').innerHTML = `${String(now.getHours()).padStart(2, '0')}<span class="blink-colon">:</span>${String(now.getMinutes()).padStart(2, '0')}<span class="secs">${String(now.getSeconds()).padStart(2, '0')}</span>`; document.getElementById('liveDate').innerText = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase(); }, 1000);
+
+    // --- FORMULAS ENGINE & TAB SWITCHER ---
+    let activeTabId = 'otTab';
+    const defaultFormulas = { pos: { label: "Positive OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.5 * INPUT", custom: false }, neg: { label: "Negative OT", expr: "((BASIC / 26) / 7.5 / 60) * 1.0 * INPUT", custom: false }, hq: { label: "HQ OT", expr: "((BASIC / 30) / 8.5 / 60) * 1.5 * INPUT", custom: false }, ph: { label: "PH (Double)", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, ab_nor: { label: "Absent Normal", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, ab_ph: { label: "Absent PH Linked", expr: "(BASIC / 26) * 2.0 * INPUT", custom: false }, sn: { label: "Short Notice", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }, al: { label: "YTD AL", expr: "(BASIC / 26) * 1.0 * INPUT", custom: false }};
+    let currentFormulas = JSON.parse(localStorage.getItem('hrFormulasV7')) || defaultFormulas;
+
+    function switchTab(tabId, btnElement) { 
+        activeTabId = tabId; 
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnElement.classList.add('active'); 
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); 
+        document.querySelectorAll('.doc-item').forEach(doc => doc.classList.remove('active'));
+        const activeManual = document.getElementById('manual-' + tabId); if(activeManual) activeManual.classList.add('active');
+
+        if (tabId === 'reminderTab') renderCalendar(); 
+        if (tabId === 'customCalcTab') { populateCustomDropdown(); handleCustomSelection(); } 
+        if (tabId === 'ptStaffTab') renderPtStaffTable(); 
+        if (tabId === 'headcountTab') renderHeadcount(); 
+        if (tabId === 'reportTab') renderManpowerReport();
+        if (tabId === 'godModeTab') document.getElementById('aiCommandInput').focus();
+    }
+    
+    function addRow(mode) { const c = document.getElementById(mode + 'Container'); const r = document.createElement('div'); r.className = 'dynamic-row'; r.innerHTML = `<input type="number" class="${mode}-input" placeholder="Value..."><button class="btn-remove-day" onclick="this.parentElement.remove();">×</button>`; c.appendChild(r); }
+    function getSum(className) { let sum = 0; document.querySelectorAll('.' + className).forEach(inp => { let v = parseFloat(inp.value); if(!isNaN(v)) sum+=v; }); return sum; }
+
+    function coreCalculation(basic, formulaKey, inputs) { let f = currentFormulas[formulaKey]; if(!f || !f.expr) return 0; try { let calcFunc = new Function('BASIC', 'INPUT', 'return ' + f.expr); return calcFunc(basic || 0, inputs || 0); } catch(e) { return 0; } }
+    function calculateOT() { let b = parseFloat(document.getElementById('otBasicSalary').value); let t = document.getElementById('otType').value; let inp = getSum('ot-input'); if(isNaN(b) || inp===0) return showToast("Missing parameters", "error"); document.getElementById('resultDisplayOT').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Calculation executed"); }
+    function calculateAbsent() { let b = parseFloat(document.getElementById('absentBasicSalary').value); let t = document.getElementById('absentType').value; let inp = getSum('absent-input'); if(isNaN(b) || inp===0) return showToast("Missing parameters", "error"); document.getElementById('resultDisplayAbsent').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Calculation executed"); }
+    function calculateResign() { let b = parseFloat(document.getElementById('resignBasicSalary').value); let t = document.getElementById('resignType').value; let inp = getSum('resign-input'); if(isNaN(b) || inp===0) return showToast("Missing parameters", "error"); document.getElementById('resultDisplayResign').innerText = coreCalculation(b, t, inp).toFixed(2); showToast("Calculation executed"); }
+
+    function handleCustomSelection() { let t = document.getElementById('cstType').value; let f = currentFormulas[t]; let cvContainer = document.getElementById('cvContainer'); let dynamicGrid = document.getElementById('cvDynamicGrid'); cvContainer.style.display = 'none'; dynamicGrid.innerHTML = ''; document.getElementById('resultDisplayCst').innerText = "0"; document.getElementById('cstUnitFront').style.display = 'none'; document.getElementById('cstUnitBack').style.display = 'none'; if(f && f.custom && f.vars && f.vars.length > 0) { f.vars.forEach((varLabel, idx) => { dynamicGrid.innerHTML += `<div class="cv-group"><label>[VAL${idx+1}] ${varLabel}</label><input type="number" id="cstDynVal${idx+1}" placeholder="Enter Value..."></div>`; }); cvContainer.style.display = 'block'; } }
+    function calculateCustomDynamic() { let t = document.getElementById('cstType').value; let f = currentFormulas[t]; if(!f || !f.custom) return showToast("Select active engine.", "error"); let argNames = []; let argValues = []; if(f.vars && f.vars.length > 0) { f.vars.forEach((_, idx) => { argNames.push('VAL'+(idx+1)); argValues.push(parseFloat(document.getElementById('cstDynVal'+(idx+1)).value) || 0); }); } try { let calcFunc = new Function(...argNames, 'return ' + f.expr); let ans = calcFunc(...argValues); if(!isFinite(ans)) throw new Error("Math Error"); document.getElementById('resultDisplayCst').innerText = (ans % 1 !== 0) ? ans.toFixed(2) : ans.toString(); let uF = document.getElementById('cstUnitFront'); let uB = document.getElementById('cstUnitBack'); uF.style.display = 'none'; uB.style.display = 'none'; if (f.unit && f.unit.trim() !== '') { let u = f.unit.trim(); if(['RM', '$', '£'].includes(u.toUpperCase()) || u==='$') { uF.innerText = u; uF.style.display = 'inline-block'; } else { uB.innerText = u; uB.style.display = 'inline-block'; } } showToast("Protocol executed successfully!"); } catch(e) { document.getElementById('resultDisplayCst').innerText = "ERROR"; showToast("Math Expression failure.", "error"); } }
+
+    function handleResignTypeChange() { let t = document.getElementById('resignType').value; document.getElementById('resignDurationLabel').innerText = t==='sn'?"Short Notice (Days)":"YTD AL (Days)"; document.getElementById('resignResultBox').className = t==='sn'?"result-wrapper danger":"result-wrapper custom"; document.getElementById('resignResultLabel').innerText = t==='sn'?"Total Penalty":"Total AL Encashment"; }
+    function handleOTTypeChange() { document.getElementById('otDurationLabel').innerText = document.getElementById('otType').value === 'ph' ? "Days" : "Minutes"; }
+    function toggleDateMode() { let isDiff = document.getElementById('calcMode').value === 'diff'; document.getElementById('modeDiff').style.display = isDiff ? 'block' : 'none'; document.getElementById('modeAddSub').style.display = !isDiff ? 'block' : 'none'; }
+    function calculateDate() { let isDiff = document.getElementById('calcMode').value === 'diff'; if(isDiff) { let d1 = new Date(document.getElementById('diffFrom').value); let d2 = new Date(document.getElementById('diffTo').value); if(isNaN(d1)||isNaN(d2)) return; document.getElementById('dateResultMain').innerText = Math.ceil(Math.abs(d2 - d1) / (1000 * 3600 * 24)) + " DAYS DIFF"; } else { let base = new Date(document.getElementById('addSubFrom').value); if(isNaN(base)) return; let m = document.querySelector('input[name="addSubType"]:checked').value==='add'?1:-1; base.setFullYear(base.getFullYear() + (parseFloat(document.getElementById('valYears').value)||0)*m); base.setMonth(base.getMonth() + (parseFloat(document.getElementById('valMonths').value)||0)*m); base.setDate(base.getDate() + (parseFloat(document.getElementById('valDays').value)||0)*m); document.getElementById('dateResultMain').innerText = base.toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' }).toUpperCase(); } document.getElementById('dateResultSub').innerText = "CALCULATION COMPLETE"; }
+
+    // --- REMINDERS & PROTOCOL LOGS ---
+    let tasks = JSON.parse(localStorage.getItem('hrReminders')) || []; let calDate = new Date();
+    function renderCalendar() { const y = calDate.getFullYear(); const m = calDate.getMonth(); document.getElementById('calMonthYearDisplay').innerText = new Date(y, m).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase(); const grid = document.getElementById('calGrid'); grid.innerHTML = ['SUN','MON','TUE','WED','THU','FRI','SAT'].map(d => `<div class="cal-day-header">${d}</div>`).join(''); for(let i=0; i<new Date(y, m, 1).getDay(); i++) grid.innerHTML += `<div class="cal-day empty"></div>`; for(let i=1; i<=new Date(y, m + 1, 0).getDate(); i++) { let s = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; let isToday = (i === new Date().getDate() && m === new Date().getMonth() && y === new Date().getFullYear()); grid.innerHTML += `<div class="cal-day ${isToday?'today':''} ${tasks.some(t => t.date === s)?'has-task':''}"><span>${i}</span></div>`; } renderTaskList(); }
+    function changeMonth(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); }
+    
+    function renderTaskList() { 
+        const listDiv = document.getElementById('taskListDisplay'); 
+        if(tasks.length === 0) { listDiv.innerHTML = `<p style="font-size:11px; color:#555;">>_ No protocols logged.</p>`; return; } 
+        listDiv.innerHTML = tasks.slice().sort((a,b) => new Date(a.date) - new Date(b.date)).map(t => `
+            <div class="task-item">
+                <div class="task-item-time">${t.date} @ ${t.time} ${t.isGroup ? '📡 [GROUP]' : ''}</div>
+                <div style="white-space: pre-wrap;">${t.note}</div>
+                <div style="margin-top:8px;"><button class="btn-danger" style="padding:4px;" onclick="removeTask(${t.id})">DEL</button></div>
+            </div>
+        `).join(''); 
+    }
+    
+    function removeTask(id) { tasks = tasks.filter(t => t.id !== id); localStorage.setItem('hrReminders', JSON.stringify(tasks)); renderCalendar(); if(activeTabId==='ptStaffTab') renderPtStaffTable(); }
+    
+    async function addTask(silent = false, specificDate, specificTime, specificNote, forceGroup = false) { 
+        let d = specificDate || document.getElementById('taskDate').value; 
+        let t = specificTime || document.getElementById('taskTime').value || "08:00"; 
+        let n = specificNote || document.getElementById('taskNote').value; 
+        
+        let isGroupChecked = specificDate ? forceGroup : document.getElementById('taskIsGroup').checked;
+
+        if(!d || !t || !n) { if(!silent) showToast("Missing data", "error"); return; } 
+        
+        tasks.push({ id: Date.now(), date: d, time: t, note: n, isGroup: isGroupChecked }); 
+        localStorage.setItem('hrReminders', JSON.stringify(tasks)); 
+        
+        try { 
+            await fetch('https://vigilant-spork-wrr9pxvrxrxvhvv96-3000.app.github.dev/tambah-task', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ date: d, time: t, note: n, sendToGroup: isGroupChecked }) 
+            }); 
+            if(!silent) showToast(isGroupChecked ? "Commited to WA GROUP Server." : "Commited to WA Server."); 
+        } catch (error) { 
+            if(!silent) showToast("Server offline", "error"); 
+        } 
+        if(!silent) { 
+            document.getElementById('taskNote').value = ""; 
+            document.getElementById('taskIsGroup').checked = false;
+            renderCalendar(); 
+        } 
+    }
+
+    // --- PERSONNEL MATRIX (PART-TIME DB) ---
+    let ptStaffArray = JSON.parse(localStorage.getItem('hrPtStaffDB')) || [];
+    function renderPtStaffTable() {
+        const tbody = document.getElementById('ptStaffTableBody');
+        if(ptStaffArray.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#555;">>_ NO PERSONNEL DATA FOUND</td></tr>`; return; }
+        const sortedStaff = [...ptStaffArray].sort((a, b) => {
+            const outletA = (a.outlet || "").toUpperCase(); const outletB = (b.outlet || "").toUpperCase();
+            if (outletA < outletB) return -1; if (outletA > outletB) return 1;
+            const nameA = (a.name || "").toUpperCase(); const nameB = (b.name || "").toUpperCase();
+            if (nameA < nameB) return -1; if (nameA > nameB) return 1; return 0;
+        });
+        tbody.innerHTML = sortedStaff.map(st => {
+            let checkedCount = 0;
+            if(st.prepAgreement) checkedCount++; if(st.loaDone) checkedCount++; if(st.loaPost) checkedCount++;
+            if(st.updateHrms) checkedCount++; if(st.scanLoa) checkedCount++; if(st.filling) checkedCount++;
+            let progressPct = Math.round((checkedCount / 6) * 100);
+            return `
+                <tr>
+                    <td style="font-weight:bold; color:var(--hacker-green);">${st.id}</td>
+                    <td><div style="font-weight:bold; color:#fff; font-size:12px;">${st.name}</div><div style="color:#d8b4fe; font-size:10px; margin-top:4px; text-transform:uppercase;">${st.outlet} • ${st.position}</div></td>
+                    <td><div style="color:var(--danger); font-size:10px;"><b>END:</b> ${st.endDate}</div><div style="color:#3b82f6; font-size:10px; margin-top:4px;"><b>DUTY:</b> ${st.reportDuty || '-'}</div></td>
+                    <td>
+                        <div class="cyber-progress-text"><span>ONBOARDING</span><span style="color: ${progressPct === 100 ? '#fff' : 'var(--hacker-green)'}">${progressPct}%</span></div>
+                        <div class="cyber-progress-container"><div class="cyber-progress-bar" style="width: ${progressPct}%; background: ${progressPct === 100 ? '#fff' : 'var(--hacker-green)'}; box-shadow: ${progressPct === 100 ? '0 0 10px #fff' : '0 0 5px var(--hacker-green)'};"></div></div>
+                        <div class="cyber-checklist">
+                            <label><input type="checkbox" ${st.prepAgreement ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'prepAgreement', this.checked)"> Prep Agreement</label>
+                            <label><input type="checkbox" ${st.loaDone ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'loaDone', this.checked)"> LOA Done</label>
+                            <label><input type="checkbox" ${st.loaPost ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'loaPost', this.checked)"> LOA Post</label>
+                            <label><input type="checkbox" ${st.updateHrms ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'updateHrms', this.checked)"> Update HRMS</label>
+                            <label><input type="checkbox" ${st.scanLoa ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'scanLoa', this.checked)"> SCAN LOA</label>
+                            <label><input type="checkbox" ${st.filling ? 'checked' : ''} onchange="updatePtChecklist(${st.timestamp}, 'filling', this.checked)"> Filling</label>
+                        </div>
+                    </td>
+                    <td><button class="db-action-btn" onclick="deletePtStaff(${st.timestamp})">PURGE</button></td>
+                </tr>
+            `;
+        }).join('');
+    }
+    
+    function updatePtChecklist(timestamp, field, isChecked) { let index = ptStaffArray.findIndex(s => s.timestamp === timestamp); if(index !== -1) { ptStaffArray[index][field] = isChecked; localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray)); renderPtStaffTable(); } }
+    function searchPtStaff() { let filter = document.getElementById('ptSearch').value.toUpperCase(); let trs = document.getElementById('ptStaffTableBody').getElementsByTagName('tr'); for(let i=0; i<trs.length; i++) { let tdId = trs[i].getElementsByTagName('td')[0]; let tdInfo = trs[i].getElementsByTagName('td')[1]; if(tdId || tdInfo) { let txtValue = (tdId.textContent || tdId.innerText) + " " + (tdInfo.textContent || tdInfo.innerText); if(txtValue.toUpperCase().indexOf(filter) > -1) { trs[i].style.display = ""; } else { trs[i].style.display = "none"; } } } }
+    
+    async function addPtStaff() {
+        const id = document.getElementById('ptId').value.trim(); const name = document.getElementById('ptName').value.trim(); const outlet = document.getElementById('ptOutlet').value.trim(); const position = document.getElementById('ptPosition').value.trim(); const endDate = document.getElementById('ptEndDate').value; const reportDuty = document.getElementById('ptReportDuty').value;
+        const prepAgreement = document.getElementById('ptPrepAgreement').checked; const loaDone = document.getElementById('ptLoaDone').checked; const loaPost = document.getElementById('ptLoaPost').checked; const updateHrms = document.getElementById('ptUpdateHrms').checked; const scanLoa = document.getElementById('ptScanLoa').checked; const filling = document.getElementById('ptFilling').checked;
+        if(!id || !name || !outlet || !position || !endDate) { showToast("COMPLETE REQUIRED FIELDS", "error"); return; }
+        const newStaff = { timestamp: Date.now(), id, name, outlet, position, endDate, reportDuty, prepAgreement, loaDone, loaPost, updateHrms, scanLoa, filling }; 
+        ptStaffArray.push(newStaff); localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray));
+        
+        const reminderNote = `🚨 *ALERT PART-TIME KONTRAK TAMAT* 🚨\n\nSila semak *Headcount Matrix* untuk tindakan lanjut & pengesahan operasi.\n\n📍 *Outlet:* ${outlet.toUpperCase()}\n👤 *Nama:* ${name}\n💼 *Posisi:* ${position.toUpperCase()}\n🆔 *Staff ID:* ${id}`; 
+        
+        await addTask(true, endDate, "09:00", reminderNote, true);
+        
+        document.getElementById('ptId').value = ""; document.getElementById('ptName').value = ""; document.getElementById('ptOutlet').value = ""; document.getElementById('ptPosition').value = ""; document.getElementById('ptEndDate').value = ""; document.getElementById('ptReportDuty').value = "";
+        document.getElementById('ptPrepAgreement').checked = false; document.getElementById('ptLoaDone').checked = false; document.getElementById('ptLoaPost').checked = false; document.getElementById('ptUpdateHrms').checked = false; document.getElementById('ptScanLoa').checked = false; document.getElementById('ptFilling').checked = false;
+        showToast(`PERSONNEL [${id}] ENROLLED & GROUP REMINDER SET.`); renderPtStaffTable();
+    }
+    
+    function deletePtStaff(timestamp) { if(confirm("Confirm purge personnel data?")) { ptStaffArray = ptStaffArray.filter(st => st.timestamp !== timestamp); localStorage.setItem('hrPtStaffDB', JSON.stringify(ptStaffArray)); renderPtStaffTable(); showToast("DATA PURGED", "error"); } }
+
+    // --- HEADCOUNT RADAR SYSTEM ---
+    let hcDB = JSON.parse(localStorage.getItem('hrHeadcountRadarDB')) || [
+        { id: 1716900000001, name: "SIBURAN", roles: [ { role: "CASHIER", target: 5, active: 3 }, { role: "SUPERVISOR", target: 1, active: 1 } ] },
+        { id: 1716900000002, name: "HQ", roles: [ { role: "ADMIN", target: 2, active: 2 } ] }
+    ];
+
+    function renderHeadcount() {
+        const container = document.getElementById('hcOutletsContainer');
+        let globalTarget = 0, globalActive = 0, globalShort = 0;
+
+        container.innerHTML = hcDB.map(outlet => {
+            let outletTarget = 0, outletActive = 0;
+            const rolesHtml = outlet.roles.map((r, rIdx) => {
+                outletTarget += parseInt(r.target) || 0; 
+                outletActive += parseInt(r.active) || 0;
+                let short = (parseInt(r.target) || 0) - (parseInt(r.active) || 0);
+                
+                let shortClass = short > 0 ? 'short' : 'ok';
+                let shortText = short > 0 ? `-${short} SHORT` : 'OPTIMAL';
+                if(short < 0) { shortClass = 'ok'; shortText = `+${Math.abs(short)} EXTRA`; }
+
+                return `
+                    <div class="hc-role-row">
+                        <div style="color:#ccc; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${r.role}</div>
+                        <div><input type="number" min="0" class="hc-card-input" value="${r.target}" onchange="updateHCRole(${outlet.id}, ${rIdx}, 'target', this.value)"></div>
+                        <div><input type="number" min="0" class="hc-card-input" value="${r.active}" onchange="updateHCRole(${outlet.id}, ${rIdx}, 'active', this.value)"></div>
+                        <div class="hc-shortage ${shortClass}">${shortText}</div>
+                        <button class="db-action-btn" style="padding:2px; font-size:10px;" onclick="deleteHCRole(${outlet.id}, ${rIdx})">X</button>
+                    </div>
+                `;
+            }).join('');
+
+            globalTarget += outletTarget; 
+            globalActive += outletActive; 
+            let outShortage = outletTarget - outletActive;
+            if(outShortage > 0) globalShort += outShortage;
+
+            return `
+                <div class="hc-card">
+                    <div class="hc-card-header">
+                        <span>${outlet.name}</span>
+                        <div>
+                            <button class="btn-admin" style="font-size:9px; padding:3px 6px; border-color:#3b82f6; color:#93c5fd;" onclick="addHCRole(${outlet.id})">+ ROLE</button>
+                            <button class="btn-danger" style="font-size:9px; padding:3px 6px;" onclick="deleteHCOutlet(${outlet.id})">DEL</button>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr 30px; gap: 8px; margin-bottom: 8px; font-size: 9px; color:#555; text-transform:uppercase; font-weight:bold; border-bottom:1px solid #222; padding-bottom:5px;">
+                        <div>Department</div><div style="text-align:center;">Quota</div><div style="text-align:center;">Active</div><div style="text-align:center;">Status</div><div></div>
+                    </div>
+                    ${rolesHtml}
+                    ${outlet.roles.length === 0 ? '<div style="font-size:10px; color:#555; margin-top:10px; text-align:center;">>_ No roles assigned.</div>' : ''}
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('hcTotalTarget').innerText = globalTarget;
+        document.getElementById('hcTotalActive').innerText = globalActive;
+        document.getElementById('hcTotalShort').innerText = globalShort;
+        
+        if(activeTabId === 'reportTab') renderManpowerReport();
+    }
+
+    function addHCOutlet() { let name = prompt("Masukkaan nama Outlet baru (Cth: BINTULU):"); if(name && name.trim() !== "") { hcDB.push({ id: Date.now(), name: name.toUpperCase(), roles: [] }); saveHC(); showToast(`Outlet [${name.toUpperCase()}] Added.`); } }
+    function deleteHCOutlet(id) { if(confirm("Adakah anda pasti untuk memadam outlet ini sepenuhnya?")) { hcDB = hcDB.filter(o => o.id !== id); saveHC(); showToast("Outlet Purged.", "error"); } }
+    function addHCRole(outletId) { let role = prompt("Masukkan Department/Peranan baru (Cth: PROMOTER):"); if(role && role.trim() !== "") { let outlet = hcDB.find(o => o.id === outletId); if(outlet) { outlet.roles.push({ role: role.toUpperCase(), target: 0, active: 0 }); saveHC(); } } }
+    function updateHCRole(outletId, roleIndex, field, value) { let outlet = hcDB.find(o => o.id === outletId); if(outlet && outlet.roles[roleIndex]) { outlet.roles[roleIndex][field] = parseInt(value) || 0; saveHC(); } }
+    function deleteHCRole(outletId, roleIndex) { if(confirm("Padam department ini?")) { let outlet = hcDB.find(o => o.id === outletId); if(outlet) { outlet.roles.splice(roleIndex, 1); saveHC(); } } }
+    function saveHC() { localStorage.setItem('hrHeadcountRadarDB', JSON.stringify(hcDB)); renderHeadcount(); }
+
+    // --- MANPOWER EXECUTIVE REPORT ---
+    function renderManpowerReport() {
+        const tbody = document.getElementById('reportTableBody');
+        const summaryCards = document.getElementById('reportSummaryCards');
+        
+        if (!hcDB || hcDB.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#555;">>_ NO MANPOWER DATA TO REPORT</td></tr>`;
+            return;
+        }
+
+        let globalTarget = 0; let globalActive = 0; let globalShort = 0; let htmlRows = '';
+
+        hcDB.forEach(outlet => {
+            if (outlet.roles.length === 0) { htmlRows += `<tr><td style="font-weight:bold; color:#93c5fd; border-right:1px solid #222;">${outlet.name}</td><td colspan="5" style="text-align:center; color:#555;">NO DEPARTMENTS CONFIGURED</td></tr>`; return; }
+            let outletTarget = 0; let outletActive = 0;
+
+            outlet.roles.forEach((r, idx) => {
+                let target = parseInt(r.target) || 0; let active = parseInt(r.active) || 0; let variance = active - target; 
+                outletTarget += target; outletActive += active;
+                
+                let varText = variance < 0 ? `${variance}` : `+${variance}`;
+                let varColor = variance < 0 ? 'var(--danger)' : (variance === 0 ? '#fff' : 'var(--hacker-green)');
+                let statusText = variance < 0 ? 'SHORTAGE' : (variance === 0 ? 'OPTIMAL' : 'SURPLUS');
+                let statusColor = variance < 0 ? 'var(--danger)' : (variance === 0 ? '#fff' : 'var(--hacker-green)');
+
+                if (idx === 0) { htmlRows += `<tr><td rowspan="${outlet.roles.length}" style="font-weight:bold; color:#93c5fd; border-right:1px solid #222; vertical-align:top;">${outlet.name}</td><td style="color:#ccc; font-weight:bold;">${r.role}</td><td style="text-align:center;">${target}</td><td style="text-align:center; color:var(--hacker-green); font-weight:bold;">${active}</td><td style="text-align:center; color:${varColor}; font-weight:bold;">${varText}</td><td style="text-align:center; color:${statusColor}; font-weight:bold;">${statusText}</td></tr>`; } 
+                else { htmlRows += `<tr><td style="color:#ccc; font-weight:bold;">${r.role}</td><td style="text-align:center;">${target}</td><td style="text-align:center; color:var(--hacker-green); font-weight:bold;">${active}</td><td style="text-align:center; color:${varColor}; font-weight:bold;">${varText}</td><td style="text-align:center; color:${statusColor}; font-weight:bold;">${statusText}</td></tr>`; }
+            });
+            globalTarget += outletTarget; globalActive += outletActive;
+            if (outletTarget > outletActive) { globalShort += (outletTarget - outletActive); }
+        });
+
+        tbody.innerHTML = htmlRows;
+        summaryCards.innerHTML = `<div class="hc-stat-box" style="border-color:#333;"><div class="hc-stat-label">Total Outlets</div><div class="hc-stat-value">${hcDB.length}</div></div><div class="hc-stat-box" style="border-color:#333;"><div class="hc-stat-label">Total Quota</div><div class="hc-stat-value">${globalTarget}</div></div><div class="hc-stat-box" style="border-color:var(--hacker-green);"><div class="hc-stat-label">Total Active</div><div class="hc-stat-value" style="color:var(--hacker-green);">${globalActive}</div></div><div class="hc-stat-box ${globalShort > 0 ? 'danger' : ''}"><div class="hc-stat-label">Total Shortage</div><div class="hc-stat-value">${globalShort}</div></div>`;
+    }
+
+    // --- ADMIN PANEL ---
+    function openAdminModal() { document.getElementById('authModal').classList.add('active'); document.getElementById('adminPassword').value=''; }
+    function verifyAdmin() { if(document.getElementById('adminPassword').value === "admin123") { document.getElementById('authModal').classList.remove('active'); document.getElementById('adminPanel').style.display = 'block'; buildAdminUI(); } else showToast("Unauthorized access", "error"); }
+    function addNewCustomFormula() { let newId = 'cst_' + Date.now(); currentFormulas[newId] = { label: "Blank Engine", custom: true, vars: ["Var Alpha", "Var Beta"], expr: "VAL1 + VAL2", unit: "" }; buildAdminUI(); showToast("New Engine initialized."); }
+    function deleteCustomFormula(key) { if(confirm("Confirm purge?")) { delete currentFormulas[key]; buildAdminUI(); showToast("Purged", "error"); } }
+    function addVarToAdmin(key) { let grid = document.getElementById(`vars_grid_${key}`); let div = document.createElement('div'); div.className = 'var-input-group'; div.innerHTML = `<label>VAL${grid.querySelectorAll('.var-input-group').length + 1} Label:</label><input type="text" class="adm-var-input-${key}" placeholder="Label name...">`; grid.appendChild(div); }
+    function buildAdminUI() {
+        const grid = document.getElementById('adminFormulasRender'); grid.innerHTML = "";
+        for(let key in currentFormulas) {
+            let f = currentFormulas[key];
+            grid.innerHTML += `<div class="formula-card ${f.custom ? 'custom-card' : ''}"><div class="fc-header"><div>${f.custom ? `<input type="text" class="editable-title" id="adm_${key}_label" value="${f.label}">` : `<strong>${f.label}</strong>`}</div><div>${f.custom ? `<button class="btn-danger" onclick="deleteCustomFormula('${key}')">Purge Engine</button>` : `<span style="font-size:9px; color:#555;">CORE_SYS</span>`}</div></div>${f.custom ? `<div class="custom-vars-grid" id="vars_grid_${key}">${f.vars ? f.vars.map((v, i) => `<div class="var-input-group"><label>VAL${i+1} Label:</label><input type="text" class="adm-var-input-${key}" value="${v}"></div>`).join('') : ''}</div><button type="button" class="btn-add-var" onclick="addVarToAdmin('${key}')">➕ Insert VAL Input</button><div class="var-input-group" style="margin-top:10px;"><label>Output Unit:</label><input type="text" id="adm_${key}_unit" value="${f.unit || ''}"></div>` : ''}<label style="font-size:10px; margin-top:15px; display:block;">Math Expression:</label><input type="text" class="formula-input-box" id="adm_${key}_expr" value="${f.expr}"></div>`;
+        }
+    }
+    function saveFormulas() {
+        for(let key in currentFormulas) {
+            if(currentFormulas[key].custom) { currentFormulas[key].label = document.getElementById(`adm_${key}_label`).value; let vArr = []; document.querySelectorAll(`.adm-var-input-${key}`).forEach(inp => { if(inp.value.trim()!=='') vArr.push(inp.value.trim()); }); currentFormulas[key].vars = vArr; currentFormulas[key].unit = document.getElementById(`adm_${key}_unit`).value; }
+            currentFormulas[key].expr = document.getElementById(`adm_${key}_expr`).value;
+        }
+        localStorage.setItem('hrFormulasV7', JSON.stringify(currentFormulas)); showToast("Sync Complete."); populateCustomDropdown(); if(activeTabId === 'customCalcTab') handleCustomSelection(); buildAdminUI();
+    }
+    function populateCustomDropdown() { let select = document.getElementById('cstType'); select.innerHTML = ""; let hasCustom = false; for(let key in currentFormulas) { if(currentFormulas[key].custom) { hasCustom = true; select.innerHTML += `<option value="${key}">${currentFormulas[key].label}</option>`; } } if(!hasCustom) { select.innerHTML = `<option value="">-- No Engines Synced --</option>`; document.getElementById('btnCalculateCustom').disabled = true; } else { document.getElementById('btnCalculateCustom').disabled = false; } }
+
+    function showToast(msg, type="success") { 
+        const c = document.getElementById('toastContainer'); 
+        let borderColor = type === 'error' ? '#ff003c' : 'var(--hacker-green)';
+        c.innerHTML += `<div class="toast" style="border-color:${borderColor}; border-left:4px solid ${borderColor};">[INFO] ${msg}</div>`; 
+        setTimeout(() => { if(c.firstChild) c.firstChild.remove(); }, 3000); 
+    }
+
+    // ====================================================================================
+    // 💀 SECRET GEMINI NEURAL CORE (GOD MODE) 💀
+    // ====================================================================================
+    let clickCount = 0; let clickTimer;
+    
+    // Unlock Protocol
+    document.getElementById('secretLogoTrigger').addEventListener('click', () => {
+        clickCount++; clearTimeout(clickTimer); clickTimer = setTimeout(() => { clickCount = 0; }, 1000);
+        if (clickCount === 3) {
+            clickCount = 0;
+            let code = prompt("🚨 UNAUTHORIZED ACCESS DETECTED. ENTER NEURAL OVERRIDE KEY:");
+            if (code === "ETHAN.EXE") { activateGodMode(); } 
+            else if (code !== null) { showToast("ACCESS DENIED. SECURITY PROTOCOL LOGGED.", "error"); playTone(200, 'sawtooth', 0.5, 0.5); }
+        }
+    });
+
+    function activateGodMode() {
+        document.body.classList.add('god-mode');
+        document.getElementById('hiddenGodTabBtn').style.display = 'block';
+        showToast("GHOST PROTOCOL ACTIVATED. MAINFRAME OVERRIDDEN.", "error");
+        playTone(400, 'square', 0.2, 0.5); setTimeout(()=>playTone(300, 'square', 0.4, 0.5), 200);
+    }
+
+    // Gemini API Setup
     const aiInput = document.getElementById('aiCommandInput');
     const aiOutput = document.getElementById('aiTerminalOutput');
-    
-    // API KEY BOS DITANAM DI SINI SECARA KEKAL
-    const API_KEY = "AQ.Ab8RN6L07Wevx-y5kCiA1I0LtK4CGp962_E3fzdDvhg_ZaFYYA";
+    const terminalWindow = document.getElementById('aiTerminalWindow');
 
+    function addAiLog(text, className = '') {
+        const div = document.createElement('div'); div.className = `ai-log ${className}`; aiOutput.appendChild(div);
+        
+        if(className === 'system' || className === 'error') {
+            div.innerHTML = text;
+            terminalWindow.scrollTop = terminalWindow.scrollHeight;
+        } else {
+            let i = 0; div.innerHTML = '';
+            function typeWriter() {
+                if (i < text.length) {
+                    div.innerHTML += text.charAt(i); i++;
+                    terminalWindow.scrollTop = terminalWindow.scrollHeight;
+                    setTimeout(typeWriter, 10);
+                }
+            }
+            typeWriter();
+        }
+    }
+
+    // Proses sembang ke Gemini API
     async function sendToGemini(text) {
-        aiOutput.innerHTML += `<div class="ai-log">> Processing...</div>`;
+        // API KEY TELAH DI-HARDCODE DENGAN SELAMAT DI SINI
+        const apiKey = "AQ.Ab8RN6L07Wevx-y5kCiA1I0LtK4CGp962_E3fzdDvhg_ZaFYYA";
+        
+        addAiLog("> TRANSMITTING SIGNAL TO GEMINI NEURAL NET...", 'system');
+        
         try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: text }] }] })
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: text }] }]
+                })
             });
+
             const data = await response.json();
+            
+            if(data.error) {
+                addAiLog("> API CONNECTION ERROR: " + data.error.message, 'error');
+                return;
+            }
+
             const reply = data.candidates[0].content.parts[0].text;
-            aiOutput.innerHTML += `<div class="ai-log" style="color:#fff;">${reply}</div>`;
+            addAiLog(reply, 'gemini-reply');
+
         } catch(e) {
-            aiOutput.innerHTML += `<div class="ai-log" style="color:red;">Error: ${e.message}</div>`;
+            addAiLog("> FATAL ERROR: " + e.message, 'error');
         }
     }
 
@@ -81,18 +1062,33 @@
         if (e.key === 'Enter') {
             let cmd = this.value.trim();
             if(cmd === '') return;
+            
             this.value = '';
-            aiOutput.innerHTML += `<div class="ai-log">> ${cmd}</div>`;
-            sendToGemini(cmd);
+            
+            const userDiv = document.createElement('div'); 
+            userDiv.className = 'ai-log'; 
+            userDiv.innerHTML = `<span style="color:#fff;">user@ethan:~#</span> ${cmd}`; 
+            aiOutput.appendChild(userDiv);
+            
+            playTone(1500, 'square', 0.05, 0.1);
+
+            if(cmd.toLowerCase() === 'clear') {
+                aiOutput.innerHTML = ''; 
+                addAiLog("> TERMINAL CLEARED.", 'system');
+            } else {
+                sendToGemini(cmd);
+            }
         }
     });
 
-    // --- SETUP ASAL ---
-    function switchTab(tabId, btn) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active');
-    }
-    document.getElementById('secretLogoTrigger').addEventListener('click', () => { document.body.classList.add('god-mode'); });
+    // --- INIT ---
+    document.addEventListener("DOMContentLoaded", () => {
+        runBootSequence(); initMatrix(); initGraph();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('diffFrom').value = today; document.getElementById('diffTo').value = today; document.getElementById('addSubFrom').value = today; document.getElementById('taskDate').value = today;
+        populateCustomDropdown(); renderPtStaffTable(); renderHeadcount(); setLang('ms');
+    });
 </script>
+
 </body>
 </html>
