@@ -576,7 +576,7 @@
         <div id="godModeTab" class="tab-content">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
                 <h3 style="color:#ff003c; text-shadow: 0 0 10px #ff003c; margin:0;">GEMINI NEURAL CORE</h3>
-                <input type="password" id="geminiApiKey" placeholder="AQ.Ab8RN6L07Wevx-y5kCiA1I0LtK4CGp962_E3fzdDvhg_ZaFYYA" style="width:200px; padding:5px; border-color:#ff003c; color:#ff003c; font-size:10px;">
+                <input type="password" id="geminiApiKey" placeholder="Enter Gemini API Key..." style="width:200px; padding:5px; border-color:#ff003c; color:#ff003c; font-size:10px;">
             </div>
             
             <div class="ai-terminal-box" id="aiTerminalWindow">
@@ -1040,7 +1040,7 @@
 
     // Process chat to Gemini API
     async function sendToGemini(text) {
-        const apiKey = apiKeyInput.value.trim();
+        const apiKey = AQ.Ab8RN6L07Wevx-y5kCiA1I0LtK4CGp962_E3fzdDvhg_ZaFYYA;
         if(!apiKey) {
             addAiLog("> ERROR: OMNISCIENT CORE (API KEY) MISSING. PLEASE INSERT KEY.", 'error');
             return;
