@@ -18,6 +18,19 @@
             --text-dark: #CCCCCC;
         }
 
+        /* --- GOD MODE OVERRIDE (SECRET THEME) --- */
+        body.god-mode {
+            --hacker-green: #ff003c;
+            --hacker-green-dim: rgba(255, 0, 60, 0.4);
+            --hacker-bg: #0a0000;
+            --box-bg: rgba(15, 0, 0, 0.95);
+            --border-glow: 0 0 15px rgba(255, 0, 60, 0.5);
+            --primary: #ff003c;
+        }
+        body.god-mode .brand-logo { filter: invert(1) hue-rotate(0deg) saturate(10) brightness(1.2) drop-shadow(0 0 10px #ff003c); mix-blend-mode: normal; }
+        body.god-mode .cyber-panel::before { background: conic-gradient(#ff003c 10deg, transparent 90deg); animation-duration: 2s; }
+        body.god-mode .tab-btn.active { background: #1a0000; text-shadow: 0 0 8px #ff003c; }
+
         @keyframes glitch { 0% { text-shadow: 1px 0 0 red, -1px 0 0 blue; } 100% { text-shadow: -1px 0 0 red, 1px 0 0 blue; } }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes neonFlicker { 0%, 19%, 22%, 62%, 64%, 70%, 100% { opacity: 1; text-shadow: 0 0 5px var(--hacker-green), 0 0 15px var(--hacker-green); } 20%, 21%, 63%, 65%, 69% { opacity: 0.4; text-shadow: none; } }
@@ -29,6 +42,7 @@
             font-family: 'Fira Code', monospace; background-color: var(--hacker-bg); color: var(--hacker-green);
             margin: 0; padding: 20px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
             min-height: 100vh; box-sizing: border-box; position: relative; overflow-x: hidden; cursor: crosshair !important;
+            transition: background-color 0.5s ease;
         }
         
         body::after {
@@ -43,7 +57,7 @@
         h2, h3 { margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; text-shadow: var(--border-glow); cursor: crosshair;}
         h2:hover { animation: glitch 0.2s linear infinite; }
 
-        /* --- BOOT SCREEN (PATCHED) --- */
+        /* --- BOOT SCREEN & LOGO GLITCH PROGRESS --- */
         #bootScreen {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 10000;
             display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start; padding: 40px;
@@ -51,6 +65,35 @@
         }
         .boot-line { margin-bottom: 8px; text-shadow: 0 0 5px var(--hacker-green); }
         .boot-cursor { display: inline-block; width: 8px; height: 15px; background: var(--hacker-green); animation: blinker 0.8s infinite; vertical-align: middle; margin-left: 5px;}
+
+        #bootLogoContainer {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10001; pointer-events: none; width: 300px;
+        }
+
+        #bootLogo {
+            max-width: 160px;
+            filter: invert(1) hue-rotate(85deg) saturate(5) brightness(1.5) drop-shadow(3px 0px 0px rgba(255,0,0,0.4)) drop-shadow(-3px 0px 0px rgba(0,0,255,0.4));
+            animation: tvGlitch 0.2s infinite linear; opacity: 0.85;
+        }
+
+        #bootLoaderText {
+            margin-top: 25px; color: var(--hacker-green); font-family: 'Fira Code', monospace;
+            font-size: 13px; font-weight: 600; letter-spacing: 2px; text-shadow: 0 0 5px var(--hacker-green); text-align: center; width: 100%;
+        }
+
+        #bootProgressContainer { width: 100%; height: 4px; background: #111; border: 1px solid #333; margin-top: 8px; border-radius: 2px; overflow: hidden; position: relative; }
+        #bootProgressBar { height: 100%; width: 0%; background: var(--hacker-green); box-shadow: 0 0 10px var(--hacker-green); transition: width 0.1s linear; }
+
+        @keyframes tvGlitch {
+            0% { transform: translate(0) skew(0deg); }
+            20% { transform: translate(-3px, 2px) skew(2deg); filter: invert(1) hue-rotate(85deg) saturate(6) brightness(2) drop-shadow(-3px 0 0 red) drop-shadow(3px 0 0 blue); }
+            40% { transform: translate(-2px, -2px) skew(-2deg); }
+            60% { transform: translate(3px, 2px) skew(3deg); opacity: 0.5; }
+            80% { transform: translate(2px, -2px) skew(-1deg); opacity: 1; }
+            100% { transform: translate(0) skew(0deg); }
+        }
 
         /* --- CLOCK HERO (HUD) --- */
         .hero-clock-container {
@@ -69,70 +112,27 @@
         .sound-toggle { font-size: 9px; border: 1px solid var(--hacker-green-dim); padding: 2px 5px; cursor: crosshair; background: transparent; color: var(--hacker-green); margin-top: 5px; width: 100%; text-align: center; transition: 0.2s;}
         .sound-toggle:hover { background: var(--hacker-green); color: #000;}
 
-        /* --- DASHBOARD LAYOUT (2 COLUMNS) --- */
-        .dashboard-container {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            width: 100%;
-            max-width: 1500px;
-            margin-top: 20px; 
-            z-index: 2;
-        }
-
-        @media (max-width: 1024px) {
-            .dashboard-container { flex-direction: column; align-items: center; }
-        }
+        /* --- DASHBOARD LAYOUT --- */
+        .dashboard-container { display: flex; flex-direction: row; gap: 20px; width: 100%; max-width: 1500px; margin-top: 20px; z-index: 2; }
+        @media (max-width: 1024px) { .dashboard-container { flex-direction: column; align-items: center; } }
 
         /* --- CYBER PANEL BASE --- */
         .cyber-panel {
-            background: var(--box-bg); border-radius: 4px; padding: 30px; 
-            box-sizing: border-box; box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            background: var(--box-bg); border-radius: 4px; padding: 30px; box-sizing: border-box; box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
             position: relative; overflow: hidden; border: 1px solid rgba(0, 255, 0, 0.1);
         }
-        .cyber-panel::before { content: ''; position: absolute; height: 150%; width: 150%; background: conic-gradient(#00ff00 10deg, transparent 90deg); top: -25%; left: -25%; animation: rotate 4s linear infinite; z-index: 0; opacity: 0.5; }
+        .cyber-panel::before { content: ''; position: absolute; height: 150%; width: 150%; background: conic-gradient(var(--hacker-green) 10deg, transparent 90deg); top: -25%; left: -25%; animation: rotate 4s linear infinite; z-index: 0; opacity: 0.5; }
         .cyber-panel::after { content: ''; position: absolute; background: var(--box-bg); inset: 2px; border-radius: 2px; z-index: 1; }
         .cyber-panel > * { position: relative; z-index: 2; }
 
         /* --- SIDEBAR MANUAL --- */
-        .sidebar {
-            width: 350px;
-            flex-shrink: 0;
-            height: fit-content;
-        }
+        .sidebar { width: 350px; flex-shrink: 0; height: fit-content; }
         @media (max-width: 1024px) { .sidebar { width: 100%; max-width: 1100px; order: 2; } }
         
-        /* --- BRAND LOGO STYLES (MAGIC GREEN FORMULA) --- */
-        .brand-logo-container {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 1px dashed var(--hacker-green-dim);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .brand-logo {
-            max-width: 190px;
-            width: 100%;
-            height: auto;
-            /* Formula membuang background putih & tukar warna biru ke hijau neon */
-            filter: invert(1) hue-rotate(85deg) saturate(5) brightness(1.5);
-            mix-blend-mode: screen; 
-            transition: all 0.3s ease;
-        }
-        .brand-logo:hover {
-            filter: invert(1) hue-rotate(85deg) saturate(6) brightness(2) drop-shadow(0 0 15px rgba(0,255,0,0.8));
-            transform: scale(1.03);
-        }
-        .brand-subtext {
-            font-size: 9px;
-            color: var(--hacker-green);
-            letter-spacing: 2px;
-            margin-top: 10px;
-            text-transform: uppercase;
-            animation: blinker 2s infinite;
-        }
+        .brand-logo-container { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--hacker-green-dim); display: flex; flex-direction: column; align-items: center; }
+        .brand-logo { max-width: 190px; width: 100%; height: auto; filter: invert(1) hue-rotate(85deg) saturate(5) brightness(1.5); mix-blend-mode: screen; transition: all 0.3s ease; cursor: pointer;}
+        .brand-logo:hover { filter: invert(1) hue-rotate(85deg) saturate(6) brightness(2) drop-shadow(0 0 15px rgba(0,255,0,0.8)); transform: scale(1.03); }
+        .brand-subtext { font-size: 9px; color: var(--hacker-green); letter-spacing: 2px; margin-top: 10px; text-transform: uppercase; animation: blinker 2s infinite; }
 
         .manual-title { border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 10px; margin-bottom: 15px; color: #fff; display: flex; justify-content: space-between; align-items: center;}
         
@@ -143,14 +143,9 @@
         .doc-item { margin-bottom: 15px; border-left: 2px solid var(--hacker-green-dim); padding-left: 10px; animation: slideIn 0.3s ease; display: none; }
         .doc-item.active { display: block; }
         .doc-cmd { font-weight: bold; color: #fff; margin-bottom: 6px; font-size: 13px; text-shadow: 0 0 5px rgba(255,255,255,0.2); }
-        
-        .lang-content { display: none; }
-        .lang-content.active-lang { display: block; }
-
+        .lang-content { display: none; } .lang-content.active-lang { display: block; }
         .doc-desc { font-size: 11px; color: #aaa; line-height: 1.6; margin-bottom: 10px; text-transform: none; }
-        .doc-desc ul { margin-top: 5px; padding-left: 15px; }
-        .doc-desc li { margin-bottom: 5px; }
-        
+        .doc-desc ul { margin-top: 5px; padding-left: 15px; } .doc-desc li { margin-bottom: 5px; }
         .doc-warn { color: var(--danger); font-size: 9px; margin-top: 25px; font-weight: bold; border-top: 1px dashed #333; padding-top: 10px;}
 
         /* --- MAIN TERMINAL BOX --- */
@@ -158,22 +153,24 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--hacker-green-dim); padding-bottom: 10px;}
         .header-top h2::before { content: '$ '; color: #fff; } label::before { content: '> '; color: #fff; }
 
-        /* --- REKAAN TABS (GRID SYSTEM 4x2 + 1) --- */
+        /* --- REKAAN TABS --- */
         .tabs-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 25px; border-bottom: 1px dashed var(--hacker-green-dim); padding-bottom: 20px; font-family: monospace;}
         @media (max-width: 1200px) { .tabs-container { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 768px) { .tabs-container { grid-template-columns: repeat(2, 1fr); } }
 
         .tab-btn { background: #050505; border: 1px solid #333; padding: 12px 10px; font-size: 11px; font-weight: 600; color: #888; cursor: crosshair; border-radius: 2px; transition: all 0.2s ease; white-space: nowrap; text-align: center; letter-spacing: 0.5px;}
         .tab-btn:hover { background: #111; color: #fff !important; border-color: var(--hacker-green-dim); box-shadow: 0 0 8px rgba(0,255,0,0.1); }
-        .tab-btn.active { border-color: var(--hacker-green) !important; color: var(--hacker-green) !important; background: #001f00; box-shadow: inset 0 0 10px rgba(0,255,0,0.1), 0 0 5px rgba(0,255,0,0.2); text-shadow: 0 0 5px rgba(0,255,0,0.3); }
+        .tab-btn.active { border-color: var(--hacker-green) !important; color: var(--hacker-green) !important; background: rgba(0, 255, 0, 0.05); box-shadow: inset 0 0 10px rgba(0,255,0,0.1), 0 0 5px rgba(0,255,0,0.2); text-shadow: 0 0 5px rgba(0,255,0,0.3); }
+        
+        #hiddenGodTabBtn { display: none; border-color: #ff003c; color: #ff003c; animation: neonFlicker 2s infinite; font-weight: 800; grid-column: span 2; }
         
         .tab-content { display: none; } .tab-content.active { display: block; animation: slideIn 0.2s ease; }
 
         /* --- FORM ELEMENTS --- */
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: 700; font-size: 10px; margin-bottom: 6px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8;}
-        input, select { width: 100%; padding: 10px 14px; border: 1px solid var(--hacker-green-dim); border-radius: 2px; font-size: 13px; font-family: 'Fira Code', monospace; box-sizing: border-box; background-color: #000; color: #00FF00; cursor: crosshair;}
-        input:focus, select:focus { outline: none; border-color: var(--hacker-green); box-shadow: var(--border-glow); } input::placeholder { color: #005500; font-size: 11px;}
+        input, select { width: 100%; padding: 10px 14px; border: 1px solid var(--hacker-green-dim); border-radius: 2px; font-size: 13px; font-family: 'Fira Code', monospace; box-sizing: border-box; background-color: #000; color: var(--hacker-green); cursor: crosshair;}
+        input:focus, select:focus { outline: none; border-color: var(--hacker-green); box-shadow: var(--border-glow); } input::placeholder { color: rgba(0,255,0,0.3); font-size: 11px;}
         
         .cv-container { background: #000; border: 1px solid var(--hacker-green-dim); border-radius: 2px; padding: 20px; margin-bottom: 20px; display: none; }
         .cv-header-title { font-size: 10px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
@@ -206,9 +203,21 @@
         .hc-card-input { width: 100%; padding: 4px; font-size: 11px; text-align: center; background: #000; color: #fff; border: 1px solid #333; }
         .hc-card-input:focus { border-color: var(--hacker-green); outline: none; }
 
+        /* --- SECRET AI TERMINAL STYLES (GEMINI INTEGRATION) --- */
+        .ai-terminal-box { background: #000; border: 1px solid #ff003c; border-radius: 2px; padding: 20px; height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px; color: #ff003c; box-shadow: inset 0 0 20px rgba(255,0,60,0.1); margin-bottom: 15px; position: relative;}
+        .ai-terminal-box::-webkit-scrollbar { width: 5px; } .ai-terminal-box::-webkit-scrollbar-thumb { background: #ff003c; }
+        .ai-log { margin-bottom: 12px; line-height: 1.6; text-shadow: 0 0 3px rgba(255,0,60,0.5); white-space: pre-wrap; word-wrap: break-word;}
+        .ai-log.system { color: #ccc; opacity: 0.8; font-style: italic; }
+        .ai-log.gemini-reply { color: #fff; border-left: 2px solid #ff003c; padding-left: 10px; }
+        .ai-input-wrapper { display: flex; align-items: center; gap: 10px; border-top: 1px dashed #ff003c; padding-top: 15px; margin-top: 10px;}
+        .ai-input-wrapper span { color: #fff; font-weight: bold; }
+        #aiCommandInput { flex: 1; background: transparent; border: none; color: #ff003c; font-size: 14px; font-family: monospace; text-shadow: 0 0 5px rgba(255,0,60,0.5); }
+        #aiCommandInput:focus { outline: none; box-shadow: none; border: none; }
+        .ai-glitch-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,0,60,0.1) 2px, rgba(255,0,60,0.1) 4px); pointer-events: none; z-index: 10; opacity: 0.5;}
+
         /* --- BUTTONS --- */
-        .btn-primary { width: 100%; padding: 14px; background-color: #001f00; color: #00FF00; border: 1px solid var(--hacker-green); border-radius: 2px; font-size: 13px; font-weight: 600; cursor: crosshair; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
-        .btn-primary:hover { background-color: #00FF00; color: #000; box-shadow: var(--border-glow); transform: translateY(-1px); }
+        .btn-primary { width: 100%; padding: 14px; background-color: rgba(0,31,0,0.8); color: var(--hacker-green); border: 1px solid var(--hacker-green); border-radius: 2px; font-size: 13px; font-weight: 600; cursor: crosshair; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; }
+        .btn-primary:hover { background-color: var(--hacker-green); color: #000; box-shadow: var(--border-glow); transform: translateY(-1px); }
         .btn-admin { padding: 8px 12px; font-size: 11px; font-weight: 600; background-color: transparent; color: #CCCCCC; border: 1px solid #444; border-radius: 2px; cursor: crosshair; text-transform: uppercase;}
         .btn-admin:hover { background-color: #111; color: #fff; border-color: var(--hacker-green-dim); }
         .btn-danger { background-color: #111; color: var(--danger); border: 1px solid var(--danger); padding: 6px 10px; border-radius: 2px; cursor: crosshair; font-size: 10px; font-weight: bold;}
@@ -264,7 +273,7 @@
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
         .toast { background: #000; border: 1px solid var(--hacker-green); border-left: 4px solid var(--hacker-green); padding: 15px 20px; border-radius: 2px; margin-top: 10px; box-shadow: var(--border-glow); font-weight: 600; font-size: 12px; color: #fff; font-family: monospace;}
         
-        /* --- PRINT STYLES (CLEAN FORMAT FOR BOSS) --- */
+        /* --- PRINT STYLES --- */
         @media print { 
             body { background: #fff !important; color: #000 !important; } 
             body::after, #matrixCanvas, #bootScreen, .hero-clock-container, .tabs-container, .header-top button, .form-group, .btn-primary, .btn-add-day, .btn-print, .footer-brand, #adminPanel, .sidebar { display: none !important; } 
@@ -292,23 +301,24 @@
 <div id="bootScreen">
     <div id="bootTextContainer"></div>
     <div class="boot-cursor"></div>
+    <div id="bootLogoContainer">
+        <img src="hl.png" alt="H&L Logo" id="bootLogo">
+        <div id="bootLoaderText">SYSTEM_BOOT: <span id="bootPercent">0</span>%</div>
+        <div id="bootProgressContainer"><div id="bootProgressBar"></div></div>
+    </div>
 </div>
 
 <canvas id="matrixCanvas"></canvas>
 
-<!-- DASHBOARD 2 KOLUM BERSAIZ LEBAR -->
 <div class="dashboard-container">
 
-    <!-- KOLUM KIRI: CLOCK & SYSTEM MANUAL (DYNAMIC) -->
     <div class="cyber-panel sidebar">
         
-        <!-- H&L BRAND LOGO (MAGIC GREEN FORMULA) -->
         <div class="brand-logo-container">
-            <img src="hl.png" alt="H&L Retail Logo" class="brand-logo">
+            <img src="hl.png" alt="H&L Retail Logo" class="brand-logo" id="secretLogoTrigger">
             <div class="brand-subtext">AUTHORIZED HR PERSONNEL ONLY</div>
         </div>
 
-        <!-- HUD CLOCK -->
         <div class="hero-clock-container">
             <div class="hud-top-row">
                 <canvas id="cpuGraph"></canvas>
@@ -318,216 +328,94 @@
             <button class="sound-toggle" onclick="toggleSound()" id="soundBtn">[ SOUND: ON ]</button>
         </div>
 
-        <h3 class="manual-title">
-            <span>[ SYSTEM MANUAL ]</span>
-        </h3>
+        <h3 class="manual-title"><span>[ SYSTEM MANUAL ]</span></h3>
         <div class="lang-switcher" style="margin-bottom: 15px;">
             <button class="lang-btn active" id="btn-lang-ms" onclick="setLang('ms')">MS</button>
             <button class="lang-btn" id="btn-lang-en" onclick="setLang('en')">EN</button>
             <button class="lang-btn" id="btn-lang-zh" onclick="setLang('zh')">中文</button>
         </div>
         
-        <!-- MANUAL: OT CALC -->
         <div id="manual-otTab" class="doc-item active">
             <div class="doc-cmd">$ ot_calc</div>
-            <div class="doc-desc lang-content lang-ms active-lang">
-                Pengiraan bayaran lebih masa (OT) secara automatik.<br>
-                <ul>
-                    <li>Masukkan Gaji Asas.</li>
-                    <li>Pilih jenis kadar OT.</li>
-                    <li>Masukkan durasi bekerja (Minit atau Hari).</li>
-                </ul>
-                Klik <b>Execute</b> untuk jumlah tepat.
-            </div>
-            <div class="doc-desc lang-content lang-en">
-                Automated Overtime (OT) payment calculation.<br>
-                <ul>
-                    <li>Enter Basic Salary.</li>
-                    <li>Select OT rate type.</li>
-                    <li>Enter working duration (Minutes or Days).</li>
-                </ul>
-                Click <b>Execute</b> for the exact amount.
-            </div>
-            <div class="doc-desc lang-content lang-zh">
-                自动计算加班费 (OT)。<br>
-                <ul>
-                    <li>输入基本薪资。</li>
-                    <li>选择加班费率类型。</li>
-                    <li>输入工作时间（分钟或天数）。</li>
-                </ul>
-                点击 <b>Execute</b> 获取准确金额。
-            </div>
+            <div class="doc-desc lang-content lang-ms active-lang">Pengiraan bayaran lebih masa (OT) secara automatik.<br><ul><li>Masukkan Gaji Asas.</li><li>Pilih jenis kadar OT.</li><li>Masukkan durasi bekerja.</li></ul></div>
+            <div class="doc-desc lang-content lang-en">Automated Overtime (OT) payment calculation.<br><ul><li>Enter Basic Salary.</li><li>Select OT rate type.</li><li>Enter working duration.</li></ul></div>
+            <div class="doc-desc lang-content lang-zh">自动计算加班费 (OT)。<br><ul><li>输入基本薪资。</li><li>选择加班费率类型。</li><li>输入工作时间。</li></ul></div>
         </div>
 
-        <!-- MANUAL: ABSENT CALC -->
         <div id="manual-absentTab" class="doc-item">
             <div class="doc-cmd">$ absent_calc</div>
-            <div class="doc-desc lang-content lang-ms active-lang">
-                Enjin tolakan gaji untuk ketidakhadiran staf.<br>
-                <ul>
-                    <li>Masukkan Gaji Asas.</li>
-                    <li>Pilih jenis tolakan (Normal 1x atau Bersambung PH 2x).</li>
-                    <li>Masukkan jumlah hari tidak hadir.</li>
-                </ul>
-            </div>
-            <div class="doc-desc lang-content lang-en">
-                Salary deduction engine for staff absenteeism.<br>
-                <ul>
-                    <li>Enter Basic Salary.</li>
-                    <li>Select deduction type (Normal 1x or PH Linked 2x).</li>
-                    <li>Enter the number of absent days.</li>
-                </ul>
-            </div>
-            <div class="doc-desc lang-content lang-zh">
-                员工缺勤扣薪计算引擎。<br>
-                <ul>
-                    <li>输入基本薪资。</li>
-                    <li>选择扣款类型（普通 1x 或 连公共假期 2x）。</li>
-                    <li>输入缺勤天数。</li>
-                </ul>
-            </div>
+            <div class="doc-desc lang-content lang-ms active-lang">Enjin tolakan gaji untuk ketidakhadiran staf.<br><ul><li>Masukkan Gaji Asas.</li><li>Pilih jenis tolakan.</li><li>Masukkan jumlah hari tidak hadir.</li></ul></div>
+            <div class="doc-desc lang-content lang-en">Salary deduction engine for staff absenteeism.<br><ul><li>Enter Basic Salary.</li><li>Select deduction type.</li><li>Enter absent days.</li></ul></div>
+            <div class="doc-desc lang-content lang-zh">员工缺勤扣薪计算引擎。<br><ul><li>输入基本薪资。</li><li>选择扣款类型。</li><li>输入缺勤天数。</li></ul></div>
         </div>
 
-        <!-- MANUAL: RESIGN CALC -->
         <div id="manual-resignTab" class="doc-item">
             <div class="doc-cmd">$ resign_calc</div>
-            <div class="doc-desc lang-content lang-ms active-lang">
-                Pengiraan penyelesaian berhenti kerja.<br>Kira penalti untuk Notis Singkat (Short Notice) dan juga jumlah penebusan baki Cuti Tahunan (AL Encashment) mengikut divisor harian.
-            </div>
-            <div class="doc-desc lang-content lang-en">
-                Resignation settlement calculation.<br>Calculate penalties for Short Notice and the total encashment for remaining Annual Leave (AL) using the standard daily divisor.
-            </div>
-            <div class="doc-desc lang-content lang-zh">
-                离职结算计算。<br>使用标准每日除数计算短期通知 (Short Notice) 的罚款以及剩余年假 (AL) 的折现总额。
-            </div>
+            <div class="doc-desc lang-content lang-ms active-lang">Pengiraan penyelesaian berhenti kerja.<br>Kira penalti untuk Notis Singkat (Short Notice) dan juga jumlah penebusan baki Cuti Tahunan (AL Encashment).</div>
+            <div class="doc-desc lang-content lang-en">Resignation settlement calculation.<br>Calculate penalties for Short Notice and the total encashment for remaining Annual Leave (AL).</div>
+            <div class="doc-desc lang-content lang-zh">离职结算计算。<br>计算短期通知 (Short Notice) 的罚款以及剩余年假 (AL) 的折现总额。</div>
         </div>
 
-        <!-- MANUAL: DATE UTILITY -->
         <div id="manual-dateTab" class="doc-item">
             <div class="doc-cmd">$ date_utility</div>
-            <div class="doc-desc lang-content lang-ms active-lang">
-                Alat utiliti pengurusan tarikh.<br>
-                <ul>
-                    <li><b>Mod Diff:</b> Mengira jumlah hari sebenar di antara 2 tarikh.</li>
-                    <li><b>Mod Add/Sub:</b> Meramal tarikh hadapan dengan menambah masa.</li>
-                </ul>
-            </div>
-            <div class="doc-desc lang-content lang-en">
-                Date management utility tool.<br>
-                <ul>
-                    <li><b>Diff Mode:</b> Calculates the exact number of days between 2 dates.</li>
-                    <li><b>Add/Sub Mode:</b> Projects future dates by adding or subtracting time.</li>
-                </ul>
-            </div>
-            <div class="doc-desc lang-content lang-zh">
-                日期管理实用工具。<br>
-                <ul>
-                    <li><b>Diff 模式:</b> 计算两个日期之间的确切天数。</li>
-                    <li><b>Add/Sub 模式:</b> 通过加减时间来预测未来的日期。</li>
-                </ul>
-            </div>
+            <div class="doc-desc lang-content lang-ms active-lang">Alat utiliti pengurusan tarikh.<br><ul><li><b>Mod Diff:</b> Mengira jumlah hari sebenar.</li><li><b>Mod Add/Sub:</b> Meramal tarikh hadapan.</li></ul></div>
+            <div class="doc-desc lang-content lang-en">Date management utility tool.<br><ul><li><b>Diff Mode:</b> Calculates exact days.</li><li><b>Add/Sub Mode:</b> Projects future dates.</li></ul></div>
+            <div class="doc-desc lang-content lang-zh">日期管理实用工具。<br><ul><li><b>Diff 模式:</b> 计算确切天数。</li><li><b>Add/Sub 模式:</b> 预测未来日期。</li></ul></div>
         </div>
 
-        <!-- MANUAL: PROTOCOL LOGS -->
         <div id="manual-reminderTab" class="doc-item">
             <div class="doc-cmd">$ protocol_logs</div>
-            <div class="doc-desc lang-content lang-ms active-lang">
-                Diari log dan amaran pintar.<br>Set tarikh peringatan penting. Tandakan <b>"Blast to WA Group"</b> jika anda ingin sistem menghantar mesej amaran secara terus ke kumpulan WhatsApp HR.
-            </div>
-            <div class="doc-desc lang-content lang-en">
-                Smart log and alert diary.<br>Set important reminder dates. Check <b>"Blast to WA Group"</b> if you want the system to send alert messages directly to the HR WhatsApp group.
-            </div>
-            <div class="doc-desc lang-content lang-zh">
-                智能日志和警报日记。<br>设置重要的提醒日期。如果您希望系统直接向 HR WhatsApp 群组发送警报消息，请勾选 <b>"Blast to WA Group"</b>。
-            </div>
+            <div class="doc-desc lang-content lang-ms active-lang">Diari log dan amaran pintar.<br>Set tarikh peringatan penting. Tandakan <b>"Blast to WA Group"</b> untuk mesej kumpulan WhatsApp HR.</div>
+            <div class="doc-desc lang-content lang-en">Smart log and alert diary.<br>Set reminder dates. Check <b>"Blast to WA Group"</b> for HR WhatsApp group alerts.</div>
+            <div class="doc-desc lang-content lang-zh">智能日志和警报日记。<br>设置提醒日期。勾选 <b>"Blast to WA Group"</b> 向 HR WhatsApp 群组发送警报。</div>
         </div>
 
-        <!-- MANUAL: CUSTOM MATH -->
         <div id="manual-customCalcTab" class="doc-item">
             <div class="doc-cmd" style="color: #fff;">🧮 Custom Math</div>
-            <div class="doc-desc lang-content lang-ms active-lang">
-                Enjin formula peribadi anda.<br>Gunakan formula yang anda cipta. Untuk mengubahsuai atau mencipta formula baharu, sila akses menu [ADMIN TERMINAL].
-            </div>
-            <div class="doc-desc lang-content lang-en">
-                Your personalized formula engine.<br>Use the formulas you've created. To modify or create new mathematical formulas, please access the [ADMIN TERMINAL].
-            </div>
-            <div class="doc-desc lang-content lang-zh">
-                您的个性化公式引擎。<br>使用您创建的公式。要修改或创建新的数学公式，请访问 [ADMIN TERMINAL] 菜单。
-            </div>
+            <div class="doc-desc lang-content lang-ms active-lang">Enjin formula peribadi anda.<br>Gunakan formula yang anda cipta di [ADMIN TERMINAL].</div>
+            <div class="doc-desc lang-content lang-en">Your personalized formula engine.<br>Use the formulas created in [ADMIN TERMINAL].</div>
+            <div class="doc-desc lang-content lang-zh">您的个性化公式引擎。<br>使用在 [ADMIN TERMINAL] 中创建的公式。</div>
         </div>
 
-        <!-- MANUAL: PT MATRIX -->
         <div id="manual-ptStaffTab" class="doc-item" style="border-left-color: #d8b4fe;">
             <div class="doc-cmd" style="color: #d8b4fe;">$ pt_matrix</div>
-            <div class="doc-desc lang-content lang-ms active-lang">
-                Pangkalan Data Staf Part-Time.<br>
-                <ul>
-                    <li>Daftar info staf & tarikh tamat kontrak (Mesej amaran auto diaktifkan).</li>
-                    <li>Pantau bar kemajuan Onboarding.</li>
-                    <li>Tick status dokumen terus dari jadual.</li>
-                </ul>
-            </div>
-            <div class="doc-desc lang-content lang-en">
-                Part-Time Staff Database.<br>
-                <ul>
-                    <li>Register staff info & contract end date (Auto alert message activated).</li>
-                    <li>Monitor Onboarding progress bar.</li>
-                    <li>Tick document status directly from the table.</li>
-                </ul>
-            </div>
-            <div class="doc-desc lang-content lang-zh">
-                兼职员工数据库。<br>
-                <ul>
-                    <li>注册员工信息和合同结束日期（激活自动警报消息）。</li>
-                    <li>监控入职 (Onboarding) 进度条。</li>
-                    <li>直接从表格中勾选文件状态。</li>
-                </ul>
-            </div>
+            <div class="doc-desc lang-content lang-ms active-lang">Pangkalan Data Staf Part-Time.<br>Pantau bar kemajuan Onboarding & tarikh kontrak.</div>
+            <div class="doc-desc lang-content lang-en">Part-Time Staff Database.<br>Monitor Onboarding progress & contract dates.</div>
+            <div class="doc-desc lang-content lang-zh">兼职员工数据库。<br>监控入职进度和合同日期。</div>
         </div>
 
-        <!-- MANUAL: HEADCOUNT RADAR -->
         <div id="manual-headcountTab" class="doc-item" style="border-left-color: #3b82f6;">
             <div class="doc-cmd" style="color: #93c5fd;">$ manpower_radar</div>
-            <div class="doc-desc lang-content lang-ms active-lang">
-                Pemantauan Kuota Pekerja.<br>Tambah cawangan (Outlet) dan posisi pekerja. Sistem akan mengira keseimbangan secara langsung. Kotak MERAH bermaksud staf tidak mencukupi (Shortage).
-            </div>
-            <div class="doc-desc lang-content lang-en">
-                Workforce Quota Monitoring.<br>Add branches (Outlets) and job positions. The system computes the balance in real-time. A RED box indicates insufficient staff (Shortage).
-            </div>
-            <div class="doc-desc lang-content lang-zh">
-                员工配额监控。<br>添加分店 (Outlets) 和职位。系统实时计算平衡。红框表示人员不足 (Shortage)。
-            </div>
+            <div class="doc-desc lang-content lang-ms active-lang">Pemantauan Kuota Pekerja.<br>Kira keseimbangan pekerja secara langsung. Kotak MERAH bermaksud staf tidak mencukupi.</div>
+            <div class="doc-desc lang-content lang-en">Workforce Quota Monitoring.<br>Computes balance in real-time. A RED box indicates insufficient staff.</div>
+            <div class="doc-desc lang-content lang-zh">员工配额监控。<br>实时计算平衡。红框表示人员不足。</div>
         </div>
 
-        <!-- MANUAL: MANPOWER REPORT -->
         <div id="manual-reportTab" class="doc-item" style="border-left-color: #fde047;">
             <div class="doc-cmd" style="color: #fde047;">$ manpower_report</div>
-            <div class="doc-desc lang-content lang-ms active-lang">
-                Laporan Eksekutif Manpower.<br>
-                Paparan ringkasan keseluruhan data dari Manpower Radar. Dirumus khas dengan jadual yang kemas untuk dicetak dan dibentangkan kepada pihak pengurusan.
-            </div>
-            <div class="doc-desc lang-content lang-en">
-                Executive Manpower Report.<br>
-                A comprehensive summary view of all data from the Manpower Radar. Specially formatted with clean tables, ideal for printing and management presentations.
-            </div>
-            <div class="doc-desc lang-content lang-zh">
-                人力资源执行报告。<br>
-                汇总来自 Manpower Radar 的所有数据。采用整洁的表格格式，非常适合打印并向管理层汇报。
+            <div class="doc-desc lang-content lang-ms active-lang">Laporan Eksekutif Manpower.<br>Paparan ringkasan keseluruhan data dari Manpower Radar untuk dicetak.</div>
+            <div class="doc-desc lang-content lang-en">Executive Manpower Report.<br>A comprehensive summary view of all data from the Manpower Radar.</div>
+            <div class="doc-desc lang-content lang-zh">人力资源执行报告。<br>汇总来自 Manpower Radar 的所有数据。</div>
+        </div>
+
+        <div id="manual-godModeTab" class="doc-item" style="border-left-color: #ff003c;">
+            <div class="doc-cmd" style="color: #ff003c;">$ omniscient_core (GEMINI)</div>
+            <div class="doc-desc lang-content lang-ms active-lang" style="color: #ccc;">
+                <b>GHOST PROTOCOL ACTIVATED.</b><br>
+                Terminal ini diintegrasikan secara terus dengan <b>Google Gemini AI</b>.<br><br>
+                Anda boleh bertanya apa sahaja, suruh dia tulis skrip korporat untuk Kin, minta kod Python, atau tanya tentang motosikal R25. AI ini hidup.
             </div>
         </div>
 
-        <!-- PERSISTENT FOOTER -->
         <div class="doc-warn">> Akses Formula Baharu: Buka [ADMIN TERMINAL] (Code: admin123)</div>
     </div>
 
-    <!-- KOLUM KANAN: MAIN TERMINAL -->
     <div class="cyber-panel main-terminal">
         <div class="header-top">
             <h2>Cyber HR Terminal</h2>
             <button class="btn-admin" onclick="openAdminModal()">⚙️ ADMIN TERMINAL</button>
         </div>
 
-        <!-- TABS CONTAINER DENGAN REKAAN GRID KEMAS -->
         <div class="tabs-container">
             <button class="tab-btn active" onclick="switchTab('otTab', this)">$ ot_calc</button>
             <button class="tab-btn" onclick="switchTab('absentTab', this)">$ absent_calc</button>
@@ -538,6 +426,8 @@
             <button class="tab-btn" onclick="switchTab('ptStaffTab', this)" style="color: #d8b4fe;">$ pt_matrix</button>
             <button class="tab-btn" onclick="switchTab('headcountTab', this)" style="color: #93c5fd;">$ manpower_radar</button>
             <button class="tab-btn" onclick="switchTab('reportTab', this)" style="color: #fde047;">$ manpower_report</button>
+            
+            <button class="tab-btn" id="hiddenGodTabBtn" onclick="switchTab('godModeTab', this)">[ 👁️ GEMINI CORE ]</button>
         </div>
         
         <div id="otTab" class="tab-content active">
@@ -570,7 +460,7 @@
         <div id="customCalcTab" class="tab-content">
             <div class="form-group"><label>Select Custom Engine</label><select id="cstType" class="custom-select-box" onchange="handleCustomSelection()"><option value="">-- No Engines Synced --</option></select></div>
             <div id="cvContainer" class="cv-container"><div class="cv-header-title">🎛️ Dynamic Inputs</div><div class="cv-grid" id="cvDynamicGrid"></div></div>
-            <button class="btn-primary" onclick="calculateCustomDynamic()">Execute Protocol</button>
+            <button class="btn-primary" id="btnCalculateCustom" onclick="calculateCustomDynamic()">Execute Protocol</button>
             <div class="result-wrapper custom"><div class="result-label">Generated Output</div><div class="result-value"><span id="cstUnitFront" class="result-unit-text" style="display:none;"></span><span id="resultDisplayCst">0</span><span id="cstUnitBack" class="result-unit-text" style="display:none;"></span></div><button class="btn-print" onclick="window.print()">[ PRINT DOSSIER ]</button></div>
         </div>
 
@@ -613,8 +503,7 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="ptStaffTableBody">
-                        </tbody>
+                    <tbody id="ptStaffTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -636,10 +525,7 @@
             </div>
 
             <button class="btn-add-day" style="border-color: #3b82f6; color: #93c5fd;" onclick="addHCOutlet()">+ INITIALIZE NEW OUTLET ZONE</button>
-            
-            <div class="hc-outlets-grid" id="hcOutletsContainer">
-                <!-- Kad Outlet akan di-render di sini -->
-            </div>
+            <div class="hc-outlets-grid" id="hcOutletsContainer"></div>
         </div>
 
         <div id="reportTab" class="tab-content">
@@ -647,11 +533,7 @@
                 <h3 style="color:#fde047;">EXECUTIVE MANPOWER REPORT</h3>
                 <button class="btn-print" style="width:auto; padding:8px 15px; border-color:#fde047; color:#fde047;" onclick="window.print()">[ 🖨️ PRINT REPORT ]</button>
             </div>
-            
-            <div class="hc-dashboard" id="reportSummaryCards" style="margin-top: 20px;">
-                <!-- Summary cards generated by JS -->
-            </div>
-
+            <div class="hc-dashboard" id="reportSummaryCards" style="margin-top: 20px;"></div>
             <div class="db-table-wrapper" style="max-height: 600px;">
                 <table class="db-table">
                     <thead>
@@ -664,9 +546,7 @@
                             <th style="text-align:center;">STATUS</th>
                         </tr>
                     </thead>
-                    <tbody id="reportTableBody">
-                        <!-- Auto-Generated Report Rows -->
-                    </tbody>
+                    <tbody id="reportTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -693,6 +573,27 @@
             <div class="calendar-layout"><div class="task-list-box"><h3>Active Logs</h3><div id="taskListDisplay"></div></div><div class="calendar-box"><div class="cal-header"><button class="cal-nav-btn" onclick="changeMonth(-1)">&lt;</button><span id="calMonthYearDisplay"></span><button class="cal-nav-btn" onclick="changeMonth(1)">&gt;</button></div><div class="cal-grid" id="calGrid"></div></div></div>
         </div>
 
+        <div id="godModeTab" class="tab-content">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:center;">
+                <h3 style="color:#ff003c; text-shadow: 0 0 10px #ff003c; margin:0;">GEMINI NEURAL CORE</h3>
+                <input type="password" id="geminiApiKey" placeholder="AQ.Ab8RN6L07Wevx-y5kCiA1I0LtK4CGp962_E3fzdDvhg_ZaFYYA" style="width:200px; padding:5px; border-color:#ff003c; color:#ff003c; font-size:10px;">
+            </div>
+            
+            <div class="ai-terminal-box" id="aiTerminalWindow">
+                <div class="ai-glitch-overlay"></div>
+                <div id="aiTerminalOutput">
+                    <div class="ai-log system">> INITIALIZING GEMINI CONNECTION...</div>
+                    <div class="ai-log system">> Please ensure your API Key is inserted above. Get a free key at aistudio.google.com if you don't have one.</div>
+                    <div class="ai-log success">> HELLO NOEL ETHAN. I AM READY. WHAT DO YOU REQUIRE?</div>
+                </div>
+            </div>
+
+            <div class="ai-input-wrapper">
+                <span>user@ethan:~#</span>
+                <input type="text" id="aiCommandInput" placeholder="Ask Gemini anything..." autocomplete="off">
+            </div>
+        </div>
+
         <div id="adminPanel">
             <div class="admin-header"><h3>CYBER_ENGINE V9.4</h3><button class="btn-primary" onclick="addNewCustomFormula()" style="width:auto; padding: 8px 15px; font-size:11px; background:#111;">+ Add Engine</button></div>
             <div class="formula-grid" id="adminFormulasRender"></div>
@@ -700,9 +601,8 @@
         </div>
 
         <div class="footer-brand">PROTOCOL MAINTAINED BY NoelEthan.exe</div>
-    </div> <!-- END MAIN TERMINAL -->
-    
-</div> <!-- END DASHBOARD CONTAINER -->
+    </div> 
+</div> 
 
 <div class="modal-overlay" id="authModal"><div class="modal-content"><h3>Terminal Access</h3><input type="password" id="adminPassword" placeholder="Code..."><button class="btn-primary" onclick="verifyAdmin()" style="margin-top:15px;">Unlock</button><button class="btn-admin" onclick="document.getElementById('authModal').classList.remove('active')" style="width:100%; margin-top:10px;">Cancel</button></div></div>
 <div class="toast-container" id="toastContainer"></div>
@@ -712,11 +612,8 @@
     let currentLang = 'ms';
     function setLang(lang) {
         currentLang = lang;
-        // Update Buttons
         document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById('btn-lang-' + lang).classList.add('active');
-        
-        // Update Text Content
         document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active-lang'));
         document.querySelectorAll('.lang-' + lang).forEach(el => el.classList.add('active-lang'));
         playTone(1800, 'sine', 0.05, 0.1);
@@ -738,7 +635,7 @@
         if(e.target.classList.contains('btn-primary')) { playTone(600, 'sawtooth', 0.1, 0.2); setTimeout(()=>playTone(900, 'sawtooth', 0.2, 0.2), 100); }
     });
 
-    // --- BOOT UP SEQUENCE ---
+    // --- BOOT UP SEQUENCE WITH PROGRESS ---
     const bootLines = [
         "SYS_MEM: 640K OK", "ESTABLISHING SECURE CONNECTION...", "HANDSHAKE ACCEPTED.",
         "LOADING KERNEL MODULES... OK", "BYPASSING SECURITY PROTOCOL... OK",
@@ -747,7 +644,18 @@
     function runBootSequence() {
         const container = document.getElementById('bootTextContainer');
         const bootScreen = document.getElementById('bootScreen');
+        const loaderText = document.getElementById('bootLoaderText'); 
+        const bootPercent = document.getElementById('bootPercent'); 
+        const bootProgressBar = document.getElementById('bootProgressBar');
         let delay = 0;
+        let progress = 0;
+        let progressInterval = setInterval(() => {
+            progress += Math.floor(Math.random() * 5) + 1;
+            if(progress >= 99) progress = 99;
+            bootPercent.innerText = progress;
+            bootProgressBar.style.width = progress + '%';
+        }, 50);
+
         bootLines.forEach((line, index) => {
             setTimeout(() => {
                 const div = document.createElement('div'); div.className = 'boot-line'; div.innerText = '> ' + line;
@@ -755,24 +663,38 @@
             }, delay);
             delay += Math.random() * 400 + 200;
         });
+
         setTimeout(() => {
-            bootScreen.style.opacity = '0';
-            setTimeout(() => bootScreen.style.display = 'none', 500);
-            playTone(400, 'sine', 0.5, 0.3);
+            clearInterval(progressInterval);
+            bootPercent.innerText = '100'; bootProgressBar.style.width = '100%';
+            loaderText.style.animation = "blinker 0.15s infinite";
+            setTimeout(() => { bootScreen.style.opacity = '0'; setTimeout(() => bootScreen.style.display = 'none', 500); playTone(400, 'sine', 0.5, 0.3); }, 600);
         }, delay + 800);
     }
 
     // --- CYBER CROSSHAIR & GRAPH ---
     document.addEventListener('mousemove', (e) => { const trail = document.createElement('div'); trail.className = 'cursor-trail'; trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; document.body.appendChild(trail); setTimeout(() => trail.remove(), 500); });
     const graphCanvas = document.getElementById('cpuGraph'); const gCtx = graphCanvas.getContext('2d'); let graphData = Array(30).fill(10);
-    function initGraph() { graphData.push(Math.random() * 20 + 5); graphData.shift(); gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height); gCtx.beginPath(); gCtx.strokeStyle = '#00FF00'; gCtx.lineWidth = 1; for(let i=0; i<graphData.length; i++) { let x = i * (graphCanvas.width / graphData.length); let y = graphCanvas.height - graphData[i]; if(i===0) gCtx.moveTo(x, y); else gCtx.lineTo(x, y); } gCtx.stroke(); requestAnimationFrame(initGraph); }
+    function initGraph() { 
+        graphData.push(Math.random() * 20 + 5); graphData.shift(); 
+        gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height); gCtx.beginPath(); 
+        gCtx.strokeStyle = document.body.classList.contains('god-mode') ? '#ff003c' : '#00FF00'; 
+        gCtx.lineWidth = 1; 
+        for(let i=0; i<graphData.length; i++) { let x = i * (graphCanvas.width / graphData.length); let y = graphCanvas.height - graphData[i]; if(i===0) gCtx.moveTo(x, y); else gCtx.lineTo(x, y); } gCtx.stroke(); requestAnimationFrame(initGraph); 
+    }
 
     // --- MATRIX DIGITAL RAIN ---
+    const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
     function initMatrix() {
-        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()"; const charsArray = matrixChars.split("");
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const charsArray = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()".split("");
         const fontSize = 14; const columns = canvas.width / fontSize; const drops = []; for(let x = 0; x < columns; x++) drops[x] = 1;
-        setInterval(() => { ctx.fillStyle = "rgba(5, 5, 5, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = "#00FF00"; ctx.font = fontSize + "px monospace"; for(let i = 0; i < drops.length; i++) { ctx.fillText(charsArray[Math.floor(Math.random() * charsArray.length)], i * fontSize, drops[i] * fontSize); if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; } }, 35);
+        setInterval(() => { 
+            ctx.fillStyle = "rgba(5, 5, 5, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height); 
+            ctx.fillStyle = document.body.classList.contains('god-mode') ? "#ff003c" : "#00FF00"; 
+            ctx.font = fontSize + "px monospace"; 
+            for(let i = 0; i < drops.length; i++) { ctx.fillText(charsArray[Math.floor(Math.random() * charsArray.length)], i * fontSize, drops[i] * fontSize); if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; } 
+        }, 35);
         window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
     }
 
@@ -786,26 +708,17 @@
 
     function switchTab(tabId, btnElement) { 
         activeTabId = tabId; 
-        
-        // Handle Tab Button Highlight
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-        btnElement.classList.add('active'); 
-        
-        // Handle Tab Content Display
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
-        document.getElementById(tabId).classList.add('active'); 
-        
-        // Handle DYNAMIC MANUAL DISPLAY
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btnElement.classList.add('active'); 
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); 
         document.querySelectorAll('.doc-item').forEach(doc => doc.classList.remove('active'));
-        const activeManual = document.getElementById('manual-' + tabId);
-        if(activeManual) activeManual.classList.add('active');
+        const activeManual = document.getElementById('manual-' + tabId); if(activeManual) activeManual.classList.add('active');
 
-        // Specific Tab Render Functions
         if (tabId === 'reminderTab') renderCalendar(); 
         if (tabId === 'customCalcTab') { populateCustomDropdown(); handleCustomSelection(); } 
         if (tabId === 'ptStaffTab') renderPtStaffTable(); 
         if (tabId === 'headcountTab') renderHeadcount(); 
         if (tabId === 'reportTab') renderManpowerReport();
+        if (tabId === 'godModeTab') document.getElementById('aiCommandInput').focus();
     }
     
     function addRow(mode) { const c = document.getElementById(mode + 'Container'); const r = document.createElement('div'); r.className = 'dynamic-row'; r.innerHTML = `<input type="number" class="${mode}-input" placeholder="Value..."><button class="btn-remove-day" onclick="this.parentElement.remove();">×</button>`; c.appendChild(r); }
@@ -991,51 +904,15 @@
         document.getElementById('hcTotalActive').innerText = globalActive;
         document.getElementById('hcTotalShort').innerText = globalShort;
         
-        // Auto-update report if tab is currently open
         if(activeTabId === 'reportTab') renderManpowerReport();
     }
 
-    function addHCOutlet() {
-        let name = prompt("Masukkaan nama Outlet baru (Cth: BINTULU):");
-        if(name && name.trim() !== "") {
-            hcDB.push({ id: Date.now(), name: name.toUpperCase(), roles: [] });
-            saveHC(); showToast(`Outlet [${name.toUpperCase()}] Added.`);
-        }
-    }
-
-    function deleteHCOutlet(id) {
-        if(confirm("Adakah anda pasti untuk memadam outlet ini sepenuhnya?")) {
-            hcDB = hcDB.filter(o => o.id !== id); saveHC(); showToast("Outlet Purged.", "error");
-        }
-    }
-
-    function addHCRole(outletId) {
-        let role = prompt("Masukkan Department/Peranan baru (Cth: PROMOTER):");
-        if(role && role.trim() !== "") {
-            let outlet = hcDB.find(o => o.id === outletId);
-            if(outlet) { outlet.roles.push({ role: role.toUpperCase(), target: 0, active: 0 }); saveHC(); }
-        }
-    }
-
-    function updateHCRole(outletId, roleIndex, field, value) {
-        let outlet = hcDB.find(o => o.id === outletId);
-        if(outlet && outlet.roles[roleIndex]) {
-            outlet.roles[roleIndex][field] = parseInt(value) || 0;
-            saveHC(); 
-        }
-    }
-
-    function deleteHCRole(outletId, roleIndex) {
-        if(confirm("Padam department ini?")) {
-            let outlet = hcDB.find(o => o.id === outletId);
-            if(outlet) { outlet.roles.splice(roleIndex, 1); saveHC(); }
-        }
-    }
-
-    function saveHC() {
-        localStorage.setItem('hrHeadcountRadarDB', JSON.stringify(hcDB));
-        renderHeadcount();
-    }
+    function addHCOutlet() { let name = prompt("Masukkaan nama Outlet baru (Cth: BINTULU):"); if(name && name.trim() !== "") { hcDB.push({ id: Date.now(), name: name.toUpperCase(), roles: [] }); saveHC(); showToast(`Outlet [${name.toUpperCase()}] Added.`); } }
+    function deleteHCOutlet(id) { if(confirm("Adakah anda pasti untuk memadam outlet ini sepenuhnya?")) { hcDB = hcDB.filter(o => o.id !== id); saveHC(); showToast("Outlet Purged.", "error"); } }
+    function addHCRole(outletId) { let role = prompt("Masukkan Department/Peranan baru (Cth: PROMOTER):"); if(role && role.trim() !== "") { let outlet = hcDB.find(o => o.id === outletId); if(outlet) { outlet.roles.push({ role: role.toUpperCase(), target: 0, active: 0 }); saveHC(); } } }
+    function updateHCRole(outletId, roleIndex, field, value) { let outlet = hcDB.find(o => o.id === outletId); if(outlet && outlet.roles[roleIndex]) { outlet.roles[roleIndex][field] = parseInt(value) || 0; saveHC(); } }
+    function deleteHCRole(outletId, roleIndex) { if(confirm("Padam department ini?")) { let outlet = hcDB.find(o => o.id === outletId); if(outlet) { outlet.roles.splice(roleIndex, 1); saveHC(); } } }
+    function saveHC() { localStorage.setItem('hrHeadcountRadarDB', JSON.stringify(hcDB)); renderHeadcount(); }
 
     // --- MANPOWER EXECUTIVE REPORT ---
     function renderManpowerReport() {
@@ -1047,93 +924,33 @@
             return;
         }
 
-        let globalTarget = 0;
-        let globalActive = 0;
-        let globalShort = 0;
-        let htmlRows = '';
+        let globalTarget = 0; let globalActive = 0; let globalShort = 0; let htmlRows = '';
 
         hcDB.forEach(outlet => {
-            if (outlet.roles.length === 0) {
-                htmlRows += `
-                    <tr>
-                        <td style="font-weight:bold; color:#93c5fd; border-right:1px solid #222;">${outlet.name}</td>
-                        <td colspan="5" style="text-align:center; color:#555;">NO DEPARTMENTS CONFIGURED</td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            let outletTarget = 0;
-            let outletActive = 0;
+            if (outlet.roles.length === 0) { htmlRows += `<tr><td style="font-weight:bold; color:#93c5fd; border-right:1px solid #222;">${outlet.name}</td><td colspan="5" style="text-align:center; color:#555;">NO DEPARTMENTS CONFIGURED</td></tr>`; return; }
+            let outletTarget = 0; let outletActive = 0;
 
             outlet.roles.forEach((r, idx) => {
-                let target = parseInt(r.target) || 0;
-                let active = parseInt(r.active) || 0;
-                let variance = active - target; 
-                
-                outletTarget += target;
-                outletActive += active;
+                let target = parseInt(r.target) || 0; let active = parseInt(r.active) || 0; let variance = active - target; 
+                outletTarget += target; outletActive += active;
                 
                 let varText = variance < 0 ? `${variance}` : `+${variance}`;
                 let varColor = variance < 0 ? 'var(--danger)' : (variance === 0 ? '#fff' : 'var(--hacker-green)');
                 let statusText = variance < 0 ? 'SHORTAGE' : (variance === 0 ? 'OPTIMAL' : 'SURPLUS');
                 let statusColor = variance < 0 ? 'var(--danger)' : (variance === 0 ? '#fff' : 'var(--hacker-green)');
 
-                if (idx === 0) {
-                    htmlRows += `
-                        <tr>
-                            <td rowspan="${outlet.roles.length}" style="font-weight:bold; color:#93c5fd; border-right:1px solid #222; vertical-align:top;">${outlet.name}</td>
-                            <td style="color:#ccc; font-weight:bold;">${r.role}</td>
-                            <td style="text-align:center;">${target}</td>
-                            <td style="text-align:center; color:var(--hacker-green); font-weight:bold;">${active}</td>
-                            <td style="text-align:center; color:${varColor}; font-weight:bold;">${varText}</td>
-                            <td style="text-align:center; color:${statusColor}; font-weight:bold;">${statusText}</td>
-                        </tr>
-                    `;
-                } else {
-                    htmlRows += `
-                        <tr>
-                            <td style="color:#ccc; font-weight:bold;">${r.role}</td>
-                            <td style="text-align:center;">${target}</td>
-                            <td style="text-align:center; color:var(--hacker-green); font-weight:bold;">${active}</td>
-                            <td style="text-align:center; color:${varColor}; font-weight:bold;">${varText}</td>
-                            <td style="text-align:center; color:${statusColor}; font-weight:bold;">${statusText}</td>
-                        </tr>
-                    `;
-                }
+                if (idx === 0) { htmlRows += `<tr><td rowspan="${outlet.roles.length}" style="font-weight:bold; color:#93c5fd; border-right:1px solid #222; vertical-align:top;">${outlet.name}</td><td style="color:#ccc; font-weight:bold;">${r.role}</td><td style="text-align:center;">${target}</td><td style="text-align:center; color:var(--hacker-green); font-weight:bold;">${active}</td><td style="text-align:center; color:${varColor}; font-weight:bold;">${varText}</td><td style="text-align:center; color:${statusColor}; font-weight:bold;">${statusText}</td></tr>`; } 
+                else { htmlRows += `<tr><td style="color:#ccc; font-weight:bold;">${r.role}</td><td style="text-align:center;">${target}</td><td style="text-align:center; color:var(--hacker-green); font-weight:bold;">${active}</td><td style="text-align:center; color:${varColor}; font-weight:bold;">${varText}</td><td style="text-align:center; color:${statusColor}; font-weight:bold;">${statusText}</td></tr>`; }
             });
-
-            globalTarget += outletTarget;
-            globalActive += outletActive;
-            if (outletTarget > outletActive) {
-                globalShort += (outletTarget - outletActive);
-            }
+            globalTarget += outletTarget; globalActive += outletActive;
+            if (outletTarget > outletActive) { globalShort += (outletTarget - outletActive); }
         });
 
         tbody.innerHTML = htmlRows;
-
-        // Update Report Summary Cards
-        summaryCards.innerHTML = `
-            <div class="hc-stat-box" style="border-color:#333;">
-                <div class="hc-stat-label">Total Outlets</div>
-                <div class="hc-stat-value">${hcDB.length}</div>
-            </div>
-            <div class="hc-stat-box" style="border-color:#333;">
-                <div class="hc-stat-label">Total Quota</div>
-                <div class="hc-stat-value">${globalTarget}</div>
-            </div>
-            <div class="hc-stat-box" style="border-color:var(--hacker-green);">
-                <div class="hc-stat-label">Total Active</div>
-                <div class="hc-stat-value" style="color:var(--hacker-green);">${globalActive}</div>
-            </div>
-            <div class="hc-stat-box ${globalShort > 0 ? 'danger' : ''}">
-                <div class="hc-stat-label">Total Shortage</div>
-                <div class="hc-stat-value">${globalShort}</div>
-            </div>
-        `;
+        summaryCards.innerHTML = `<div class="hc-stat-box" style="border-color:#333;"><div class="hc-stat-label">Total Outlets</div><div class="hc-stat-value">${hcDB.length}</div></div><div class="hc-stat-box" style="border-color:#333;"><div class="hc-stat-label">Total Quota</div><div class="hc-stat-value">${globalTarget}</div></div><div class="hc-stat-box" style="border-color:var(--hacker-green);"><div class="hc-stat-label">Total Active</div><div class="hc-stat-value" style="color:var(--hacker-green);">${globalActive}</div></div><div class="hc-stat-box ${globalShort > 0 ? 'danger' : ''}"><div class="hc-stat-label">Total Shortage</div><div class="hc-stat-value">${globalShort}</div></div>`;
     }
 
-    // Admin Panel
+    // --- ADMIN PANEL ---
     function openAdminModal() { document.getElementById('authModal').classList.add('active'); document.getElementById('adminPassword').value=''; }
     function verifyAdmin() { if(document.getElementById('adminPassword').value === "admin123") { document.getElementById('authModal').classList.remove('active'); document.getElementById('adminPanel').style.display = 'block'; buildAdminUI(); } else showToast("Unauthorized access", "error"); }
     function addNewCustomFormula() { let newId = 'cst_' + Date.now(); currentFormulas[newId] = { label: "Blank Engine", custom: true, vars: ["Var Alpha", "Var Beta"], expr: "VAL1 + VAL2", unit: "" }; buildAdminUI(); showToast("New Engine initialized."); }
@@ -1154,17 +971,139 @@
         localStorage.setItem('hrFormulasV7', JSON.stringify(currentFormulas)); showToast("Sync Complete."); populateCustomDropdown(); if(activeTabId === 'customCalcTab') handleCustomSelection(); buildAdminUI();
     }
     function populateCustomDropdown() { let select = document.getElementById('cstType'); select.innerHTML = ""; let hasCustom = false; for(let key in currentFormulas) { if(currentFormulas[key].custom) { hasCustom = true; select.innerHTML += `<option value="${key}">${currentFormulas[key].label}</option>`; } } if(!hasCustom) { select.innerHTML = `<option value="">-- No Engines Synced --</option>`; document.getElementById('btnCalculateCustom').disabled = true; } else { document.getElementById('btnCalculateCustom').disabled = false; } }
-    function showToast(msg, type="success") { const c = document.getElementById('toastContainer'); c.innerHTML += `<div class="toast ${type}">[INFO] ${msg}</div>`; setTimeout(() => { if(c.firstChild) c.firstChild.remove(); }, 3000); }
 
-    // Init
+    function showToast(msg, type="success") { 
+        const c = document.getElementById('toastContainer'); 
+        let borderColor = type === 'error' ? '#ff003c' : 'var(--hacker-green)';
+        c.innerHTML += `<div class="toast" style="border-color:${borderColor}; border-left:4px solid ${borderColor};">[INFO] ${msg}</div>`; 
+        setTimeout(() => { if(c.firstChild) c.firstChild.remove(); }, 3000); 
+    }
+
+    // ====================================================================================
+    // 💀 SECRET GEMINI NEURAL CORE (GOD MODE) 💀
+    // ====================================================================================
+    let clickCount = 0; let clickTimer;
+    
+    // Unlock Protocol
+    document.getElementById('secretLogoTrigger').addEventListener('click', () => {
+        clickCount++; clearTimeout(clickTimer); clickTimer = setTimeout(() => { clickCount = 0; }, 1000);
+        if (clickCount === 3) {
+            clickCount = 0;
+            let code = prompt("🚨 UNAUTHORIZED ACCESS DETECTED. ENTER NEURAL OVERRIDE KEY:");
+            if (code === "ETHAN.EXE") { activateGodMode(); } 
+            else if (code !== null) { showToast("ACCESS DENIED. SECURITY PROTOCOL LOGGED.", "error"); playTone(200, 'sawtooth', 0.5, 0.5); }
+        }
+    });
+
+    function activateGodMode() {
+        document.body.classList.add('god-mode');
+        document.getElementById('hiddenGodTabBtn').style.display = 'block';
+        showToast("GHOST PROTOCOL ACTIVATED. MAINFRAME OVERRIDDEN.", "error");
+        playTone(400, 'square', 0.2, 0.5); setTimeout(()=>playTone(300, 'square', 0.4, 0.5), 200);
+    }
+
+    // Gemini API Setup
+    const aiInput = document.getElementById('aiCommandInput');
+    const aiOutput = document.getElementById('aiTerminalOutput');
+    const terminalWindow = document.getElementById('aiTerminalWindow');
+    const apiKeyInput = document.getElementById('geminiApiKey');
+
+    // Load saved API key
+    if(localStorage.getItem('savedGeminiKey')) {
+        apiKeyInput.value = localStorage.getItem('savedGeminiKey');
+    }
+
+    // Save API key on input
+    apiKeyInput.addEventListener('input', (e) => {
+        localStorage.setItem('savedGeminiKey', e.target.value);
+    });
+
+    function addAiLog(text, className = '') {
+        const div = document.createElement('div'); div.className = `ai-log ${className}`; aiOutput.appendChild(div);
+        
+        // Fast print for system/error, Typewriter for Gemini reply
+        if(className === 'system' || className === 'error') {
+            div.innerHTML = text;
+            terminalWindow.scrollTop = terminalWindow.scrollHeight;
+        } else {
+            let i = 0; div.innerHTML = '';
+            function typeWriter() {
+                if (i < text.length) {
+                    div.innerHTML += text.charAt(i); i++;
+                    terminalWindow.scrollTop = terminalWindow.scrollHeight;
+                    setTimeout(typeWriter, 10);
+                }
+            }
+            typeWriter();
+        }
+    }
+
+    // Process chat to Gemini API
+    async function sendToGemini(text) {
+        const apiKey = apiKeyInput.value.trim();
+        if(!apiKey) {
+            addAiLog("> ERROR: OMNISCIENT CORE (API KEY) MISSING. PLEASE INSERT KEY.", 'error');
+            return;
+        }
+
+        addAiLog("> TRANSMITTING SIGNAL TO GEMINI NEURAL NET...", 'system');
+        
+        try {
+            // Using gemini-1.5-flash as the standard fast/free tier model
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: text }] }]
+                })
+            });
+
+            const data = await response.json();
+            
+            if(data.error) {
+                addAiLog("> API CONNECTION ERROR: " + data.error.message, 'error');
+                return;
+            }
+
+            const reply = data.candidates[0].content.parts[0].text;
+            addAiLog(reply, 'gemini-reply');
+
+        } catch(e) {
+            addAiLog("> FATAL ERROR: " + e.message, 'error');
+        }
+    }
+
+    aiInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            let cmd = this.value.trim();
+            if(cmd === '') return;
+            
+            this.value = '';
+            
+            // Print user command
+            const userDiv = document.createElement('div'); 
+            userDiv.className = 'ai-log'; 
+            userDiv.innerHTML = `<span style="color:#fff;">user@ethan:~#</span> ${cmd}`; 
+            aiOutput.appendChild(userDiv);
+            
+            playTone(1500, 'square', 0.05, 0.1);
+
+            // Handle local clear command, otherwise send to Gemini
+            if(cmd.toLowerCase() === 'clear') {
+                aiOutput.innerHTML = ''; 
+                addAiLog("> TERMINAL CLEARED.", 'system');
+            } else {
+                sendToGemini(cmd);
+            }
+        }
+    });
+
+    // --- INIT ---
     document.addEventListener("DOMContentLoaded", () => {
-        runBootSequence(); 
-        initMatrix(); initGraph();
+        runBootSequence(); initMatrix(); initGraph();
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('diffFrom').value = today; document.getElementById('diffTo').value = today; document.getElementById('addSubFrom').value = today; document.getElementById('taskDate').value = today;
-        populateCustomDropdown(); renderPtStaffTable();
-        renderHeadcount();
-        setLang('ms'); // Set default language
+        populateCustomDropdown(); renderPtStaffTable(); renderHeadcount(); setLang('ms');
     });
 </script>
 
